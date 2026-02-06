@@ -1,0 +1,33 @@
+{
+  "name": "aidlc-for-claude",
+  "owner": {
+    "name": "AI-DLC",
+    "email": "mateon01@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "ai-dlc-for-claude",
+      "source": "./",
+      "description": "AI-DLC (AI-Driven Development Life Cycle) - A structured three-phase workflow (INCEPTION, CONSTRUCTION, OPERATIONS) that guides AI assistants through disciplined software development with adaptive depth, human-in-the-loop approval gates, and comprehensive audit trails.",
+      "category": "productivity",
+      "tags": [
+        "ai-dlc",
+        "sdlc",
+        "software-development",
+        "workflow",
+        "methodology",
+        "inception",
+        "construction",
+        "requirements",
+        "design",
+        "code-generation"
+      ],
+      "homepage": "https://github.com/mateon01/ai-dlc-for-claude",
+      "version": "1.0.0",
+      "author": {
+        "name": "AI-DLC",
+        "email": "mateon01@gmail.com"
+      }
+    }
+  ]
+}

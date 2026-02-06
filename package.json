@@ -1,0 +1,27 @@
+{
+  "name": "ai-dlc-for-claude",
+  "version": "1.0.0",
+  "description": "AI-DLC (AI-Driven Development Life Cycle) plugin for Claude Code - structured software development workflow",
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "ai-dlc",
+    "sdlc",
+    "software-development",
+    "workflow",
+    "methodology"
+  ],
+  "homepage": "https://github.com/mateon01/aidlc-for-claude",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mateon01/aidlc-for-claude.git"
+  },
+  "license": "Apache-2.0",
+  "files": [
+    "commands",
+    "agents",
+    ".claude-plugin",
+    "README.md",
+    "LICENSE"
+  ]
+}
