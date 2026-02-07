@@ -199,11 +199,17 @@ aidlc-for-claude/
 
 ## Origin
 
-AI-DLC was originally developed as AWS Kiro steering files (30+ markdown rules). This plugin is a conversion to Claude Code's native command/agent system, preserving the methodology while adapting to Claude Code's architecture:
+AI-DLC was originally developed as an AI-driven software development methodology by AWS. This plugin adapts the methodology for Claude Code's native command/agent system:
 
 - Kiro's rule-loading mechanism becomes self-contained agent markdown files
 - Kiro's file-based approvals become chat-based approval gates
 - Single-AI execution becomes multi-agent delegation with model tiering
+
+### References
+
+- [AI-DLC Methodology Blog (AWS Tech Blog)](https://aws.amazon.com/ko/blogs/tech/ai-driven-development-life-cycle/) - Original methodology introduction
+- [AI-DLC Interactive Demo](https://prod.d13rzhkk8cj2z0.amplifyapp.com/) - Live demo of the AI-DLC workflow
+- [AI-DLC Workflows for Kiro (GitHub)](https://github.com/awslabs/aidlc-workflows) - Original Kiro steering files
 
 ## License
 
