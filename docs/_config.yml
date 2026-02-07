@@ -1,0 +1,33 @@
+title: AI-DLC for Claude Code
+description: A structured, adaptive software development workflow plugin for Claude Code
+remote_theme: just-the-docs/just-the-docs
+
+url: https://mateon01.github.io
+baseurl: /aidlc-for-claude
+
+aux_links:
+  "GitHub":
+    - https://github.com/mateon01/aidlc-for-claude
+
+nav_enabled: true
+search_enabled: true
+
+heading_anchors: true
+
+footer_content: "AI-DLC for Claude Code &mdash; Apache-2.0 License"
+
+color_scheme: dark
+
+callouts:
+  note:
+    title: Note
+    color: blue
+  tip:
+    title: Tip
+    color: green
+  warning:
+    title: Warning
+    color: yellow
+  important:
+    title: Important
+    color: red
