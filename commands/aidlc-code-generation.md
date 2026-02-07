@@ -28,11 +28,11 @@ Generate code from approved design artifacts. Two-part: Planning then Execution.
 
 ```
 # Part 1
-Task(subagent_type="aidlc-code-planner", model="opus",
+Task(subagent_type="aidlc-for-claude:aidlc-code-planner", model="opus",
      prompt="Create code generation plan for unit [unit-name]. [context]")
 
 # Part 2
-Task(subagent_type="aidlc-code-generator", model="sonnet",
+Task(subagent_type="aidlc-for-claude:aidlc-code-generator", model="sonnet",
      prompt="Execute the approved code plan for unit [unit-name]. [context]")
 ```
 

@@ -13,6 +13,7 @@ Thumbs.db
 
 # OMC state (oh-my-claudecode)
 .omc/
+.claude/
 
 # Generated artifacts (created at runtime in user's workspace)
 aidlc-docs/

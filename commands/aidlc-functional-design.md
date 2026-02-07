@@ -18,7 +18,7 @@ Detailed business logic design per unit (technology-agnostic).
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-functional-designer", model="sonnet",
+Task(subagent_type="aidlc-for-claude:aidlc-functional-designer", model="sonnet",
      prompt="Create functional design for unit [unit-name]. [context]")
 ```
 

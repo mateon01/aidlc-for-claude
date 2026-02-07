@@ -18,7 +18,7 @@ Generate comprehensive build and test instructions after all units complete.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-build-test-engineer", model="sonnet",
+Task(subagent_type="aidlc-for-claude:aidlc-build-test-engineer", model="sonnet",
      prompt="Generate build and test instructions for all completed units. [context]")
 ```
 

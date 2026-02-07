@@ -19,7 +19,7 @@ Create user stories with INVEST criteria through planning then generation.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-story-writer", model="opus",
+Task(subagent_type="aidlc-for-claude:aidlc-story-writer", model="opus",
      prompt="Create user stories for the project. [context]")
 ```
 

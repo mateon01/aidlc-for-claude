@@ -17,7 +17,7 @@ Gather and analyze requirements with adaptive depth.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-requirements-analyst", model="opus",
+Task(subagent_type="aidlc-for-claude:aidlc-requirements-analyst", model="opus",
      prompt="Analyze requirements for the project. [context]")
 ```
 

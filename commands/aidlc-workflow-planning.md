@@ -18,7 +18,7 @@ Determine which stages to execute and create the execution plan.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-workflow-planner", model="opus",
+Task(subagent_type="aidlc-for-claude:aidlc-workflow-planner", model="opus",
      prompt="Create workflow execution plan based on all prior context. [context]")
 ```
 

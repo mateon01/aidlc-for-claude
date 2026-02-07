@@ -18,7 +18,7 @@ Determine non-functional requirements and tech stack per unit.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-nfr-analyst", model="sonnet",
+Task(subagent_type="aidlc-for-claude:aidlc-nfr-analyst", model="sonnet",
      prompt="Determine NFR requirements for unit [unit-name]. [context]")
 ```
 

@@ -18,7 +18,7 @@ Deep analysis of existing codebase for brownfield projects.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-reverse-engineer", model="opus",
+Task(subagent_type="aidlc-for-claude:aidlc-reverse-engineer", model="opus",
      prompt="Analyze the existing codebase and generate reverse engineering artifacts. [context]")
 ```
 

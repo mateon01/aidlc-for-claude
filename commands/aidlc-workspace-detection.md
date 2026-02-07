@@ -17,7 +17,7 @@ Scan the workspace to determine project type and existing state.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-workspace-analyst", model="sonnet",
+Task(subagent_type="aidlc-for-claude:aidlc-workspace-analyst", model="sonnet",
      prompt="Scan the workspace and determine project state. [context]")
 ```
 

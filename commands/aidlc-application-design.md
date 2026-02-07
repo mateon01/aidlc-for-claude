@@ -18,7 +18,7 @@ High-level component identification and service layer design.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-application-designer", model="opus",
+Task(subagent_type="aidlc-for-claude:aidlc-application-designer", model="opus",
      prompt="Design application components and service layers. [context]")
 ```
 

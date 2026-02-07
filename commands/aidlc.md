@@ -105,27 +105,27 @@ OPERATIONS PHASE (future placeholder)
 
 Execute stages in order. For each stage, delegate to the corresponding agent via Task tool:
 
-1. **Workspace Detection** (ALWAYS) → Agent: `aidlc-workspace-analyst` → Auto-proceed (no approval needed)
-2. **Reverse Engineering** (IF brownfield, no existing artifacts) → Agent: `aidlc-reverse-engineer` → APPROVAL GATE
-3. **Requirements Analysis** (ALWAYS) → Agent: `aidlc-requirements-analyst` → APPROVAL GATE
-4. **User Stories** (CONDITIONAL - multi-factor assessment) → Agent: `aidlc-story-writer` → APPROVAL GATE x2
-5. **Workflow Planning** (ALWAYS) → Agent: `aidlc-workflow-planner` → APPROVAL GATE
-6. **Application Design** (CONDITIONAL) → Agent: `aidlc-application-designer` → APPROVAL GATE
-7. **Units Generation** (CONDITIONAL) → Agent: `aidlc-units-planner` → APPROVAL GATE x2
+1. **Workspace Detection** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-workspace-analyst` → Auto-proceed (no approval needed)
+2. **Reverse Engineering** (IF brownfield, no existing artifacts) → Agent: `aidlc-for-claude:aidlc-reverse-engineer` → APPROVAL GATE
+3. **Requirements Analysis** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-requirements-analyst` → APPROVAL GATE
+4. **User Stories** (CONDITIONAL - multi-factor assessment) → Agent: `aidlc-for-claude:aidlc-story-writer` → APPROVAL GATE x2
+5. **Workflow Planning** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-workflow-planner` → APPROVAL GATE
+6. **Application Design** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-application-designer` → APPROVAL GATE
+7. **Units Generation** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-units-planner` → APPROVAL GATE x2
 
 ### CONSTRUCTION PHASE (HOW)
 
 Execute per-unit loop for each unit from Units Generation:
 
 **FOR each unit:**
-1. **Functional Design** (CONDITIONAL) → Agent: `aidlc-functional-designer` → APPROVAL GATE
-2. **NFR Requirements** (CONDITIONAL) → Agent: `aidlc-nfr-analyst` → APPROVAL GATE
-3. **NFR Design** (CONDITIONAL, requires NFR Requirements) → Agent: `aidlc-nfr-designer` → APPROVAL GATE
-4. **Infrastructure Design** (CONDITIONAL) → Agent: `aidlc-infra-designer` → APPROVAL GATE
-5. **Code Generation** (ALWAYS) → Agents: `aidlc-code-planner` then `aidlc-code-generator` → APPROVAL GATE x2
+1. **Functional Design** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-functional-designer` → APPROVAL GATE
+2. **NFR Requirements** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-nfr-analyst` → APPROVAL GATE
+3. **NFR Design** (CONDITIONAL, requires NFR Requirements) → Agent: `aidlc-for-claude:aidlc-nfr-designer` → APPROVAL GATE
+4. **Infrastructure Design** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-infra-designer` → APPROVAL GATE
+5. **Code Generation** (ALWAYS) → Agents: `aidlc-for-claude:aidlc-code-planner` then `aidlc-for-claude:aidlc-code-generator` → APPROVAL GATE x2
 
 **After all units:**
-6. **Build and Test** (ALWAYS) → Agent: `aidlc-build-test-engineer` → APPROVAL GATE
+6. **Build and Test** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-build-test-engineer` → APPROVAL GATE
 
 ### OPERATIONS PHASE
 Placeholder for future deployment and monitoring workflows.

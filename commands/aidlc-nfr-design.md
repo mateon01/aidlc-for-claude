@@ -18,7 +18,7 @@ Incorporate NFR requirements into design using patterns.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-nfr-designer", model="sonnet",
+Task(subagent_type="aidlc-for-claude:aidlc-nfr-designer", model="sonnet",
      prompt="Design NFR patterns for unit [unit-name]. [context]")
 ```
 

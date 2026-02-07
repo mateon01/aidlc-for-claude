@@ -19,7 +19,7 @@ Decompose system into manageable units of work.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-units-planner", model="opus",
+Task(subagent_type="aidlc-for-claude:aidlc-units-planner", model="opus",
      prompt="Decompose the system into units of work. [context]")
 ```
 

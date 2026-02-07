@@ -18,7 +18,7 @@ Map logical components to actual infrastructure services.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-infra-designer", model="sonnet",
+Task(subagent_type="aidlc-for-claude:aidlc-infra-designer", model="sonnet",
      prompt="Design infrastructure mapping for unit [unit-name]. [context]")
 ```
 
