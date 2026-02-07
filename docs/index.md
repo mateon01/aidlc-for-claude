@@ -2,25 +2,11 @@
 
 **A structured, adaptive software development workflow that guides AI through disciplined three-phase development.**
 
-<div class="grid cards" markdown>
+:material-rocket-launch: [**Get Started**](getting-started.md) -- Just run `/aidlc` and the workflow adapts automatically.
+{ .md-button }
 
--   :material-rocket-launch:{ .lg .middle } **Quick Start**
-
-    ---
-
-    Just run `/aidlc` and the workflow adapts to your project automatically.
-
-    [:octicons-arrow-right-24: Getting Started](getting-started.md)
-
--   :material-github:{ .lg .middle } **Open Source**
-
-    ---
-
-    Apache-2.0 licensed. Adapted from AWS Labs AI-DLC methodology.
-
-    [:octicons-arrow-right-24: GitHub](https://github.com/mateon01/aidlc-for-claude)
-
-</div>
+:material-github: [**View on GitHub**](https://github.com/mateon01/aidlc-for-claude) -- Apache-2.0 licensed. Adapted from AWS Labs AI-DLC.
+{ .md-button }
 
 ---
 
