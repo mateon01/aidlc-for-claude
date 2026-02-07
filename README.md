@@ -4,7 +4,7 @@ A Claude Code plugin that implements the **AI-DLC (AI-Driven Development Life Cy
 
 AI-DLC intelligently adapts to your project: simple changes execute only essential stages, while complex projects receive comprehensive treatment with full safeguards.
 
-**[Documentation](https://mateon01.github.io/aidlc-for-claude)** | **[GitHub](https://github.com/mateon01/aidlc-for-claude)** | **[Apache-2.0 License](LICENSE)**
+**[Documentation](https://mateon01.github.io/aidlc-for-claude)** | **[Apache-2.0 License](LICENSE)**
 
 ## Installation
 
