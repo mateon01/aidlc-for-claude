@@ -8,11 +8,11 @@ AI-DLC intelligently adapts to your project: simple changes execute only essenti
 
 ## Installation
 
-In Claude Code, run `/plugins` to open the plugin manager, then add the marketplace and install:
+In the Claude Code chat, run these two commands:
 
 ```
-/plugins   → Add Marketplace → https://github.com/mateon01/aidlc-for-claude
-/plugins   → Install → aidlc-for-claude
+/plugin marketplace add mateon01/aidlc-for-claude
+/plugin install aidlc-for-claude
 ```
 
 ## Quick Start

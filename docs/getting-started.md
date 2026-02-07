@@ -7,29 +7,29 @@
 !!! warning "Requirements"
     [Claude Code](https://claude.ai/code) v2.0 or later is required.
 
-### Step 1: Open Plugin Manager
+### Step 1: Add Marketplace
 
-Run `/plugins` in Claude Code to open the plugin manager.
-
-```
-/plugins
-```
-
-### Step 2: Add Marketplace
-
-Select **Add Marketplace** and enter the repository URL:
+In the Claude Code chat, register the marketplace:
 
 ```
-https://github.com/mateon01/aidlc-for-claude
+/plugin marketplace add mateon01/aidlc-for-claude
 ```
 
-### Step 3: Install
+### Step 2: Install
 
-Select **Install** and choose `aidlc-for-claude` from the list.
+Install the plugin from the marketplace:
 
-### Step 4: Verify
+```
+/plugin install aidlc-for-claude
+```
 
-Confirm that `aidlc-for-claude` is listed as **enabled** in the plugin manager.
+### Step 3: Verify
+
+Confirm that `aidlc-for-claude` is listed as **enabled**:
+
+```
+/plugin list
+```
 
 ---
 

@@ -74,7 +74,14 @@ Commands and agents are markdown files with specific frontmatter and structure. 
 # Test in a new project
 mkdir test-project && cd test-project
 claude
-# Run /plugins → Add Marketplace (local fork path) → Install → /aidlc
+```
+
+In the Claude Code chat, add your fork and install:
+
+```
+/plugin marketplace add your-username/aidlc-for-claude
+/plugin install aidlc-for-claude
+/aidlc
 ```
 
 ### What to Test

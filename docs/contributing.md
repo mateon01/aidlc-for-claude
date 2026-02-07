@@ -65,7 +65,12 @@ Each command delegates to a corresponding agent via the Task tool.
 
 ### Install from local fork
 
-Run `/plugins` in Claude Code, add your local fork path as a marketplace, then install `aidlc-for-claude`.
+In the Claude Code chat, add your local fork as a marketplace and install:
+
+```
+/plugin marketplace add your-username/aidlc-for-claude
+/plugin install aidlc-for-claude
+```
 
 ### Test checklist
 
