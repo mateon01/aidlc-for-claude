@@ -6,17 +6,16 @@ AI-DLC intelligently adapts to your project: simple changes execute only essenti
 
 ## Installation
 
-**Claude Code marketplace:**
+**Claude Code CLI:**
 
-```
-/plugin marketplace add https://github.com/mateon01/aidlc-for-claude
-/plugin install ai-dlc-for-claude
+```bash
+claude plugin add https://github.com/mateon01/aidlc-for-claude
 ```
 
 **npm:**
 
 ```bash
-npm install -g ai-dlc-for-claude
+npm install -g aidlc-for-claude
 ```
 
 ## Quick Start
@@ -197,7 +196,9 @@ aidlc-for-claude/
     aidlc-code-planner.md
     aidlc-code-generator.md
     aidlc-build-test-engineer.md
+  .gitignore
   package.json
+  LICENSE
   README.md
 ```
 

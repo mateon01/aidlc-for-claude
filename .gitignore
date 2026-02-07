@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OMC state (oh-my-claudecode)
+.omc/
+
+# Generated artifacts (created at runtime in user's workspace)
+aidlc-docs/
+
+# Logs
+*.log
+npm-debug.log*

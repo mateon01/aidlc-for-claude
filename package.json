@@ -1,5 +1,5 @@
 {
-  "name": "ai-dlc-for-claude",
+  "name": "aidlc-for-claude",
   "version": "1.0.0",
   "description": "AI-DLC (AI-Driven Development Life Cycle) plugin for Claude Code - structured software development workflow",
   "keywords": [
