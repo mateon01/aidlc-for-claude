@@ -118,9 +118,10 @@ Placeholder for deployment, monitoring, and operational concerns. Will be implem
 
 ## Model Strategy
 
-AI-DLC uses two model tiers for cost-efficiency:
+AI-DLC uses three model tiers for cost-efficiency:
 
 | Model | Role | Used For |
 |:------|:-----|:---------|
 | **Opus** | Strategic reasoning | Requirements analysis, architectural decisions, planning, system decomposition |
-| **Sonnet** | Volume execution | Functional design, NFR analysis, code generation, testing |
+| **Sonnet** | Volume execution | Functional design, NFR analysis, code generation, testing, user stories |
+| **Haiku** | Fast detection | Workspace scanning, quick project classification |

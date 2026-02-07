@@ -84,20 +84,13 @@ If your session is interrupted, simply run `/aidlc` again. The orchestrator dete
 
 ## How Questions Work
 
-AI-DLC never asks clarifying questions in chat. Instead, it creates markdown files with `[Answer]:` tags:
+AI-DLC uses Claude Code's interactive question UI to gather your preferences. Questions appear as clickable multiple-choice options directly in the terminal:
 
-```markdown
-## Question 1: Target Platform
-What platform should this application target?
-[Answer]:
+- **Tech stack**, **database**, **authentication**, and **scope** decisions
+- Each question offers recommended defaults you can accept with one click
+- You can also type custom responses
 
-## Question 2: Authentication Method
-Which authentication method do you prefer?
-[Answer]:
-```
-
-!!! tip
-    Fill in the answers in the file and the workflow continues. This keeps all decisions documented and auditable.
+All decisions are documented in the `aidlc-docs/` audit trail with ISO 8601 timestamps.
 
 ---
 

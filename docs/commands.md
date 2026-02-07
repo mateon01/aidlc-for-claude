@@ -47,29 +47,37 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 
 Each command delegates to a specialized agent. Agents are tiered by model for cost-efficiency.
 
+!!! note "Agent Naming"
+    Agents use the fully qualified `aidlc-for-claude:` prefix when invoked via the Task tool.
+
 ### :material-brain: Opus Agents (Strategic Reasoning)
 
 | Agent | Purpose |
 |:------|:--------|
-| `aidlc-reverse-engineer` | Deep codebase analysis for brownfield projects |
-| `aidlc-requirements-analyst` | Requirements gathering with adaptive depth |
-| `aidlc-story-writer` | User story creation with INVEST criteria |
-| `aidlc-workflow-planner` | Execution planning and stage determination |
-| `aidlc-application-designer` | Component and service layer design |
-| `aidlc-units-planner` | System decomposition into implementation units |
-| `aidlc-code-planner` | Code generation plan creation |
+| `aidlc-for-claude:aidlc-reverse-engineer` | Deep codebase analysis for brownfield projects |
+| `aidlc-for-claude:aidlc-requirements-analyst` | Requirements gathering with adaptive depth |
+| `aidlc-for-claude:aidlc-story-writer` | User story creation with INVEST criteria |
+| `aidlc-for-claude:aidlc-workflow-planner` | Execution planning and stage determination |
+| `aidlc-for-claude:aidlc-application-designer` | Component and service layer design |
+| `aidlc-for-claude:aidlc-units-planner` | System decomposition into implementation units |
+| `aidlc-for-claude:aidlc-code-planner` | Code generation plan creation |
 
 ### :material-lightning-bolt: Sonnet Agents (Volume Work)
 
 | Agent | Purpose |
 |:------|:--------|
-| `aidlc-workspace-analyst` | Workspace scanning and project type detection |
-| `aidlc-functional-designer` | Business logic and domain model design |
-| `aidlc-nfr-analyst` | Non-functional requirements assessment |
-| `aidlc-nfr-designer` | NFR pattern and component design |
-| `aidlc-infra-designer` | Infrastructure service mapping |
-| `aidlc-code-generator` | Code generation execution |
-| `aidlc-build-test-engineer` | Build and test instruction generation |
+| `aidlc-for-claude:aidlc-functional-designer` | Business logic and domain model design |
+| `aidlc-for-claude:aidlc-nfr-analyst` | Non-functional requirements assessment |
+| `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
+| `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
+| `aidlc-for-claude:aidlc-code-generator` | Code generation execution |
+| `aidlc-for-claude:aidlc-build-test-engineer` | Build and test instruction generation |
+
+### :material-speedometer: Haiku Agents (Fast Detection)
+
+| Agent | Purpose |
+|:------|:--------|
+| `aidlc-for-claude:aidlc-workspace-analyst` | Workspace scanning and project type detection |
 
 ---
 

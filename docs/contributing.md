@@ -57,6 +57,7 @@ Each command delegates to a corresponding agent via the Task tool.
 
 - Commands: `aidlc-{stage-name}.md` (e.g., `aidlc-requirements-analysis.md`)
 - Agents: `aidlc-{role-name}.md` (e.g., `aidlc-requirements-analyst.md`)
+- Agent references in commands: `aidlc-for-claude:aidlc-{role-name}` (fully qualified with plugin prefix)
 
 ---
 

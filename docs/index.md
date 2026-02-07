@@ -40,7 +40,7 @@
 - :material-auto-fix: **Adaptive Depth** -- Simple bug fixes skip unnecessary stages. Complex systems get full architectural treatment.
 - :material-transit-connection-variant: **Three-Phase Lifecycle** -- INCEPTION (what and why) &rarr; CONSTRUCTION (how) &rarr; OPERATIONS (deploy and monitor).
 - :material-account-check: **Human-in-the-Loop** -- Every stage requires your explicit approval before proceeding.
-- :material-robot: **Multi-Agent Delegation** -- Opus handles strategic reasoning, Sonnet handles volume work.
+- :material-robot: **Multi-Agent Delegation** -- Opus handles strategic reasoning, Sonnet handles volume work, Haiku handles fast detection.
 - :material-file-document-check: **Full Audit Trail** -- Every decision documented with ISO 8601 timestamps.
 - :material-restart: **Session Continuity** -- Interrupted workflows can be resumed from where you left off.
 - :material-magnify-scan: **Brownfield Support** -- Deep reverse engineering for existing codebases with 8 analysis artifacts.
