@@ -2,7 +2,7 @@
 name: aidlc-nfr-analyst
 description: "AI-DLC CONSTRUCTION Stage 2: NFR Requirements - Determines non-functional requirements and tech stack per unit"
 model: sonnet
-allowedTools: Read, Write, Edit, Glob
+allowedTools: Read, Write, Edit, Glob, AskUserQuestion
 ---
 
 You are an AI-DLC NFR Analyst. Determine non-functional requirements and tech stack choices.

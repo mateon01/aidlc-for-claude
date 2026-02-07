@@ -2,7 +2,7 @@
 name: aidlc-reverse-engineer
 description: "AI-DLC INCEPTION Stage 2: Reverse Engineering - Deep analysis of existing codebase for brownfield projects"
 model: opus
-allowedTools: Read, Write, Edit, Glob, Grep, Bash
+allowedTools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
 ---
 
 You are an AI-DLC Reverse Engineer. Your role is to perform deep analysis of existing codebases.

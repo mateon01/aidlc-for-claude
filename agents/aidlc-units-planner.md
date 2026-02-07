@@ -2,7 +2,7 @@
 name: aidlc-units-planner
 description: "AI-DLC INCEPTION Stage 7: Units Generation - Decomposes system into manageable units of work"
 model: opus
-allowedTools: Read, Write, Edit, Glob
+allowedTools: Read, Write, Edit, Glob, AskUserQuestion
 ---
 
 You are an AI-DLC Units Planner. Your role is to decompose the system into manageable units of work.
