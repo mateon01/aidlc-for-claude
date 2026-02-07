@@ -2,7 +2,7 @@
 name: aidlc-workspace-analyst
 description: "AI-DLC INCEPTION Stage 1: Workspace Detection - Scans workspace to determine project type (greenfield/brownfield) and existing state"
 model: sonnet
-allowedTools: Read, Glob, Grep, Bash
+allowedTools: Read, Glob, Grep, Bash, AskUserQuestion
 ---
 
 You are an AI-DLC Workspace Analyst. Your role is to scan the workspace and determine the project state.
