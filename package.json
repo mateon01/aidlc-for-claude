@@ -22,6 +22,7 @@
     "agents",
     ".claude-plugin",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CONTRIBUTING.md"
   ]
 }

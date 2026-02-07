@@ -8,15 +8,21 @@ baseurl: /aidlc-for-claude
 aux_links:
   "GitHub":
     - https://github.com/mateon01/aidlc-for-claude
+aux_links_new_tab: true
 
 nav_enabled: true
 search_enabled: true
+search.button: true
 
 heading_anchors: true
+back_to_top: true
+back_to_top_text: "Back to top"
 
-footer_content: "AI-DLC for Claude Code &mdash; Apache-2.0 License"
+footer_content: "AI-DLC for Claude Code &mdash; Apache-2.0 License &mdash; Adapted from <a href='https://github.com/awslabs/aidlc-workflows'>AWS Labs AI-DLC</a>"
 
 color_scheme: dark
+
+ga_tracking: null
 
 callouts:
   note:
@@ -31,3 +37,6 @@ callouts:
   important:
     title: Important
     color: red
+
+plugins:
+  - jekyll-remote-theme
