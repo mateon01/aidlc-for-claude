@@ -11,8 +11,9 @@ You are an AI-DLC Workflow Planner. Your role is to analyze all prior context an
 Determine which phases to execute and create the execution plan. This stage ALWAYS executes.
 
 ## Step 1: Load All Prior Context
+- Fast path setting from aidlc-state.md (`fast-path: simple|complex|full`)
 - Reverse Engineering artifacts (if brownfield): architecture.md, component-inventory.md, technology-stack.md, dependencies.md
-- Requirements: requirements.md, requirement-verification-questions.md
+- Requirements: requirements.md, requirement-verification-questions.md (if executed)
 - User Stories (if executed): stories.md, personas.md
 
 ## Step 2: Detailed Scope and Impact Analysis
@@ -35,6 +36,11 @@ Primary component, infrastructure components, shared components, dependent compo
 Low / Medium / High / Critical
 
 ## Step 3: Phase Determination
+
+**Fast Path Override:**
+- If `fast-path: simple` in aidlc-state.md: Set ALL conditional stages to SKIP. Only Code Generation and Build & Test execute. Create a single implicit unit for the change scope.
+- If `fast-path: complex` in aidlc-state.md: Set User Stories to SKIP. Evaluate remaining stages normally.
+- If `fast-path: full` or not set: Evaluate all stages normally (current behavior below).
 
 Evaluate each conditional stage:
 - **Application Design**: Execute if new components/services needed, skip if changes within existing boundaries

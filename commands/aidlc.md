@@ -49,11 +49,27 @@ OPERATIONS PHASE (future placeholder)
 
 ## Common Rules (Apply to ALL stages)
 
-### Question Format Protocol
-- ALL questions go in dedicated `.md` files, NEVER in chat
-- Multiple-choice format with A, B, C... options
+### Question Format Protocol (Hybrid)
+
+**Tier 1: Interactive Questions (AskUserQuestion tool)**
+Use when ALL of these apply:
+- 4 or fewer questions
+- Multiple-choice answers (not open-ended)
+- Simple decisions (scope, tech preference, yes/no)
+
+**Tier 2: Document-Based Questions (.md files)**
+Use when ANY of these apply:
+- More than 4 questions
+- Open-ended answers expected
+- Complex domain knowledge required
+- Requirements verification, functional design, architecture decisions
+
+Format for Tier 2:
+- Dedicated `.md` files with multiple-choice (A, B, C...)
 - MANDATORY "Other" as last option: `X) Other (please describe after [Answer]: tag below)`
 - `[Answer]:` tag for user responses
+
+**Both tiers:**
 - After collecting answers, ALWAYS analyze for contradictions and ambiguities
 - Create clarification question files if issues found
 - NEVER proceed with unresolved ambiguities
@@ -101,14 +117,33 @@ OPERATIONS PHASE (future placeholder)
 
 ## Workflow Orchestration
 
+### Brownfield Fast Path
+
+After Workspace Detection, if the project is brownfield, the user is asked about change scope (via AskUserQuestion):
+
+**Simple Change** (bug fix, small feature, config change):
+- Skips: Requirements Analysis, User Stories, Application Design, Units Generation, Functional Design, NFR Requirements, NFR Design, Infrastructure Design
+- Executes: Workspace Detection → RE (if no artifacts) → Workflow Planning (minimal) → Code Generation → Build and Test
+- Records `fast-path: simple` in aidlc-state.md
+
+**Complex Change** (significant feature, multi-component refactoring):
+- Skips: User Stories
+- Executes: Workspace Detection → RE → Requirements Analysis → Workflow Planning → (remaining per planner)
+- Records `fast-path: complex` in aidlc-state.md
+
+**Full Structured Workflow**:
+- Current behavior unchanged
+- Records `fast-path: full` in aidlc-state.md
+
 ### INCEPTION PHASE (WHAT and WHY)
 
 Execute stages in order. For each stage, delegate to the corresponding agent via Task tool:
 
 1. **Workspace Detection** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-workspace-analyst` → Auto-proceed (no approval needed)
+   - **[BROWNFIELD FAST PATH DECISION]** If brownfield detected, scope assessment occurs here
 2. **Reverse Engineering** (IF brownfield, no existing artifacts) → Agent: `aidlc-for-claude:aidlc-reverse-engineer` → APPROVAL GATE
-3. **Requirements Analysis** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-requirements-analyst` → APPROVAL GATE
-4. **User Stories** (CONDITIONAL - multi-factor assessment) → Agent: `aidlc-for-claude:aidlc-story-writer` → APPROVAL GATE x2
+3. **Requirements Analysis** (ALWAYS, skipped in simple fast path) → Agent: `aidlc-for-claude:aidlc-requirements-analyst` → APPROVAL GATE
+4. **User Stories** (CONDITIONAL, skipped in simple/complex fast path) → Agent: `aidlc-for-claude:aidlc-story-writer` → APPROVAL GATE x2
 5. **Workflow Planning** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-workflow-planner` → APPROVAL GATE
 6. **Application Design** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-application-designer` → APPROVAL GATE
 7. **Units Generation** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-units-planner` → APPROVAL GATE x2
@@ -126,6 +161,8 @@ Execute per-unit loop for each unit from Units Generation:
 
 **After all units:**
 6. **Build and Test** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-build-test-engineer` → APPROVAL GATE
+
+**Fast Path Note:** In simple fast path mode, the per-unit loop is skipped. Code Generation operates directly on the workspace without unit decomposition. A single implicit unit covers the entire change scope.
 
 ### OPERATIONS PHASE
 Placeholder for future deployment and monitoring workflows.

@@ -33,7 +33,7 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 | `/aidlc-nfr-design` | 3 | NFR pattern design (per-unit) |
 | `/aidlc-infrastructure-design` | 4 | Infrastructure mapping (per-unit) |
 | `/aidlc-code-generation` | 5 | Code generation (per-unit, two-part) |
-| `/aidlc-build-and-test` | 6 | Build and test instructions |
+| `/aidlc-build-and-test` | 6 | Build, test, and validate (actual execution with retry) |
 
 ### OPERATIONS Phase
 
@@ -71,7 +71,7 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
 | `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
 | `aidlc-for-claude:aidlc-code-generator` | Code generation execution |
-| `aidlc-for-claude:aidlc-build-test-engineer` | Build and test instruction generation |
+| `aidlc-for-claude:aidlc-build-test-engineer` | Build and test execution with instruction generation |
 
 ### :material-speedometer: Haiku Agents (Fast Detection)
 

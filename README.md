@@ -38,7 +38,8 @@ AI-DLC has three phases. Each phase contains stages that may execute conditional
 +-----------------------------------------------------------------------+
 |                     INCEPTION (WHAT and WHY)                          |
 |                                                                       |
-|  Workspace Detection --> Reverse Engineering --> Requirements Analysis |
+|  Workspace Detection --> [Scope Assessment (brownfield)]              |
+|  --> Reverse Engineering --> Requirements Analysis                    |
 |  --> User Stories --> Workflow Planning --> Application Design         |
 |  --> Units Generation                                                 |
 +-----------------------------------+-----------------------------------+
@@ -67,6 +68,7 @@ Not every stage runs every time. After Workflow Planning, an execution plan dete
 | Condition | Stages Executed |
 |-----------|----------------|
 | Simple bug fix | Workspace Detection, Requirements, Workflow Planning, Code Generation, Build and Test |
+| Simple brownfield (fast path) | Workspace Detection, Reverse Engineering, Workflow Planning (minimal), Code Generation, Build and Test |
 | New feature (greenfield) | All INCEPTION + all CONSTRUCTION stages |
 | Brownfield modification | Adds Reverse Engineering, adapts scope based on existing codebase |
 | Infrastructure-only change | Skips User Stories, Functional Design; includes Infrastructure Design |
@@ -90,7 +92,7 @@ You can override any recommendation at the Workflow Planning approval gate.
 | `/aidlc-nfr-design` | CONSTRUCTION 3 | NFR pattern design (per-unit) |
 | `/aidlc-infrastructure-design` | CONSTRUCTION 4 | Infrastructure mapping (per-unit) |
 | `/aidlc-code-generation` | CONSTRUCTION 5 | Code generation (per-unit) |
-| `/aidlc-build-and-test` | CONSTRUCTION 6 | Build and test instructions |
+| `/aidlc-build-and-test` | CONSTRUCTION 6 | Build, test, and validate (actual execution) |
 | `/aidlc-operations` | OPERATIONS | Placeholder for future release |
 
 ## Agents
@@ -118,7 +120,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 | `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
 | `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
 | `aidlc-for-claude:aidlc-code-generator` | Code generation execution |
-| `aidlc-for-claude:aidlc-build-test-engineer` | Build and test instruction generation |
+| `aidlc-for-claude:aidlc-build-test-engineer` | Build and test execution with instruction generation |
 
 ### Haiku (Fast Detection)
 
@@ -130,7 +132,9 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 
 ## Key Conventions
 
-**Interactive Q&A** -- Requirements are gathered via Claude Code's interactive question UI with clickable multiple-choice options. All decisions are documented in the audit trail.
+**Interactive Q&A** -- Simple preference questions use Claude Code's interactive question UI (AskUserQuestion) with clickable options. Complex questions with many items use document-based questionnaires. All decisions are documented in the audit trail.
+
+**Brownfield fast path** -- For existing codebases, a scope assessment after workspace detection lets you choose between a simple fast path (skips most analysis, goes directly to code generation), a complex streamlined path, or the full structured workflow.
 
 **Approval gates** are required at each stage. You review the generated artifacts and choose to approve, request changes, or add/remove stages.
 

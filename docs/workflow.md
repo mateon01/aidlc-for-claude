@@ -8,7 +8,7 @@ The Inception phase establishes what needs to be built and why. It consists of 7
 
 ### Stage 1: Workspace Detection
 
-Scans the workspace to determine if it's greenfield (new project) or brownfield (existing code). This decision affects which subsequent stages are executed.
+Scans the workspace to determine if it's greenfield (new project) or brownfield (existing code). For brownfield projects, this stage also performs a **scope assessment** -- asking whether the change is simple, complex, or requires the full structured workflow. This determines the fast path routing.
 
 ### Stage 2: Reverse Engineering (Brownfield Only)
 
@@ -83,7 +83,7 @@ For each unit defined in Inception:
 
 ### Build and Test
 
-After all units are complete, generates build instructions and test plans for the entire system.
+After all units are complete, generates build instructions and test plans, then **executes actual builds and tests**. The agent detects the project's build system (npm, pip, cargo, etc.), installs dependencies, runs the build, and executes tests. Failed builds are retried up to 3 times with automated fix attempts.
 
 ---
 
@@ -95,21 +95,21 @@ Placeholder for deployment, monitoring, and operational concerns. Will be implem
 
 ## Stage Execution Matrix
 
-| Stage | Simple Bug Fix | New Feature | Brownfield | Infra Change |
-|:------|:-:|:-:|:-:|:-:|
-| Workspace Detection | :material-check: | :material-check: | :material-check: | :material-check: |
-| Reverse Engineering | -- | -- | :material-check: | -- |
-| Requirements Analysis | :material-check: | :material-check: | :material-check: | :material-check: |
-| User Stories | -- | :material-check: | :material-dots-horizontal: | -- |
-| Workflow Planning | :material-check: | :material-check: | :material-check: | :material-check: |
-| Application Design | -- | :material-check: | :material-dots-horizontal: | -- |
-| Units Generation | -- | :material-check: | :material-dots-horizontal: | -- |
-| Functional Design | -- | :material-check: | :material-dots-horizontal: | -- |
-| NFR Requirements | -- | :material-check: | :material-dots-horizontal: | -- |
-| NFR Design | -- | :material-check: | :material-dots-horizontal: | -- |
-| Infrastructure Design | -- | :material-check: | :material-dots-horizontal: | :material-check: |
-| Code Generation | :material-check: | :material-check: | :material-check: | :material-check: |
-| Build and Test | :material-check: | :material-check: | :material-check: | :material-check: |
+| Stage | Simple Bug Fix | Fast Path | New Feature | Brownfield | Infra Change |
+|:------|:-:|:-:|:-:|:-:|:-:|
+| Workspace Detection | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| Reverse Engineering | -- | :material-check: | -- | :material-check: | -- |
+| Requirements Analysis | :material-check: | -- | :material-check: | :material-check: | :material-check: |
+| User Stories | -- | -- | :material-check: | :material-dots-horizontal: | -- |
+| Workflow Planning | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| Application Design | -- | -- | :material-check: | :material-dots-horizontal: | -- |
+| Units Generation | -- | -- | :material-check: | :material-dots-horizontal: | -- |
+| Functional Design | -- | -- | :material-check: | :material-dots-horizontal: | -- |
+| NFR Requirements | -- | -- | :material-check: | :material-dots-horizontal: | -- |
+| NFR Design | -- | -- | :material-check: | :material-dots-horizontal: | -- |
+| Infrastructure Design | -- | -- | :material-check: | :material-dots-horizontal: | :material-check: |
+| Code Generation | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| Build and Test | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 
 !!! note "Legend"
     :material-check: = Always executed | :material-dots-horizontal: = Conditional | -- = Skipped

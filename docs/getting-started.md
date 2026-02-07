@@ -53,6 +53,19 @@ The orchestrator will:
 
 ---
 
+## Brownfield Fast Path
+
+When working with an existing codebase, AI-DLC detects it as brownfield and asks about the scope of your change:
+
+- **Simple change** -- Bug fixes, small features, config changes. Skips most analysis stages and goes directly to code generation. Fastest path.
+- **Complex change** -- Multi-component features or refactoring. Streamlined path that includes requirements analysis but skips user stories.
+- **Full workflow** -- Complete AI-DLC treatment. All stages evaluated based on your project's needs.
+
+!!! tip
+    For quick bug fixes, choose "Simple change" to skip the full analysis pipeline and get to code generation faster.
+
+---
+
 ## Running Individual Stages
 
 You can run any stage independently:
