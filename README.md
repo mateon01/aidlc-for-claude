@@ -4,6 +4,8 @@ A Claude Code plugin that implements the **AI-DLC (AI-Driven Development Life Cy
 
 AI-DLC intelligently adapts to your project: simple changes execute only essential stages, while complex projects receive comprehensive treatment with full safeguards.
 
+**[Documentation](https://mateon01.github.io/aidlc-for-claude)** | **[GitHub](https://github.com/mateon01/aidlc-for-claude)** | **[Apache-2.0 License](LICENSE)**
+
 ## Installation
 
 **Claude Code CLI:**
@@ -19,7 +21,7 @@ claude plugin install aidlc-for-claude
 /aidlc
 ```
 
-That's it. The orchestrator detects your workspace (greenfield or brownfield), gathers requirements, and walks through each phase with you. Every stage requires your approval before proceeding.
+That's it. The orchestrator detects your workspace (greenfield or brownfield), gathers requirements through interactive Q&A, and walks through each phase with you. Every stage requires your approval before proceeding.
 
 To run a specific stage independently:
 
@@ -93,26 +95,52 @@ You can override any recommendation at the Workflow Planning approval gate.
 
 ## Agents
 
-Each command delegates to a specialized agent via the Task tool. Agents are tiered by model:
+Each command delegates to a specialized agent via the Task tool. Agents use the fully qualified `aidlc-for-claude:` prefix and are tiered by model for cost-efficiency:
 
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| `aidlc-workspace-analyst` | Sonnet | Workspace scanning and project type detection |
-| `aidlc-reverse-engineer` | Opus | Deep codebase analysis for brownfield projects |
-| `aidlc-requirements-analyst` | Opus | Requirements gathering with adaptive depth |
-| `aidlc-story-writer` | Opus | User story creation with INVEST criteria |
-| `aidlc-workflow-planner` | Opus | Execution planning and stage determination |
-| `aidlc-application-designer` | Opus | Component and service layer design |
-| `aidlc-units-planner` | Opus | System decomposition into units |
-| `aidlc-functional-designer` | Sonnet | Business logic and domain model design |
-| `aidlc-nfr-analyst` | Sonnet | Non-functional requirements assessment |
-| `aidlc-nfr-designer` | Sonnet | NFR pattern and component design |
-| `aidlc-infra-designer` | Sonnet | Infrastructure service mapping |
-| `aidlc-code-planner` | Opus | Code generation plan creation |
-| `aidlc-code-generator` | Sonnet | Code generation execution |
-| `aidlc-build-test-engineer` | Sonnet | Build and test instruction generation |
+### Opus (Strategic Reasoning)
 
-**Model strategy:** Opus handles stages requiring deep reasoning (requirements analysis, architectural decisions, planning). Sonnet handles volume work (design documents, code generation, testing).
+| Agent | Purpose |
+|-------|---------|
+| `aidlc-for-claude:aidlc-reverse-engineer` | Deep codebase analysis for brownfield projects |
+| `aidlc-for-claude:aidlc-requirements-analyst` | Requirements gathering with adaptive depth |
+| `aidlc-for-claude:aidlc-story-writer` | User story creation with INVEST criteria |
+| `aidlc-for-claude:aidlc-workflow-planner` | Execution planning and stage determination |
+| `aidlc-for-claude:aidlc-application-designer` | Component and service layer design |
+| `aidlc-for-claude:aidlc-units-planner` | System decomposition into units |
+| `aidlc-for-claude:aidlc-code-planner` | Code generation plan creation |
+
+### Sonnet (Volume Work)
+
+| Agent | Purpose |
+|-------|---------|
+| `aidlc-for-claude:aidlc-functional-designer` | Business logic and domain model design |
+| `aidlc-for-claude:aidlc-nfr-analyst` | Non-functional requirements assessment |
+| `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
+| `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
+| `aidlc-for-claude:aidlc-code-generator` | Code generation execution |
+| `aidlc-for-claude:aidlc-build-test-engineer` | Build and test instruction generation |
+
+### Haiku (Fast Detection)
+
+| Agent | Purpose |
+|-------|---------|
+| `aidlc-for-claude:aidlc-workspace-analyst` | Workspace scanning and project type detection |
+
+**Model strategy:** Opus handles stages requiring deep reasoning (requirements analysis, architectural decisions, planning). Sonnet handles volume work (design documents, code generation, testing). Haiku handles fast detection (workspace scanning, project classification).
+
+## Key Conventions
+
+**Interactive Q&A** -- Requirements are gathered via Claude Code's interactive question UI with clickable multiple-choice options. All decisions are documented in the audit trail.
+
+**Approval gates** are required at each stage. You review the generated artifacts and choose to approve, request changes, or add/remove stages.
+
+**Audit trail** (`aidlc-docs/audit.md`) captures every user input with ISO 8601 timestamps. It is append-only and never overwritten.
+
+**Session continuity** is handled via `aidlc-docs/aidlc-state.md`. Re-running `/aidlc` detects existing state and offers to resume.
+
+**Adaptive depth** means all defined artifacts for a stage are created, but the detail level adapts to problem complexity. A simple bug fix gets concise artifacts; a complex system gets comprehensive treatment.
+
+**ASCII diagrams** use only `+`, `-`, `|`, `^`, `v`, `<`, `>` characters. No Unicode box-drawing characters.
 
 ## Artifacts
 
@@ -138,20 +166,6 @@ aidlc-docs/
       code/                         # Code summaries (code itself at workspace root)
     build-and-test/                 # Build and test instructions
 ```
-
-## Key Conventions
-
-**Questions** are always file-based with `[Answer]:` tags -- never asked in chat. This keeps decisions documented and auditable.
-
-**Approval gates** are required at each stage. You review the generated artifacts and choose to approve, request changes, or add/remove stages.
-
-**Audit trail** (`aidlc-docs/audit.md`) captures every user input with ISO 8601 timestamps. It is append-only and never overwritten.
-
-**Session continuity** is handled via `aidlc-docs/aidlc-state.md`. Re-running `/aidlc` detects existing state and offers to resume.
-
-**Adaptive depth** means all defined artifacts for a stage are created, but the detail level adapts to problem complexity. A simple bug fix gets concise artifacts; a complex system gets comprehensive treatment.
-
-**ASCII diagrams** use only `+`, `-`, `|`, `^`, `v`, `<`, `>` characters. No Unicode box-drawing characters.
 
 ## Plugin Structure
 
@@ -191,9 +205,12 @@ aidlc-for-claude/
     aidlc-code-planner.md
     aidlc-code-generator.md
     aidlc-build-test-engineer.md
+  docs/                             # GitHub Pages (Material for MkDocs)
+  .github/workflows/                # CI/CD (docs deployment)
   .gitignore
   package.json
   LICENSE
+  CONTRIBUTING.md
   README.md
 ```
 
@@ -202,8 +219,8 @@ aidlc-for-claude/
 AI-DLC was originally developed as an AI-driven software development methodology by AWS. This plugin adapts the methodology for Claude Code's native command/agent system:
 
 - Kiro's rule-loading mechanism becomes self-contained agent markdown files
-- Kiro's file-based approvals become chat-based approval gates
-- Single-AI execution becomes multi-agent delegation with model tiering
+- Kiro's file-based approvals become interactive approval gates
+- Single-AI execution becomes multi-agent delegation with model tiering (Opus/Sonnet/Haiku)
 
 ### References
 
