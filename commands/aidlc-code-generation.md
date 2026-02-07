@@ -14,7 +14,7 @@ Generate code from approved design artifacts. Two-part: Planning then Execution.
 ### Part 1: Planning
 3. Delegate to the `aidlc-code-planner` agent via Task tool (model: opus)
 4. Pass context: aidlc-state.md, all design artifacts for the unit, RE artifacts (if brownfield)
-5. Agent creates code plan in `aidlc-docs/construction/plans/{unit-name}-code-plan.md`
+5. Agent creates code plan in `aidlc-docs/construction/plans/{unit-name}-code-generation-plan.md`
 6. Present approval gate for the plan
 
 ### Part 2: Execution

@@ -66,6 +66,18 @@ When working with an existing codebase, AI-DLC detects it as brownfield and asks
 
 ---
 
+## Batch Approval Mode
+
+After Workflow Planning, AI-DLC offers a batch approval option:
+
+- **Stage-by-stage** (default) -- Review and approve each stage individually
+- **Batch approve construction** -- Auto-approve all construction design stages (Functional Design through Infrastructure Design), and review only Code Generation and Build & Test results
+
+!!! tip
+    For large multi-unit projects, batch approval significantly reduces the number of review steps while still giving you control over the most critical stages (code and tests).
+
+---
+
 ## Running Individual Stages
 
 You can run any stage independently:

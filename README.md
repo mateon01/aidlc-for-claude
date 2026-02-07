@@ -142,6 +142,16 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 
 **Session continuity** is handled via `aidlc-docs/aidlc-state.md`. Re-running `/aidlc` detects existing state and offers to resume.
 
+**Error recovery** -- Failed stages can be retried, skipped, or aborted. State is preserved for session continuity. Build failures are retried up to 3 times with automated fix attempts.
+
+**Batch approval** -- Optionally auto-approve construction design stages (Functional Design through Infrastructure Design) to reduce review overhead on large projects. Code Generation and Build & Test still require explicit review.
+
+**Git safety** -- Brownfield code generation creates a `aidlc/{unit-name}` git branch before modifying existing files, providing a safe rollback point.
+
+**Code quality gate** -- Before presenting generated code, the agent runs a type/syntax check (tsc, py_compile, cargo check, go vet) and auto-fixes issues up to 2 times.
+
+**Cross-unit consistency** -- When building multi-unit systems, each unit receives summaries of all previously completed units to maintain consistent domain models, tech stack choices, and conventions.
+
 **Adaptive depth** means all defined artifacts for a stage are created, but the detail level adapts to problem complexity. A simple bug fix gets concise artifacts; a complex system gets comprehensive treatment.
 
 **ASCII diagrams** use only `+`, `-`, `|`, `^`, `v`, `<`, `>` characters. No Unicode box-drawing characters.

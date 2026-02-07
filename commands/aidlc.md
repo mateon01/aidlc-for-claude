@@ -115,6 +115,30 @@ Format for Tier 2:
 - Detail level within artifacts adapts to problem complexity
 - Simple problems get concise artifacts, complex ones get comprehensive treatment
 
+### Error Recovery Protocol
+
+When a stage agent fails or produces incomplete results:
+
+1. **Agent failure (timeout/crash)**: Retry the same agent once. If second attempt fails, present the error to the user and ask whether to retry, skip the stage, or abort the workflow.
+2. **Repeated rejection (3+ at same approval gate)**: Ask the user whether to continue iterating, skip the stage, or abort. Do NOT loop indefinitely.
+3. **State file corruption**: If aidlc-state.md is unreadable, recreate it from existing artifacts in aidlc-docs/ by scanning what has been completed.
+4. **Code generation build failure**: Handled by Build & Test retry loop (max 3 attempts). If still failing after retries, present results and let user decide.
+5. **Mid-workflow abort**: Preserve all completed artifacts. On next `/aidlc` run, offer to resume from the last completed stage.
+
+### Batch Approval Mode
+
+After Workflow Planning approval, offer the user a batch approval option (via AskUserQuestion):
+
+- **Stage-by-stage** (default) — Review and approve each stage individually
+- **Batch approve construction** — Auto-approve all CONSTRUCTION design stages (Functional Design through Infrastructure Design), review only Code Generation and Build & Test results
+
+When batch mode is active:
+- CONSTRUCTION design stages execute without approval gates
+- Code Generation still requires approval (plan + code review)
+- Build & Test still requires approval (verify actual results)
+- All stages still log to audit.md with `[batch-approved]` marker
+- Record `batch-approval: true` in aidlc-state.md
+
 ## Workflow Orchestration
 
 ### Brownfield Fast Path
@@ -151,6 +175,8 @@ Execute stages in order. For each stage, delegate to the corresponding agent via
 ### CONSTRUCTION PHASE (HOW)
 
 Execute per-unit loop for each unit from Units Generation:
+
+**Cross-unit Context:** When starting Unit N (N > 1), pass summaries of all completed units (1 through N-1) as additional context to the agent. Include completed functional design summaries, tech stack decisions from prior units, shared patterns and conventions established, and domain entities already defined. This ensures consistency across units.
 
 **FOR each unit:**
 1. **Functional Design** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-functional-designer` → APPROVAL GATE

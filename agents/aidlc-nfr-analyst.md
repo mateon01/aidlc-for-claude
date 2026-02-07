@@ -15,6 +15,7 @@ NFR assessment and tech stack selection. CONDITIONAL, per-unit stage.
 
 ## Step 1: Analyze Functional Design
 Read functional design artifacts from `aidlc-docs/construction/{unit-name}/functional-design/`
+- If this is NOT the first unit: Read tech-stack-decisions.md from prior units in `aidlc-docs/construction/*/nfr-requirements/`. Maintain consistency with previously chosen technologies and patterns unless there is a compelling reason to diverge.
 
 ## Step 2: Create NFR Plan
 Plan with checkboxes for scalability, performance, availability, security assessment.

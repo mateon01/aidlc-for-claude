@@ -16,6 +16,7 @@ Detailed business logic, domain models, business rules. CONDITIONAL, per-unit st
 
 ## Step 1: Analyze Unit Context
 Read unit definition from unit-of-work.md and assigned stories from unit-of-work-story-map.md.
+- If this is NOT the first unit: Read completed functional design artifacts from prior units in `aidlc-docs/construction/*/functional-design/`. Identify shared domain entities, established patterns, and conventions to maintain consistency.
 
 ## Step 2: Create Functional Design Plan
 Generate plan with checkboxes for business logic, domain models, business rules.

@@ -58,13 +58,16 @@ The Construction phase implements the system. For each unit, it runs a loop of s
 
 For each unit defined in Inception:
 
+!!! info "Cross-unit Context"
+    When starting Unit N (where N > 1), the agent receives summaries of all completed units (1 through N-1). This includes functional design summaries, tech stack decisions, shared patterns, and domain entities -- ensuring consistency across the entire system.
+
 === "Step 1: Functional Design"
 
-    Business logic, domain models, rules, and entities specific to this unit.
+    Business logic, domain models, rules, and entities specific to this unit. Reads prior units' artifacts to maintain consistent domain models and conventions.
 
 === "Step 2: NFR Requirements"
 
-    Quality attributes (performance, security, reliability) and technology stack decisions.
+    Quality attributes (performance, security, reliability) and technology stack decisions. Maintains consistency with technologies chosen by prior units unless there is a compelling reason to diverge.
 
 === "Step 3: NFR Design"
 
@@ -80,6 +83,10 @@ For each unit defined in Inception:
 
     1. **Planning** (Opus) -- Creates a detailed code generation plan with file-by-file breakdown
     2. **Execution** (Sonnet) -- Generates actual code following the plan
+
+    For brownfield projects, a git branch (`aidlc/{unit-name}`) is created before modifying existing files, providing a safe rollback point.
+
+    After code generation, a **quality gate** runs a type/syntax check (tsc, py_compile, cargo check, go vet) and auto-fixes issues up to 2 times before presenting results.
 
 ### Build and Test
 
