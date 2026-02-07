@@ -9,19 +9,27 @@
 
 ### Step 1: Open Plugin Manager
 
-Claude Code에서 `/plugins` 명령어를 실행합니다.
+Run `/plugins` in Claude Code to open the plugin manager.
 
 ```
 /plugins
 ```
 
-### Step 2: Search and Install
+### Step 2: Add Marketplace
 
-`aidlc-for-claude`를 검색하여 설치합니다.
+Select **Add Marketplace** and enter the repository URL:
 
-### Step 3: Verify
+```
+https://github.com/mateon01/aidlc-for-claude
+```
 
-설치 후 `aidlc-for-claude`가 **enabled** 상태인지 확인합니다.
+### Step 3: Install
+
+Select **Install** and choose `aidlc-for-claude` from the list.
+
+### Step 4: Verify
+
+Confirm that `aidlc-for-claude` is listed as **enabled** in the plugin manager.
 
 ---
 

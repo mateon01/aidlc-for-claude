@@ -65,11 +65,7 @@ Each command delegates to a corresponding agent via the Task tool.
 
 ### Install from local fork
 
-```
-/plugins
-```
-
-로컬 fork 경로를 지정하여 설치합니다.
+Run `/plugins` in Claude Code, add your local fork path as a marketplace, then install `aidlc-for-claude`.
 
 ### Test checklist
 

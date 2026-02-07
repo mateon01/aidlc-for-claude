@@ -74,7 +74,7 @@ Commands and agents are markdown files with specific frontmatter and structure. 
 # Test in a new project
 mkdir test-project && cd test-project
 claude
-# Run /plugins to install from local fork, then: /aidlc
+# Run /plugins → Add Marketplace (local fork path) → Install → /aidlc
 ```
 
 ### What to Test
