@@ -8,11 +8,10 @@ AI-DLC intelligently adapts to your project: simple changes execute only essenti
 
 ## Installation
 
-**Claude Code CLI:**
+Claude Code에서 `/plugins` 명령어를 실행한 후 `aidlc-for-claude`를 검색하여 설치합니다.
 
-```bash
-claude plugin marketplace add https://github.com/mateon01/aidlc-for-claude
-claude plugin install aidlc-for-claude
+```
+/plugins
 ```
 
 ## Quick Start

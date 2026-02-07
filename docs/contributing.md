@@ -65,10 +65,11 @@ Each command delegates to a corresponding agent via the Task tool.
 
 ### Install from local fork
 
-```bash
-claude plugin marketplace add /path/to/your/fork
-claude plugin install aidlc-for-claude
 ```
+/plugins
+```
+
+로컬 fork 경로를 지정하여 설치합니다.
 
 ### Test checklist
 

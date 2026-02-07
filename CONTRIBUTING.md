@@ -71,16 +71,10 @@ Commands and agents are markdown files with specific frontmatter and structure. 
 ### Local Plugin Testing
 
 ```bash
-# Add local path as marketplace
-claude plugin marketplace add /path/to/your/fork
-
-# Install from local
-claude plugin install aidlc-for-claude
-
 # Test in a new project
 mkdir test-project && cd test-project
 claude
-# Then run: /aidlc
+# Run /plugins to install from local fork, then: /aidlc
 ```
 
 ### What to Test

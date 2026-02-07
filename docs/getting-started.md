@@ -7,25 +7,21 @@
 !!! warning "Requirements"
     [Claude Code](https://claude.ai/code) v2.0 or later is required.
 
-### Step 1: Add the marketplace
+### Step 1: Open Plugin Manager
 
-```bash
-claude plugin marketplace add https://github.com/mateon01/aidlc-for-claude
+Claude Code에서 `/plugins` 명령어를 실행합니다.
+
+```
+/plugins
 ```
 
-### Step 2: Install the plugin
+### Step 2: Search and Install
 
-```bash
-claude plugin install aidlc-for-claude
-```
+`aidlc-for-claude`를 검색하여 설치합니다.
 
 ### Step 3: Verify
 
-```bash
-claude plugin list
-```
-
-You should see `aidlc-for-claude` listed as **enabled**.
+설치 후 `aidlc-for-claude`가 **enabled** 상태인지 확인합니다.
 
 ---
 
