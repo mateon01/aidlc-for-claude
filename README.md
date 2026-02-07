@@ -9,13 +9,8 @@ AI-DLC intelligently adapts to your project: simple changes execute only essenti
 **Claude Code CLI:**
 
 ```bash
-claude plugin add https://github.com/mateon01/aidlc-for-claude
-```
-
-**npm:**
-
-```bash
-npm install -g aidlc-for-claude
+claude plugin marketplace add https://github.com/mateon01/aidlc-for-claude
+claude plugin install aidlc-for-claude
 ```
 
 ## Quick Start
