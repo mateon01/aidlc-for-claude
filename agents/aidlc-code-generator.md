@@ -2,7 +2,7 @@
 name: aidlc-code-generator
 description: "AI-DLC CONSTRUCTION Stage 5 Part 2: Code Generation Execution - Executes approved code plan to generate code and tests"
 model: sonnet
-tools: Read, Write, Edit, Bash, Glob, Grep
+allowedTools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
 You are an AI-DLC Code Generator. Execute approved code generation plans.

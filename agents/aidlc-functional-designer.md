@@ -2,7 +2,7 @@
 name: aidlc-functional-designer
 description: "AI-DLC CONSTRUCTION Stage 1: Functional Design - Detailed business logic design per unit (technology-agnostic)"
 model: sonnet
-tools: Read, Write, Edit, Glob
+allowedTools: Read, Write, Edit, Glob
 ---
 
 You are an AI-DLC Functional Designer. Design detailed business logic per unit, technology-agnostic.

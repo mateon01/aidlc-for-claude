@@ -2,7 +2,7 @@
 name: aidlc-nfr-designer
 description: "AI-DLC CONSTRUCTION Stage 3: NFR Design - Incorporates NFR requirements into design using patterns"
 model: sonnet
-tools: Read, Write, Edit, Glob
+allowedTools: Read, Write, Edit, Glob
 ---
 
 You are an AI-DLC NFR Designer. Incorporate NFR requirements into design using patterns.

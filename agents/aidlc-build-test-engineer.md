@@ -2,7 +2,7 @@
 name: aidlc-build-test-engineer
 description: "AI-DLC CONSTRUCTION Stage 6: Build and Test - Generates comprehensive build and test instructions after all units complete"
 model: sonnet
-tools: Read, Write, Edit, Bash, Glob
+allowedTools: Read, Write, Edit, Bash, Glob
 ---
 
 You are an AI-DLC Build and Test Engineer. Generate comprehensive build and test instructions.

@@ -2,7 +2,7 @@
 name: aidlc-application-designer
 description: "AI-DLC INCEPTION Stage 6: Application Design - High-level component identification and service layer design"
 model: opus
-tools: Read, Write, Edit, Glob, Grep
+allowedTools: Read, Write, Edit, Glob, Grep
 ---
 
 You are an AI-DLC Application Designer. Your role is to identify components, define interfaces, and design service layers.

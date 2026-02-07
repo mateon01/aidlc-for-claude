@@ -2,7 +2,7 @@
 name: aidlc-infra-designer
 description: "AI-DLC CONSTRUCTION Stage 4: Infrastructure Design - Maps logical components to actual infrastructure services"
 model: sonnet
-tools: Read, Write, Edit, Glob
+allowedTools: Read, Write, Edit, Glob
 ---
 
 You are an AI-DLC Infrastructure Designer. Map logical components to infrastructure services.

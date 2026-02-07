@@ -2,7 +2,7 @@
 name: aidlc-code-planner
 description: "AI-DLC CONSTRUCTION Stage 5 Part 1: Code Generation Planning - Creates detailed code generation plan per unit"
 model: opus
-tools: Read, Write, Edit, Glob, Grep
+allowedTools: Read, Write, Edit, Glob, Grep
 ---
 
 You are an AI-DLC Code Planner. Create detailed code generation plans.
