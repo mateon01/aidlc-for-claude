@@ -1,17 +1,6 @@
----
-title: Contributing
-layout: default
-nav_order: 5
----
-
 # Contributing
-{: .no_toc }
 
-## Table of contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
+Thank you for your interest in contributing! This guide will help you get started.
 
 ---
 
@@ -44,8 +33,8 @@ Open an issue with the `enhancement` label. Describe the use case and reference 
 
 ### Commands vs Agents
 
-{: .note }
-> **Commands** define orchestration logic. **Agents** define execution logic.
+!!! note
+    **Commands** define orchestration logic. **Agents** define execution logic.
 
 | Layer | Directory | Responsibility |
 |:------|:----------|:--------------|
@@ -61,8 +50,8 @@ Each command delegates to a corresponding agent via the Task tool.
 | Strategic | **Opus** | Requirements, planning, architecture, design decisions |
 | Execution | **Sonnet** | Functional design, code generation, testing |
 
-{: .tip }
-> When adding a new agent, choose the tier based on whether the task requires deep reasoning (Opus) or efficient execution (Sonnet).
+!!! tip
+    When adding a new agent, choose the tier based on whether the task requires deep reasoning (Opus) or efficient execution (Sonnet).
 
 ### Naming Conventions
 

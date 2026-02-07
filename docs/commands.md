@@ -1,17 +1,4 @@
----
-title: Commands & Agents
-layout: default
-nav_order: 4
----
-
 # Commands & Agents
-{: .no_toc }
-
-## Table of contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
 
 ---
 
@@ -60,7 +47,7 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 
 Each command delegates to a specialized agent. Agents are tiered by model for cost-efficiency.
 
-### Opus Agents (Strategic Reasoning)
+### :material-brain: Opus Agents (Strategic Reasoning)
 
 | Agent | Purpose |
 |:------|:--------|
@@ -72,7 +59,7 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | `aidlc-units-planner` | System decomposition into implementation units |
 | `aidlc-code-planner` | Code generation plan creation |
 
-### Sonnet Agents (Volume Work)
+### :material-lightning-bolt: Sonnet Agents (Volume Work)
 
 | Agent | Purpose |
 |:------|:--------|
@@ -96,4 +83,5 @@ Three stages use a two-part approach for quality assurance:
 | Units Generation | Decomposition plan | Unit definition documents |
 | Code Generation | File-by-file code plan (Opus) | Actual code generation (Sonnet) |
 
-In each case, you approve the plan before execution begins.
+!!! note
+    In each case, you approve the plan before execution begins.

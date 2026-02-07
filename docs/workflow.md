@@ -1,21 +1,8 @@
----
-title: Workflow
-layout: default
-nav_order: 3
----
-
 # Workflow Details
-{: .no_toc }
-
-## Table of contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
 
 ---
 
-## INCEPTION Phase (WHAT and WHY)
+## INCEPTION Phase -- What and Why
 
 The Inception phase establishes what needs to be built and why. It consists of 7 stages.
 
@@ -48,7 +35,10 @@ Creates user stories following INVEST criteria (Independent, Negotiable, Valuabl
 
 ### Stage 5: Workflow Planning
 
-The critical decision stage. Evaluates all gathered context and determines which subsequent stages are needed. You can override any recommendation.
+!!! important
+    This is the critical decision stage. It determines which subsequent stages are needed.
+
+Evaluates all gathered context and produces an execution plan. You can override any recommendation.
 
 ### Stage 6: Application Design (Conditional)
 
@@ -60,25 +50,36 @@ Decomposes the system into implementation units. Each unit becomes the scope for
 
 ---
 
-## CONSTRUCTION Phase (HOW)
+## CONSTRUCTION Phase -- How
 
-The Construction phase implements the system. For each unit, it runs a loop of 4-5 stages, followed by a final build and test stage.
+The Construction phase implements the system. For each unit, it runs a loop of stages, followed by a final build and test stage.
 
 ### Per-Unit Loop
 
 For each unit defined in Inception:
 
-**Step 1: Functional Design** -- Business logic, domain models, rules, and entities specific to this unit.
+=== "Step 1: Functional Design"
 
-**Step 2: NFR Requirements** -- Quality attributes (performance, security, reliability) and technology stack decisions for this unit.
+    Business logic, domain models, rules, and entities specific to this unit.
 
-**Step 3: NFR Design** -- Patterns and logical components that satisfy the non-functional requirements.
+=== "Step 2: NFR Requirements"
 
-**Step 4: Infrastructure Design** -- Maps logical components to infrastructure services (databases, caches, queues, etc.).
+    Quality attributes (performance, security, reliability) and technology stack decisions.
 
-**Step 5: Code Generation** -- Two-part stage:
-1. **Planning** (Opus) -- Creates a detailed code generation plan with file-by-file breakdown
-2. **Execution** (Sonnet) -- Generates actual code following the plan
+=== "Step 3: NFR Design"
+
+    Patterns and logical components that satisfy the non-functional requirements.
+
+=== "Step 4: Infrastructure Design"
+
+    Maps logical components to infrastructure services (databases, caches, queues, etc.).
+
+=== "Step 5: Code Generation"
+
+    Two-part stage:
+
+    1. **Planning** (Opus) -- Creates a detailed code generation plan with file-by-file breakdown
+    2. **Execution** (Sonnet) -- Generates actual code following the plan
 
 ### Build and Test
 
@@ -96,19 +97,22 @@ Placeholder for deployment, monitoring, and operational concerns. Will be implem
 
 | Stage | Simple Bug Fix | New Feature | Brownfield | Infra Change |
 |:------|:-:|:-:|:-:|:-:|
-| Workspace Detection | Always | Always | Always | Always |
-| Reverse Engineering | - | - | Yes | - |
-| Requirements Analysis | Always | Always | Always | Always |
-| User Stories | - | Yes | Conditional | - |
-| Workflow Planning | Always | Always | Always | Always |
-| Application Design | - | Yes | Conditional | - |
-| Units Generation | - | Yes | Conditional | - |
-| Functional Design | - | Yes | Conditional | - |
-| NFR Requirements | - | Yes | Conditional | - |
-| NFR Design | - | Yes | Conditional | - |
-| Infrastructure Design | - | Yes | Conditional | Yes |
-| Code Generation | Always | Always | Always | Always |
-| Build and Test | Always | Always | Always | Always |
+| Workspace Detection | :material-check: | :material-check: | :material-check: | :material-check: |
+| Reverse Engineering | -- | -- | :material-check: | -- |
+| Requirements Analysis | :material-check: | :material-check: | :material-check: | :material-check: |
+| User Stories | -- | :material-check: | :material-dots-horizontal: | -- |
+| Workflow Planning | :material-check: | :material-check: | :material-check: | :material-check: |
+| Application Design | -- | :material-check: | :material-dots-horizontal: | -- |
+| Units Generation | -- | :material-check: | :material-dots-horizontal: | -- |
+| Functional Design | -- | :material-check: | :material-dots-horizontal: | -- |
+| NFR Requirements | -- | :material-check: | :material-dots-horizontal: | -- |
+| NFR Design | -- | :material-check: | :material-dots-horizontal: | -- |
+| Infrastructure Design | -- | :material-check: | :material-dots-horizontal: | :material-check: |
+| Code Generation | :material-check: | :material-check: | :material-check: | :material-check: |
+| Build and Test | :material-check: | :material-check: | :material-check: | :material-check: |
+
+!!! note "Legend"
+    :material-check: = Always executed | :material-dots-horizontal: = Conditional | -- = Skipped
 
 ---
 

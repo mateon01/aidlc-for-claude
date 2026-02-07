@@ -1,24 +1,11 @@
----
-title: Getting Started
-layout: default
-nav_order: 2
----
-
 # Getting Started
-{: .no_toc }
-
-## Table of contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
 
 ---
 
 ## Installation
 
-{: .important }
-> Requires [Claude Code](https://claude.ai/code) v2.0 or later.
+!!! warning "Requirements"
+    [Claude Code](https://claude.ai/code) v2.0 or later is required.
 
 ### Step 1: Add the marketplace
 
@@ -32,13 +19,13 @@ claude plugin marketplace add https://github.com/mateon01/aidlc-for-claude
 claude plugin install aidlc-for-claude
 ```
 
-### Verify
+### Step 3: Verify
 
 ```bash
 claude plugin list
 ```
 
-You should see `aidlc-for-claude` listed as enabled.
+You should see `aidlc-for-claude` listed as **enabled**.
 
 ---
 
@@ -50,8 +37,8 @@ Launch Claude Code in your project directory and run:
 /aidlc
 ```
 
-{: .tip }
-> That's all you need. The orchestrator handles everything from here.
+!!! tip
+    That's all you need. The orchestrator handles everything from here.
 
 The orchestrator will:
 
@@ -66,13 +53,26 @@ The orchestrator will:
 
 You can run any stage independently:
 
-```
-/aidlc-requirements-analysis
-/aidlc-code-generation
-```
+=== "Requirements"
 
-{: .note }
-> This is useful when you want to re-run a specific stage or start from a particular point in the workflow.
+    ```
+    /aidlc-requirements-analysis
+    ```
+
+=== "Code Generation"
+
+    ```
+    /aidlc-code-generation
+    ```
+
+=== "Build & Test"
+
+    ```
+    /aidlc-build-and-test
+    ```
+
+!!! note
+    This is useful when you want to re-run a specific stage or start from a particular point in the workflow.
 
 ---
 
@@ -96,8 +96,8 @@ Which authentication method do you prefer?
 [Answer]:
 ```
 
-{: .tip }
-> Fill in the answers in the file and the workflow continues. This keeps all decisions documented and auditable.
+!!! tip
+    Fill in the answers in the file and the workflow continues. This keeps all decisions documented and auditable.
 
 ---
 
@@ -126,5 +126,5 @@ aidlc-docs/
     build-and-test/                 # Build and test instructions
 ```
 
-{: .warning }
-> Application code is always generated at the **workspace root**, never inside `aidlc-docs/`. The `aidlc-docs/` directory contains only documentation and workflow artifacts.
+!!! warning
+    Application code is always generated at the **workspace root**, never inside `aidlc-docs/`. The `aidlc-docs/` directory contains only documentation and workflow artifacts.

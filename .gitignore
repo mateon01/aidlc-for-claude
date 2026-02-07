@@ -21,8 +21,5 @@ aidlc-docs/
 *.log
 npm-debug.log*
 
-# Jekyll (GitHub Pages)
-docs/_site/
-docs/.jekyll-cache/
-docs/.jekyll-metadata
-docs/Gemfile.lock
+# MkDocs
+site/

@@ -1,0 +1,81 @@
+site_name: AI-DLC for Claude Code
+site_url: https://mateon01.github.io/aidlc-for-claude
+site_description: A structured, adaptive software development workflow plugin for Claude Code
+site_author: AI-DLC
+
+repo_name: mateon01/aidlc-for-claude
+repo_url: https://github.com/mateon01/aidlc-for-claude
+
+theme:
+  name: material
+  language: ko
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to dark mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Workflow:
+    - Overview: workflow.md
+    - Commands & Agents: commands.md
+  - Contributing: contributing.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.mark
+  - pymdownx.critic
+  - pymdownx.keys
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/mateon01/aidlc-for-claude
+
+copyright: "Copyright &copy; 2025 AI-DLC &mdash; Adapted from <a href='https://github.com/awslabs/aidlc-workflows'>AWS Labs AI-DLC</a>"
