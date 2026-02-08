@@ -8,7 +8,7 @@ The Inception phase establishes what needs to be built and why. It consists of 7
 
 ### Stage 1: Workspace Detection
 
-Scans the workspace to determine if it's greenfield (new project) or brownfield (existing code). For brownfield projects, this stage also performs a **scope assessment** -- asking whether the change is simple, complex, or requires the full structured workflow. This determines the fast path routing.
+Scans the workspace to determine if it's greenfield (new project) or brownfield (existing code). For brownfield projects, this stage also performs a **scope assessment** -- asking whether the change is a simple fix, a complex modification, a new component within the existing repo, or requires the full structured workflow. This determines the fast path routing.
 
 ### Stage 2: Reverse Engineering (Brownfield Only)
 

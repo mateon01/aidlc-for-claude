@@ -203,7 +203,7 @@ aidlc-for-claude/
   .claude-plugin/
     plugin.json                     # Plugin metadata
     marketplace.json                # Marketplace listing
-  commands/                         # 15 slash commands
+  commands/                         # 16 slash commands
     aidlc.md                        # Entry point orchestrator
     aidlc-workspace-detection.md
     aidlc-reverse-engineering.md
@@ -212,6 +212,7 @@ aidlc-for-claude/
     aidlc-workflow-planning.md
     aidlc-application-design.md
     aidlc-units-generation.md
+    aidlc-system-nfr.md
     aidlc-functional-design.md
     aidlc-nfr-requirements.md
     aidlc-nfr-design.md
@@ -219,7 +220,7 @@ aidlc-for-claude/
     aidlc-code-generation.md
     aidlc-build-and-test.md
     aidlc-operations.md
-  agents/                           # 14 specialized agents
+  agents/                           # 16 specialized agents
     aidlc-workspace-analyst.md
     aidlc-reverse-engineer.md
     aidlc-requirements-analyst.md
@@ -227,6 +228,7 @@ aidlc-for-claude/
     aidlc-workflow-planner.md
     aidlc-application-designer.md
     aidlc-units-planner.md
+    aidlc-system-nfr-analyst.md
     aidlc-functional-designer.md
     aidlc-nfr-analyst.md
     aidlc-nfr-designer.md
@@ -234,6 +236,7 @@ aidlc-for-claude/
     aidlc-code-planner.md
     aidlc-code-generator.md
     aidlc-build-test-engineer.md
+    aidlc-ops-generator.md
   docs/                             # GitHub Pages (Material for MkDocs)
   .github/workflows/                # CI/CD (docs deployment)
   .gitignore
