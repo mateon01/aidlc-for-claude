@@ -48,7 +48,7 @@ The orchestrator will:
 
 1. **Detect your workspace** -- greenfield (empty) or brownfield (existing code)
 2. **Gather requirements** -- ask what you want to build
-3. **Create an execution plan** -- determine which stages are needed
+3. **Create an execution plan** -- determine which stages are needed (including System NFR for multi-unit projects)
 4. **Walk through each stage** -- with your approval at every step
 
 ---
@@ -59,6 +59,7 @@ When working with an existing codebase, AI-DLC detects it as brownfield and asks
 
 - **Simple change** -- Bug fixes, small features, config changes. Skips most analysis stages and goes directly to code generation. Fastest path.
 - **Complex change** -- Multi-component features or refactoring. Streamlined path that includes requirements analysis but skips user stories.
+- **New component** -- Greenfield development within an existing repository. Adds a new component to existing system using full structured workflow.
 - **Full workflow** -- Complete AI-DLC treatment. All stages evaluated based on your project's needs.
 
 !!! tip
@@ -86,6 +87,12 @@ You can run any stage independently:
 
     ```
     /aidlc-requirements-analysis
+    ```
+
+=== "System NFR"
+
+    ```
+    /aidlc-system-nfr
     ```
 
 === "Code Generation"
@@ -138,6 +145,7 @@ aidlc-docs/
     user-stories/                   # Stories + personas
     application-design/             # Components, services, dependencies
   construction/
+    system-nfr-decisions.md         # System-level NFR (multi-unit projects)
     plans/                          # Per-unit code plans
     {unit-name}/
       functional-design/            # Business logic, rules, entities
@@ -146,6 +154,9 @@ aidlc-docs/
       infrastructure-design/        # Service mapping
       code/                         # Code summaries
     build-and-test/                 # Build and test instructions
+  operations/
+    deployment-checklist.md         # Deployment steps and validation
+    developer-readme.md             # Developer onboarding and setup
 ```
 
 !!! warning

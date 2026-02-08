@@ -28,6 +28,7 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 
 | Command | Stage | Description |
 |:--------|:------|:------------|
+| `/aidlc-system-nfr` | 0 | System-level NFR decisions (multi-unit projects) |
 | `/aidlc-functional-design` | 1 | Business logic design (per-unit) |
 | `/aidlc-nfr-requirements` | 2 | Non-functional requirements (per-unit) |
 | `/aidlc-nfr-design` | 3 | NFR pattern design (per-unit) |
@@ -39,7 +40,7 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 
 | Command | Description |
 |:--------|:------------|
-| `/aidlc-operations` | Placeholder for future release |
+| `/aidlc-operations` | Deployment checklist and developer README generation |
 
 ---
 
@@ -67,11 +68,13 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | Agent | Purpose |
 |:------|:--------|
 | `aidlc-for-claude:aidlc-functional-designer` | Business logic and domain model design |
+| `aidlc-for-claude:aidlc-system-nfr-analyst` | System-level NFR decisions for multi-unit projects |
 | `aidlc-for-claude:aidlc-nfr-analyst` | Non-functional requirements assessment |
 | `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
 | `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
 | `aidlc-for-claude:aidlc-code-generator` | Code generation execution |
 | `aidlc-for-claude:aidlc-build-test-engineer` | Build and test execution with instruction generation |
+| `aidlc-for-claude:aidlc-ops-generator` | Deployment checklist and developer README generation |
 
 ### :material-speedometer: Haiku Agents (Fast Detection)
 

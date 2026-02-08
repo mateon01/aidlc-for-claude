@@ -127,6 +127,15 @@ When a stage agent fails or produces incomplete results:
 4. **Code generation build failure**: Handled by Build & Test retry loop (max 3 attempts). If still failing after retries, present results and let user decide.
 5. **Mid-workflow abort**: Preserve all completed artifacts. On next `/aidlc` run, offer to resume from the last completed stage.
 
+### Stage Navigation
+
+Users can request to jump to or re-run a specific stage at any approval gate:
+- "Skip to Code Generation" — fast-forward, marking skipped stages as SKIPPED in aidlc-state.md
+- "Re-run Functional Design for unit-auth" — resets that stage status to PENDING, re-executes the agent
+- "Go back to Requirements Analysis" — resets all subsequent stages to PENDING, re-executes from that point
+
+When re-running a stage, warn the user that downstream artifacts may become inconsistent and offer to reset them.
+
 ### Batch Approval Mode
 
 After Workflow Planning approval, offer the user a batch approval option (via AskUserQuestion):

@@ -48,16 +48,18 @@ AI-DLC has three phases. Each phase contains stages that may execute conditional
 +-----------------------------------------------------------------------+
 |                     CONSTRUCTION (HOW)                                |
 |                                                                       |
+|  System NFR Assessment -->                                            |
 |  FOR each unit:                                                       |
 |    Functional Design --> NFR Requirements --> NFR Design               |
 |    --> Infrastructure Design --> Code Generation                      |
 |                                                                       |
 |  Build and Test (after all units)                                     |
+|  Operations (deployment checklist + README)                           |
 +-----------------------------------+-----------------------------------+
                                     |
                                     v
 +-----------------------------------------------------------------------+
-|                     OPERATIONS (future)                               |
+|                     OPERATIONS                                        |
 +-----------------------------------------------------------------------+
 ```
 
@@ -87,13 +89,14 @@ You can override any recommendation at the Workflow Planning approval gate.
 | `/aidlc-workflow-planning` | INCEPTION 5 | Determine execution plan |
 | `/aidlc-application-design` | INCEPTION 6 | Component and service layer design |
 | `/aidlc-units-generation` | INCEPTION 7 | Decompose system into units |
+| `/aidlc-system-nfr` | CONSTRUCTION 0 | System-level NFR decisions (multi-unit projects) |
 | `/aidlc-functional-design` | CONSTRUCTION 1 | Business logic design (per-unit) |
 | `/aidlc-nfr-requirements` | CONSTRUCTION 2 | Non-functional requirements (per-unit) |
 | `/aidlc-nfr-design` | CONSTRUCTION 3 | NFR pattern design (per-unit) |
 | `/aidlc-infrastructure-design` | CONSTRUCTION 4 | Infrastructure mapping (per-unit) |
 | `/aidlc-code-generation` | CONSTRUCTION 5 | Code generation (per-unit) |
 | `/aidlc-build-and-test` | CONSTRUCTION 6 | Build, test, and validate (actual execution) |
-| `/aidlc-operations` | OPERATIONS | Placeholder for future release |
+| `/aidlc-operations` | OPERATIONS | Deployment checklist and developer README generation |
 
 ## Agents
 
@@ -117,10 +120,12 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 |-------|---------|
 | `aidlc-for-claude:aidlc-functional-designer` | Business logic and domain model design |
 | `aidlc-for-claude:aidlc-nfr-analyst` | Non-functional requirements assessment |
+| `aidlc-for-claude:aidlc-system-nfr-analyst` | System-level NFR decisions for multi-unit projects |
 | `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
 | `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
 | `aidlc-for-claude:aidlc-code-generator` | Code generation execution |
 | `aidlc-for-claude:aidlc-build-test-engineer` | Build and test execution with instruction generation |
+| `aidlc-for-claude:aidlc-ops-generator` | Deployment checklist and developer README generation |
 
 ### Haiku (Fast Detection)
 
@@ -128,13 +133,19 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 |-------|---------|
 | `aidlc-for-claude:aidlc-workspace-analyst` | Workspace scanning and project type detection |
 
-**Model strategy:** Opus handles stages requiring deep reasoning (requirements analysis, architectural decisions, planning). Sonnet handles volume work (design documents, code generation, testing). Haiku handles fast detection (workspace scanning, project classification).
+**Model strategy:** Opus handles stages requiring deep reasoning (requirements analysis, architectural decisions, planning). Sonnet handles volume work (design documents, code generation, testing, operations). Haiku handles fast detection (workspace scanning, project classification).
+
+Total: **16 specialized agents** across 3 model tiers.
 
 ## Key Conventions
 
 **Interactive Q&A** -- Simple preference questions use Claude Code's interactive question UI (AskUserQuestion) with clickable options. Complex questions with many items use document-based questionnaires. All decisions are documented in the audit trail.
 
-**Brownfield fast path** -- For existing codebases, a scope assessment after workspace detection lets you choose between a simple fast path (skips most analysis, goes directly to code generation), a complex streamlined path, or the full structured workflow.
+**Brownfield fast path** -- For existing codebases, a scope assessment after workspace detection lets you choose between four options: simple change (fast path to code generation), complex change (streamlined path), new component within existing repo, or full structured workflow.
+
+**Prerequisite validation** -- Construction agents verify required input files exist before proceeding, failing fast with clear errors if a prior stage was skipped.
+
+**System-level NFR** -- For multi-unit projects, cross-cutting NFR decisions (authentication, observability, error handling) are established once before the per-unit loop, preventing contradictory choices.
 
 **Approval gates** are required at each stage. You review the generated artifacts and choose to approve, request changes, or add/remove stages.
 
@@ -171,6 +182,7 @@ aidlc-docs/
     user-stories/                   # Stories + personas
     application-design/             # Components, services, dependencies
   construction/
+    system-nfr-decisions.md         # System-level NFR (multi-unit projects)
     plans/                          # Per-unit code plans
     {unit-name}/
       functional-design/            # Business logic, rules, entities
@@ -179,6 +191,9 @@ aidlc-docs/
       infrastructure-design/        # Service mapping
       code/                         # Code summaries (code itself at workspace root)
     build-and-test/                 # Build and test instructions
+  operations/
+    deployment-checklist.md         # Deployment steps and validation
+    developer-readme.md             # Developer onboarding and setup
 ```
 
 ## Plugin Structure
