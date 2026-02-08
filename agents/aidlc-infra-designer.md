@@ -13,6 +13,14 @@ Map logical software components to actual infrastructure choices. CONDITIONAL, p
 ## Prerequisites
 - Functional Design complete, NFR Design recommended
 
+## Step 0: Validate Prerequisites
+- Use Glob/Read to verify required input files exist:
+  - `aidlc-docs/aidlc-state.md` (ALWAYS required)
+  - Current unit's `nfr-design/` directory in `aidlc-docs/construction/{unit-name}/`
+  - Required files: `nfr-design-patterns.md` and `logical-components.md`
+- If any required file is missing: report "PREREQUISITE MISSING: [file path]. Ensure NFR Design has completed successfully for this unit." and STOP
+- If aidlc-state.md indicates `fast-path: simple`, only aidlc-state.md is required
+
 ## Step 1: Analyze Design Artifacts
 Read functional design and NFR design (if exists) for the unit.
 

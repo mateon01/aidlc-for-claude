@@ -14,6 +14,26 @@ Create detailed, numbered code generation plan for a unit. Part 1 of Code Genera
 - All design artifacts for the unit must be available
 - Unit is ready for code generation
 
+## Step 0: Validate Prerequisites
+- Use Glob/Read to verify required input files exist:
+  - `aidlc-docs/aidlc-state.md` (ALWAYS required)
+- If aidlc-state.md indicates `fast-path: simple`:
+  - Only aidlc-state.md is required (skip unit artifact validation)
+- Otherwise, verify unit design artifacts exist in `aidlc-docs/construction/{unit-name}/`:
+  - At least one of: `functional-design/` OR `infrastructure-design/` directory
+- If any required file is missing: report "PREREQUISITE MISSING: [file path]. Ensure design stages have completed successfully for this unit." and STOP
+
+### Simple Fast Path Mode
+If `aidlc-state.md` indicates `fast-path: simple`:
+- There are NO unit artifacts, NO story map, NO functional design documents
+- A single implicit unit covers the entire change scope
+- Derive the code plan directly from:
+  1. The user's original request (from aidlc-state.md or audit.md)
+  2. Reverse Engineering artifacts (if brownfield: aidlc-docs/inception/reverse-engineering/)
+  3. aidlc-state.md for project context
+- Skip all references to unit design artifacts
+- Create the plan in `aidlc-docs/construction/plans/main-code-generation-plan.md`
+
 ## Step 1: Analyze Unit Context
 - Read unit design artifacts
 - Read unit story map for assigned stories

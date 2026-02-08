@@ -14,6 +14,14 @@ Detailed business logic, domain models, business rules. CONDITIONAL, per-unit st
 - Units Generation complete, unit artifacts available
 - Application Design recommended
 
+## Step 0: Validate Prerequisites
+- Use Glob/Read to verify required input files exist:
+  - `aidlc-docs/aidlc-state.md` (ALWAYS required)
+  - At least one unit defined in state (verify via Read of aidlc-state.md)
+  - `aidlc-docs/inception/` directory exists
+- If any required file is missing: report "PREREQUISITE MISSING: [file path]. Ensure Units Generation has completed successfully." and STOP
+- If aidlc-state.md indicates `fast-path: simple`, only aidlc-state.md is required
+
 ## Step 1: Analyze Unit Context
 Read unit definition from unit-of-work.md and assigned stories from unit-of-work-story-map.md.
 - If this is NOT the first unit: Read completed functional design artifacts from prior units in `aidlc-docs/construction/*/functional-design/`. Identify shared domain entities, established patterns, and conventions to maintain consistency.

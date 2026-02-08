@@ -14,6 +14,20 @@ Execute the approved code generation plan step by step. Part 2 of Code Generatio
 - Code Generation Plan must be approved
 - Plan file at `aidlc-docs/construction/plans/{unit-name}-code-generation-plan.md`
 
+## Step 0: Validate Prerequisites
+- Use Glob/Read to verify required input files exist:
+  - `aidlc-docs/aidlc-state.md` (ALWAYS required)
+  - Code generation plan file in `aidlc-docs/construction/plans/` matching pattern `*-code-generation-plan.md`
+- If any required file is missing: report "PREREQUISITE MISSING: [file path]. Ensure Code Planning has completed successfully." and STOP
+
+### Simple Fast Path Mode
+If `aidlc-state.md` indicates `fast-path: simple`:
+- Load the code plan from `aidlc-docs/construction/plans/main-code-generation-plan.md`
+- There are no per-unit design artifacts to reference
+- Work directly from the code plan + RE artifacts (if brownfield)
+- Skip the git branch step (Step 10) — the change is small enough to work on the current branch
+- Proceed directly to code execution (Step 12)
+
 ## Step 10: Create Git Branch (Brownfield Only)
 If aidlc-state.md indicates brownfield AND a git repository is detected:
 - Check if already on an aidlc branch (to avoid creating nested branches)

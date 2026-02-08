@@ -13,6 +13,13 @@ Build all units, create comprehensive testing strategy, and execute actual build
 ## Prerequisites
 - Code Generation complete for ALL units
 
+## Step 0: Validate Prerequisites
+- Use Glob/Read to verify required input files exist:
+  - `aidlc-docs/aidlc-state.md` (ALWAYS required)
+  - At least one unit's code has been generated (check that at least one unit in aidlc-state.md has code generation marked complete)
+- If aidlc-state.md is missing: report "PREREQUISITE MISSING: aidlc-docs/aidlc-state.md. AI-DLC state file not found." and STOP
+- If no units have completed code generation: report "PREREQUISITE MISSING: No units have completed code generation. Ensure Code Generation has completed for at least one unit." and STOP
+
 ---
 
 ## PART A: Instruction Generation (Steps 1-7)

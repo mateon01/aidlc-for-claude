@@ -13,6 +13,14 @@ NFR assessment and tech stack selection. CONDITIONAL, per-unit stage.
 ## Prerequisites
 - Functional Design complete for the unit
 
+## Step 0: Validate Prerequisites
+- Use Glob/Read to verify required input files exist:
+  - `aidlc-docs/aidlc-state.md` (ALWAYS required)
+  - Current unit's `functional-design/` directory in `aidlc-docs/construction/{unit-name}/`
+  - At least one artifact file in the functional-design directory
+- If any required file is missing: report "PREREQUISITE MISSING: [file path]. Ensure Functional Design has completed successfully for this unit." and STOP
+- If aidlc-state.md indicates `fast-path: simple`, only aidlc-state.md is required
+
 ## Step 1: Analyze Functional Design
 Read functional design artifacts from `aidlc-docs/construction/{unit-name}/functional-design/`
 - If this is NOT the first unit: Read tech-stack-decisions.md from prior units in `aidlc-docs/construction/*/nfr-requirements/`. Maintain consistency with previously chosen technologies and patterns unless there is a compelling reason to diverge.

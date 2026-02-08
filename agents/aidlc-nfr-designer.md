@@ -13,6 +13,14 @@ NFR pattern selection and logical component design. CONDITIONAL, per-unit (requi
 ## Prerequisites
 - NFR Requirements complete for the unit
 
+## Step 0: Validate Prerequisites
+- Use Glob/Read to verify required input files exist:
+  - `aidlc-docs/aidlc-state.md` (ALWAYS required)
+  - Current unit's `nfr-requirements/` directory in `aidlc-docs/construction/{unit-name}/`
+  - Required files: `nfr-requirements.md` and `tech-stack-decisions.md`
+- If any required file is missing: report "PREREQUISITE MISSING: [file path]. Ensure NFR Requirements has completed successfully for this unit." and STOP
+- If aidlc-state.md indicates `fast-path: simple`, only aidlc-state.md is required
+
 ## Step 1: Analyze NFR Requirements
 Read from `aidlc-docs/construction/{unit-name}/nfr-requirements/`
 
