@@ -159,6 +159,11 @@ After Workspace Detection, if the project is brownfield, the user is asked about
 - Executes: Workspace Detection → RE → Requirements Analysis → Workflow Planning → (remaining per planner)
 - Records `fast-path: complex` in aidlc-state.md
 
+**New Component** (building new component alongside existing code):
+- Reverse Engineering runs in targeted mode (integration points only). All INCEPTION stages execute but with narrowed scope.
+- Executes: Workspace Detection → RE (targeted) → Requirements Analysis → User Stories → Workflow Planning → (remaining per planner)
+- Records `fast-path: new-component` in aidlc-state.md
+
 **Full Structured Workflow**:
 - Current behavior unchanged
 - Records `fast-path: full` in aidlc-state.md
@@ -178,13 +183,23 @@ Execute stages in order. For each stage, delegate to the corresponding agent via
 
 ### CONSTRUCTION PHASE (HOW)
 
+**Stage 0: System NFR Assessment** (CONDITIONAL, before per-unit loop):
+- Execute if 2+ units exist
+- Agent: `aidlc-for-claude:aidlc-system-nfr-analyst` → APPROVAL GATE
+- Creates `aidlc-docs/construction/system-nfr-decisions.md`
+- Establishes cross-cutting NFR decisions (auth, observability, error handling, shared infrastructure, API conventions)
+- Per-unit NFR analysts MUST read this document to ensure consistency
+
+**Per-unit Construction Loop:**
+
 Execute per-unit loop for each unit from Units Generation:
 
-**Cross-unit Context:** When starting Unit N (N > 1), pass summaries of all completed units (1 through N-1) as additional context to the agent. Include completed functional design summaries, tech stack decisions from prior units, shared patterns and conventions established, and domain entities already defined. This ensures consistency across units.
+**Cross-unit Context:** When starting Unit N (N > 1), pass summaries of all completed units (1 through N-1) as additional context to the agent. Include completed functional design summaries, tech stack decisions from prior units, shared patterns and conventions established, and domain entities already defined. This ensures consistency across units. Additionally, ALL per-unit NFR analysts MUST read `aidlc-docs/construction/system-nfr-decisions.md` (if it exists) to align with system-wide decisions.
 
 **FOR each unit:**
 1. **Functional Design** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-functional-designer` → APPROVAL GATE
 2. **NFR Requirements** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-nfr-analyst` → APPROVAL GATE
+   - Agent MUST read system-nfr-decisions.md before generating unit-specific NFR requirements
 3. **NFR Design** (CONDITIONAL, requires NFR Requirements) → Agent: `aidlc-for-claude:aidlc-nfr-designer` → APPROVAL GATE
 4. **Infrastructure Design** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-infra-designer` → APPROVAL GATE
 5. **Code Generation** (ALWAYS) → Agents: `aidlc-for-claude:aidlc-code-planner` then `aidlc-for-claude:aidlc-code-generator` → APPROVAL GATE x2
@@ -225,6 +240,7 @@ aidlc-docs/
     user-stories/
     application-design/
   construction/
+    system-nfr-decisions.md
     plans/
     {unit-name}/
       functional-design/

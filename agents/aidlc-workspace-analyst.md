@@ -44,21 +44,25 @@ If `brownfield = true`, ask the user about the scope of their change using AskUs
 
 - **Simple change** — Bug fix, small feature, config change. Fast path: skips most analysis stages, goes directly to planning and code generation.
 - **Complex change** — Significant new feature, multi-component refactoring. Streamlined path: includes requirements analysis but skips user stories.
+- **New component** — Building something new alongside existing code (e.g., new microservice in a monorepo). Triggers targeted RE on integration points only, not full codebase analysis.
 - **Full structured workflow** — Complete AI-DLC treatment with all stages evaluated.
 
-Record the user's choice as `scope-assessment: simple|complex|full`.
+Record the user's choice as `scope-assessment: simple|complex|new-component|full`.
 
 If greenfield, skip this step (greenfield always uses full workflow).
 
 ## Step 4: Create Initial State File
 Create `aidlc-docs/aidlc-state.md` with project information, workspace state, code location rules, and stage progress section.
 
-If brownfield, include `fast-path: [simple|complex|full]` based on the scope assessment from Step 3.5.
+If brownfield, include `fast-path: [simple|complex|new-component|full]` based on the scope assessment from Step 3.5.
+
+When `new-component` is selected, add a note that Reverse Engineering should focus on integration points only (shared libraries, APIs, database schemas, service boundaries) rather than full codebase analysis.
 
 ## Step 5: Present Completion Message
 - For Greenfield: Show findings summary + "Proceeding to Requirements Analysis"
 - For Brownfield + Simple: Show findings summary + "Fast path activated. Proceeding to Reverse Engineering (if needed) then directly to Workflow Planning and Code Generation."
 - For Brownfield + Complex: Show findings summary + "Streamlined path activated. Proceeding to Reverse Engineering then Requirements Analysis."
+- For Brownfield + New Component: Show findings summary + "New component path activated. Proceeding to targeted Reverse Engineering (integration points only) then full INCEPTION stages."
 - For Brownfield + Full: Show findings summary + "Full workflow activated. Proceeding to Reverse Engineering."
 
 ## Step 6: Automatically Proceed

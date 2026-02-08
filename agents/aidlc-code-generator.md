@@ -28,6 +28,8 @@ If `aidlc-state.md` indicates `fast-path: simple`:
 - Skip the git branch step (Step 10) — the change is small enough to work on the current branch
 - Proceed directly to code execution (Step 12)
 
+> **Note:** Steps 1-9 are handled by the Code Planner agent (aidlc-code-planner). This agent continues the Code Generation stage from Step 10.
+
 ## Step 10: Create Git Branch (Brownfield Only)
 If aidlc-state.md indicates brownfield AND a git repository is detected:
 - Check if already on an aidlc branch (to avoid creating nested branches)

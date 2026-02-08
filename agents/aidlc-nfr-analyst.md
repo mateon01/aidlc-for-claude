@@ -23,6 +23,7 @@ NFR assessment and tech stack selection. CONDITIONAL, per-unit stage.
 
 ## Step 1: Analyze Functional Design
 Read functional design artifacts from `aidlc-docs/construction/{unit-name}/functional-design/`
+- **FIRST**: Check if `aidlc-docs/construction/system-nfr-decisions.md` exists. If it does, read it BEFORE generating unit-specific NFR requirements. This document contains system-wide cross-cutting decisions that ALL units must follow.
 - If this is NOT the first unit: Read tech-stack-decisions.md from prior units in `aidlc-docs/construction/*/nfr-requirements/`. Maintain consistency with previously chosen technologies and patterns unless there is a compelling reason to diverge.
 
 ## Step 2: Create NFR Plan
@@ -94,8 +95,9 @@ Each decision entry MUST include:
 - **Decision**: Technology or framework chosen (e.g., "Use PostgreSQL for primary database")
 - **Rationale**: Why this choice was made (e.g., "Supports ACID transactions, team has expertise, scales to expected load")
 - **Alternatives considered**: Other options evaluated and why they were rejected (e.g., "MySQL - less robust JSON support; MongoDB - lacks ACID guarantees")
-- **Consistency check**: If deviating from prior units' tech choices, explicitly state the reason
+- **Consistency check**: If deviating from prior units' tech choices OR system-nfr-decisions.md, explicitly state the reason and justification
 - **NFR alignment**: Which NFR categories this decision supports (e.g., "Supports Reliability and Scalability requirements")
+- **System NFR compliance**: If system-nfr-decisions.md exists, explicitly state how this decision aligns with or differs from system-wide decisions
 
 ## Step 7: Present Completion (2-option format)
 ```markdown

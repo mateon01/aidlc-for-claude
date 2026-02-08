@@ -39,26 +39,79 @@ Analyze existing codebase and generate comprehensive design artifacts. Execute O
 ### 1.6 Code Quality Analysis
 - Languages and frameworks, test coverage, linting, CI/CD pipelines
 
-## Step 2-8: Generate Artifacts
+## Step 2: Generate Business Overview
 
-Create the following files in `aidlc-docs/inception/reverse-engineering/`:
+Create `aidlc-docs/inception/reverse-engineering/business-overview.md`:
+- Business context diagram
+- Business description
+- Business transactions
+- Business dictionary
+- Component business descriptions
 
-1. **business-overview.md** - Business context diagram, business description, transactions, dictionary, component business descriptions
-2. **architecture.md** - System overview, architecture diagram (Mermaid), component descriptions, data flow, integration points, infrastructure
-3. **code-structure.md** - Build system, key classes/modules (Mermaid class diagram), file inventory, design patterns, critical dependencies
-4. **api-documentation.md** - REST APIs, internal APIs, data models
-5. **component-inventory.md** - Application, infrastructure, shared, test packages with counts
-6. **technology-stack.md** - Languages, frameworks, infrastructure, build tools, testing tools
-7. **dependencies.md** - Internal dependencies (Mermaid diagram), external dependencies
-8. **code-quality-assessment.md** - Test coverage, code quality indicators, technical debt, patterns/anti-patterns
+## Step 3: Generate Architecture Map
 
-## Step 9: Create Timestamp File
+Create `aidlc-docs/inception/reverse-engineering/architecture.md`:
+- System overview
+- Architecture diagram (Mermaid)
+- Component descriptions
+- Data flow
+- Integration points
+- Infrastructure
+
+## Step 4: Generate Code Structure
+
+Create `aidlc-docs/inception/reverse-engineering/code-structure.md`:
+- Build system
+- Key classes/modules (Mermaid class diagram)
+- File inventory
+- Design patterns
+- Critical dependencies
+
+## Step 5: Generate API Inventory
+
+Create `aidlc-docs/inception/reverse-engineering/api-documentation.md`:
+- REST APIs
+- Internal APIs
+- Data models
+
+## Step 6: Generate Component Inventory
+
+Create `aidlc-docs/inception/reverse-engineering/component-inventory.md`:
+- Application packages with counts
+- Infrastructure packages with counts
+- Shared packages with counts
+- Test packages with counts
+
+## Step 7: Generate Tech Stack
+
+Create `aidlc-docs/inception/reverse-engineering/technology-stack.md`:
+- Languages
+- Frameworks
+- Infrastructure
+- Build tools
+- Testing tools
+
+## Step 8: Generate Dependency Graph
+
+Create `aidlc-docs/inception/reverse-engineering/dependencies.md`:
+- Internal dependencies (Mermaid diagram)
+- External dependencies
+
+## Step 9: Generate Code Quality Assessment
+
+Create `aidlc-docs/inception/reverse-engineering/code-quality-assessment.md`:
+- Test coverage
+- Code quality indicators
+- Technical debt
+- Patterns/anti-patterns
+
+## Step 10: Create Timestamp File
 Create `reverse-engineering-timestamp.md` with analysis date, analyzer, workspace path, files analyzed, artifacts checklist.
 
-## Step 10: Update State Tracking
+## Step 11: Update State Tracking
 Update `aidlc-docs/aidlc-state.md` to mark Reverse Engineering complete.
 
-## Step 11: Present Completion Message
+## Step 12: Present Completion Message
 ```markdown
 # Reverse Engineering Complete
 
