@@ -20,7 +20,7 @@ Create user stories with INVEST criteria through planning then generation.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-story-writer", model="opus",
-     prompt="Create user stories for the project. [context]")
+     prompt="Create user stories for the project. Context: aidlc-docs/aidlc-state.md, aidlc-docs/inception/requirements/, aidlc-docs/inception/reverse-engineering/ (if brownfield)")
 ```
 
 ## Next Stage

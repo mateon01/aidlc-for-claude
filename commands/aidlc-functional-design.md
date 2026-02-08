@@ -19,7 +19,7 @@ Detailed business logic design per unit (technology-agnostic).
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-functional-designer", model="sonnet",
-     prompt="Create functional design for unit [unit-name]. [context]")
+     prompt="Create functional design for unit [unit-name]. Context: aidlc-docs/aidlc-state.md, aidlc-docs/inception/application-design/, aidlc-docs/inception/requirements/, aidlc-docs/construction/{prior-unit}/functional-design/ (if unit N > 1)")
 ```
 
 ## Next Stage

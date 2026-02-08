@@ -19,7 +19,7 @@ High-level component identification and service layer design.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-application-designer", model="opus",
-     prompt="Design application components and service layers. [context]")
+     prompt="Design application components and service layers. Context: aidlc-docs/aidlc-state.md, aidlc-docs/inception/requirements/, aidlc-docs/inception/user-stories/ (if exists)")
 ```
 
 ## Next Stage

@@ -19,7 +19,7 @@ Map logical components to actual infrastructure services.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-infra-designer", model="sonnet",
-     prompt="Design infrastructure mapping for unit [unit-name]. [context]")
+     prompt="Design infrastructure mapping for unit [unit-name]. Context: aidlc-docs/aidlc-state.md, aidlc-docs/construction/{unit-name}/nfr-design/")
 ```
 
 ## Next Stage

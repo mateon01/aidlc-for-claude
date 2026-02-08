@@ -22,7 +22,7 @@ Build, test, and validate all completed units. Generates instruction documents A
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-build-test-engineer", model="sonnet",
-     prompt="Build, test, and validate all completed units. Generate instruction documents then execute actual build and test commands. [context]")
+     prompt="Build, test, and validate all completed units. Generate instruction documents then execute actual build and test commands. Context: aidlc-docs/aidlc-state.md, aidlc-docs/construction/*/functional-design/, aidlc-docs/construction/*/nfr-design/, aidlc-docs/construction/*/infrastructure-design/")
 ```
 
 ## Next Stage

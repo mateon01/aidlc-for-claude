@@ -19,7 +19,7 @@ Deep analysis of existing codebase for brownfield projects.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-reverse-engineer", model="opus",
-     prompt="Analyze the existing codebase and generate reverse engineering artifacts. [context]")
+     prompt="Analyze the existing codebase and generate reverse engineering artifacts. Context: aidlc-docs/aidlc-state.md")
 ```
 
 ## Next Stage

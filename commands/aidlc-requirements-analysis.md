@@ -18,7 +18,7 @@ Gather and analyze requirements with adaptive depth.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-requirements-analyst", model="opus",
-     prompt="Analyze requirements for the project. [context]")
+     prompt="Analyze requirements for the project. Context: aidlc-docs/aidlc-state.md, aidlc-docs/inception/reverse-engineering/ (if brownfield)")
 ```
 
 ## Next Stage

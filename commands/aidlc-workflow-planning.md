@@ -19,7 +19,7 @@ Determine which stages to execute and create the execution plan.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-workflow-planner", model="opus",
-     prompt="Create workflow execution plan based on all prior context. [context]")
+     prompt="Create workflow execution plan based on all prior context. Context: aidlc-docs/aidlc-state.md, aidlc-docs/inception/requirements/, aidlc-docs/inception/user-stories/ (if exists), aidlc-docs/inception/reverse-engineering/ (if brownfield)")
 ```
 
 ## Next Stage

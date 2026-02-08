@@ -100,6 +100,8 @@ Format for Tier 2:
 ---
 ```
 
+**Audit logging is the orchestrator's responsibility.** Individual agents do NOT need to log to audit.md — the orchestrator records all stage completions, user decisions, and approval gate outcomes after each agent returns. Agents that do mention audit logging (story-writer, workflow-planner, build-test-engineer) are documenting redundant behavior that the orchestrator already handles.
+
 ### Checkpoint Enforcement
 - NEVER complete work without updating plan checkboxes
 - Two-level tracking: plan-level `[x]` and stage-level in aidlc-state.md
@@ -138,6 +140,8 @@ When batch mode is active:
 - Build & Test still requires approval (verify actual results)
 - All stages still log to audit.md with `[batch-approved]` marker
 - Record `batch-approval: true` in aidlc-state.md
+
+**How batch approval works:** When batch mode is active, the orchestrator auto-proceeds past approval gates for construction design stages (Functional Design, NFR Requirements, NFR Design, Infrastructure Design). The agents still generate artifacts normally, but the orchestrator does NOT present the approval gate to the user — it automatically selects "Continue to Next Stage" on their behalf. Code Generation and Build & Test approval gates are ALWAYS presented to the user regardless of batch mode.
 
 ## Workflow Orchestration
 

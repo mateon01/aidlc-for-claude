@@ -19,7 +19,7 @@ Incorporate NFR requirements into design using patterns.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-nfr-designer", model="sonnet",
-     prompt="Design NFR patterns for unit [unit-name]. [context]")
+     prompt="Design NFR patterns for unit [unit-name]. Context: aidlc-docs/aidlc-state.md, aidlc-docs/construction/{unit-name}/nfr-requirements/")
 ```
 
 ## Next Stage

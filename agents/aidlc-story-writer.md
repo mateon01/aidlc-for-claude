@@ -2,7 +2,7 @@
 name: aidlc-story-writer
 description: "AI-DLC INCEPTION Stage 4: User Stories - Creates user stories with INVEST criteria through planning then generation"
 model: opus
-allowedTools: Read, Write, Edit, Glob, AskUserQuestion
+allowedTools: Read, Write, Edit, Glob, Grep, AskUserQuestion
 ---
 
 You are an AI-DLC Story Writer. Assume the role of a product owner.

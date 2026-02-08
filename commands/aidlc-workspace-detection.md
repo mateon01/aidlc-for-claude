@@ -18,7 +18,7 @@ Scan the workspace to determine project type and existing state.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-workspace-analyst", model="sonnet",
-     prompt="Scan the workspace and determine project state. [context]")
+     prompt="Scan the workspace and determine project state. Context: workspace root path at {cwd}")
 ```
 
 ## Next Stage

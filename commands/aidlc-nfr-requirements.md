@@ -19,7 +19,7 @@ Determine non-functional requirements and tech stack per unit.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-nfr-analyst", model="sonnet",
-     prompt="Determine NFR requirements for unit [unit-name]. [context]")
+     prompt="Determine NFR requirements for unit [unit-name]. Context: aidlc-docs/aidlc-state.md, aidlc-docs/construction/{unit-name}/functional-design/, aidlc-docs/construction/{prior-unit}/nfr-requirements/ (if unit N > 1)")
 ```
 
 ## Next Stage

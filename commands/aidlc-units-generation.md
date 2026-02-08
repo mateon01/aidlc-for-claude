@@ -20,7 +20,7 @@ Decompose system into manageable units of work.
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-units-planner", model="opus",
-     prompt="Decompose the system into units of work. [context]")
+     prompt="Decompose the system into units of work. Context: aidlc-docs/aidlc-state.md, aidlc-docs/inception/application-design/, aidlc-docs/inception/requirements/")
 ```
 
 ## Next Stage
