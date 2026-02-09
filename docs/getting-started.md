@@ -132,7 +132,7 @@ All decisions are documented in the `aidlc-docs/` audit trail with ISO 8601 time
 
 ## Generated Artifacts
 
-All documentation goes to the `aidlc-docs/` directory. Application code is always placed at your workspace root.
+All documentation goes to the `aidlc-docs/` directory. Application code and operational artifacts are placed at your workspace root.
 
 ```
 aidlc-docs/
@@ -153,10 +153,20 @@ aidlc-docs/
       nfr-design/                   # Patterns, logical components
       infrastructure-design/        # Service mapping
       code/                         # Code summaries
-    build-and-test/                 # Build and test instructions
+    build-and-test/                 # Build/test instructions + execution report
   operations/
     deployment-checklist.md         # Deployment steps and validation
     developer-readme.md             # Developer onboarding and setup
+
+# Workspace root (application + operational artifacts)
+.env.example                        # Environment configuration template
+.github/workflows/ci.yml            # CI/CD pipeline (or .gitlab-ci.yml)
+Dockerfile                          # Container image (conditional)
+docker-compose.yml                  # Multi-service setup (conditional, multi-unit)
+README.md                           # Project README (generated or updated)
+tests/                              # Generated test files alongside application code
+  integration/                      # Integration tests (multi-unit)
+  e2e/                              # E2E test scaffolds (web apps, optional)
 ```
 
 !!! warning

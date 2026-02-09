@@ -95,8 +95,8 @@ You can override any recommendation at the Workflow Planning approval gate.
 | `/aidlc-nfr-design` | CONSTRUCTION 3 | NFR pattern design (per-unit) |
 | `/aidlc-infrastructure-design` | CONSTRUCTION 4 | Infrastructure mapping (per-unit) |
 | `/aidlc-code-generation` | CONSTRUCTION 5 | Code generation (per-unit) |
-| `/aidlc-build-and-test` | CONSTRUCTION 6 | Build, test, and validate (actual execution) |
-| `/aidlc-operations` | OPERATIONS | Deployment checklist and developer README generation |
+| `/aidlc-build-and-test` | CONSTRUCTION 6 | Build, test (coverage), security scan, integration/E2E tests |
+| `/aidlc-operations` | OPERATIONS | CI/CD, Dockerfile, .env.example, README, deployment checklist |
 
 ## Agents
 
@@ -112,7 +112,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 | `aidlc-for-claude:aidlc-workflow-planner` | Execution planning and stage determination |
 | `aidlc-for-claude:aidlc-application-designer` | Component and service layer design |
 | `aidlc-for-claude:aidlc-units-planner` | System decomposition into units |
-| `aidlc-for-claude:aidlc-code-planner` | Code generation plan creation |
+| `aidlc-for-claude:aidlc-code-planner` | Code generation plan with mandatory test plans per module |
 
 ### Sonnet (Volume Work)
 
@@ -123,9 +123,9 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 | `aidlc-for-claude:aidlc-system-nfr-analyst` | System-level NFR decisions for multi-unit projects |
 | `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
 | `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
-| `aidlc-for-claude:aidlc-code-generator` | Code generation execution |
-| `aidlc-for-claude:aidlc-build-test-engineer` | Build and test execution with instruction generation |
-| `aidlc-for-claude:aidlc-ops-generator` | Deployment checklist and developer README generation |
+| `aidlc-for-claude:aidlc-code-generator` | Code + test generation with multi-layer quality gate |
+| `aidlc-for-claude:aidlc-build-test-engineer` | Build, test (coverage), security scan, integration/E2E scaffolding |
+| `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
 
 ### Haiku (Fast Detection)
 

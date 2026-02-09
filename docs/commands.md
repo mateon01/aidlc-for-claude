@@ -33,14 +33,14 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 | `/aidlc-nfr-requirements` | 2 | Non-functional requirements (per-unit) |
 | `/aidlc-nfr-design` | 3 | NFR pattern design (per-unit) |
 | `/aidlc-infrastructure-design` | 4 | Infrastructure mapping (per-unit) |
-| `/aidlc-code-generation` | 5 | Code generation (per-unit, two-part) |
-| `/aidlc-build-and-test` | 6 | Build, test, and validate (actual execution with retry) |
+| `/aidlc-code-generation` | 5 | Code + test generation with multi-layer quality gate (per-unit, two-part) |
+| `/aidlc-build-and-test` | 6 | Build, test (with coverage), security scan, integration tests, and validate |
 
 ### OPERATIONS Phase
 
 | Command | Description |
 |:--------|:------------|
-| `/aidlc-operations` | Deployment checklist and developer README generation |
+| `/aidlc-operations` | CI/CD pipeline, Dockerfile, .env.example, README, deployment checklist generation |
 
 ---
 
@@ -61,7 +61,7 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | `aidlc-for-claude:aidlc-workflow-planner` | Execution planning and stage determination |
 | `aidlc-for-claude:aidlc-application-designer` | Component and service layer design |
 | `aidlc-for-claude:aidlc-units-planner` | System decomposition into implementation units |
-| `aidlc-for-claude:aidlc-code-planner` | Code generation plan creation |
+| `aidlc-for-claude:aidlc-code-planner` | Code generation plan with mandatory test plans per module |
 
 ### :material-lightning-bolt: Sonnet Agents (Volume Work)
 
@@ -72,9 +72,9 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | `aidlc-for-claude:aidlc-nfr-analyst` | Non-functional requirements assessment |
 | `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
 | `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
-| `aidlc-for-claude:aidlc-code-generator` | Code generation execution |
-| `aidlc-for-claude:aidlc-build-test-engineer` | Build and test execution with instruction generation |
-| `aidlc-for-claude:aidlc-ops-generator` | Deployment checklist and developer README generation |
+| `aidlc-for-claude:aidlc-code-generator` | Code + test generation with lint, type check, and design conformance |
+| `aidlc-for-claude:aidlc-build-test-engineer` | Build, test (coverage), security scan, integration/E2E test scaffolding |
+| `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
 
 ### :material-speedometer: Haiku Agents (Fast Detection)
 
