@@ -1,0 +1,103 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 16 slash commands and 16 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
+
+**Version**: 1.2.0 | **License**: Apache-2.0
+
+## Build & Development
+
+This is a **pure markdown plugin** -- no build step, no dependencies, no test framework.
+
+- `package.json` contains metadata only (no scripts to run)
+- Testing is done manually via live Claude Code sessions: install the plugin, run `/aidlc`, verify workflow
+- GitHub Pages docs auto-deploy on push to `main` via `.github/workflows/deploy-docs.yml`
+- To preview docs locally: `pip install mkdocs-material && mkdocs serve`
+
+## Architecture
+
+### Plugin System
+
+- `plugin.json` has a `"skills"` field pointing to `./commands/` -- NO `"agents"` field (agents are auto-discovered by convention)
+- **Commands** (`commands/`) = thin orchestration (10-30 lines each), define delegation and approval gates
+- **Agents** (`agents/`) = detailed execution protocols (60-150 lines each), do the actual work
+- The orchestrator `commands/aidlc.md` is the central file (~230 lines) that coordinates all stages
+
+### Agent References
+
+All agent references MUST use the fully qualified prefix: `aidlc-for-claude:aidlc-{agent-name}`. References without the prefix fail silently.
+
+```
+# Correct
+Task(subagent_type="aidlc-for-claude:aidlc-requirements-analyst", model="opus", ...)
+
+# WRONG - will fail silently
+Task(subagent_type="aidlc-requirements-analyst", model="opus", ...)
+```
+
+### Agent Frontmatter
+
+Agent `allowedTools:` is a **whitelist** -- tools not listed are blocked. All agents must include `AskUserQuestion` for interactive Q&A capability. Example:
+
+```yaml
+---
+name: aidlc-functional-designer
+description: "AI-DLC CONSTRUCTION Stage 1: Functional Design"
+model: sonnet
+allowedTools: Read, Write, Edit, Glob, Grep, AskUserQuestion
+---
+```
+
+### Model Tiering
+
+- **Opus**: Strategic reasoning (requirements, architecture, planning, code planning)
+- **Sonnet**: Volume execution (design, code generation, testing, operations)
+- **Haiku**: Fast detection (workspace scanning only -- `aidlc-workspace-analyst`)
+
+### Three-Phase Workflow
+
+```
+INCEPTION (7 stages): Workspace Detection → [Scope Assessment] → Reverse Engineering
+  → Requirements → User Stories → Workflow Planning → Application Design → Units
+
+CONSTRUCTION (8 stages): System NFR → per-unit(Functional Design → NFR Requirements
+  → NFR Design → Infrastructure Design → Code Generation) → Build & Test
+
+OPERATIONS (1 stage): Deployment Checklist + Developer README
+```
+
+### Key Patterns
+
+- **Approval gates**: Every stage (except Workspace Detection) requires user approval via standardized 2-option format: "Request Changes" / "Continue to Next Stage"
+- **State tracking**: `aidlc-docs/aidlc-state.md` tracks progress, fast-path, batch mode
+- **Audit trail**: `aidlc-docs/audit.md` is append-only with ISO 8601 timestamps; managed by the orchestrator, not individual agents
+- **Code location**: Application code at workspace root ONLY; `aidlc-docs/` for documentation only
+- **Prerequisite validation**: Construction agents validate input files exist (Step 0) before proceeding
+- **Cross-unit context**: Unit N receives summaries of units 1 through N-1 for consistency
+- **Fast paths**: Brownfield projects offer simple/complex/new-component/full scope options
+- **Batch approval**: Auto-approve design stages, review only code generation and build/test
+
+## File Naming Conventions
+
+- Commands: `aidlc-{stage-name}.md` (e.g., `aidlc-requirements-analysis.md`)
+- Agents: `aidlc-{role-name}.md` (e.g., `aidlc-requirements-analyst.md`)
+- Construction artifacts: `aidlc-docs/construction/{unit-name}/{stage}/`
+- Code plans: `aidlc-docs/construction/plans/{unit-name}-code-generation-plan.md`
+
+## Adding a New Stage
+
+1. Create `commands/aidlc-{name}.md` with YAML frontmatter (`description:`) and delegation example
+2. Create `agents/aidlc-{name}.md` with YAML frontmatter (`name:`, `description:`, `model:`, `allowedTools:`)
+3. Update `commands/aidlc.md` orchestrator to include the new stage in the flow
+4. Update `README.md` (commands table, agents table, ASCII diagram, plugin structure)
+5. Update `docs/workflow.md`, `docs/commands.md`, `docs/getting-started.md`
+
+## Documentation
+
+- All README.md and GitHub Pages content MUST be in English
+- MkDocs Material theme (standard edition, NOT Insiders) -- grid cards and some advanced features are unavailable
+- `:material-icon:` syntax requires `pymdownx.emoji` extension (configured in `mkdocs.yml`)
+- ASCII diagrams use only `+`, `-`, `|`, `^`, `v`, `<`, `>` characters -- no Unicode box-drawing
