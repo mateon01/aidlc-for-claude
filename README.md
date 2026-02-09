@@ -53,8 +53,8 @@ AI-DLC has three phases. Each phase contains stages that may execute conditional
 |    Functional Design --> NFR Requirements --> NFR Design               |
 |    --> Infrastructure Design --> Code Generation                      |
 |                                                                       |
-|  Build and Test (after all units)                                     |
-|  Operations (deployment checklist + README)                           |
+|  Build and Test (after all units) + security scan + coverage          |
+|  Operations (CI/CD, Dockerfile, .env, README, deploy checklist)      |
 +-----------------------------------+-----------------------------------+
                                     |
                                     v
@@ -159,7 +159,21 @@ Total: **16 specialized agents** across 3 model tiers.
 
 **Git safety** -- Brownfield code generation creates a `aidlc/{unit-name}` git branch before modifying existing files, providing a safe rollback point.
 
-**Code quality gate** -- Before presenting generated code, the agent runs a type/syntax check (tsc, py_compile, cargo check, go vet) and auto-fixes issues up to 2 times.
+**Code quality gate** -- Before presenting generated code, the agent runs a multi-layer quality check: type/syntax check (tsc, py_compile, cargo check, go vet), lint check (ESLint, Ruff, Clippy if configured), and unit test execution. Auto-fixes issues up to 3 times.
+
+**Test-first code generation** -- Code generation plans include mandatory test plans per module with test file paths, test cases, and coverage targets. Test files are generated alongside application code as first-class artifacts.
+
+**Dependency security scanning** -- Build and Test stage runs `npm audit` / `pip audit` / `cargo audit` to catch known vulnerabilities in dependencies. Results are informational (not gating).
+
+**Test coverage tracking** -- Test execution includes coverage flags (--coverage, --cov) when available. Coverage percentage is reported in the execution report.
+
+**Integration test scaffolding** -- For multi-unit projects, executable integration test files are generated to verify cross-unit interfaces, API contracts, and shared data models.
+
+**E2E test scaffolding** -- For web applications, optional Playwright or Cypress test scaffolds with basic smoke tests are generated based on data-testid attributes in UI components.
+
+**Operations artifacts** -- The Operations phase generates executable artifacts beyond documentation: CI/CD pipeline, Dockerfile, Docker Compose, .env.example, root README.md, and monitoring configuration.
+
+**Design conformance check** -- Optional verification that generated code matches functional design artifacts (domain entities, API endpoints, business rules).
 
 **Cross-unit consistency** -- When building multi-unit systems, each unit receives summaries of all previously completed units to maintain consistent domain models, tech stack choices, and conventions.
 
@@ -190,10 +204,20 @@ aidlc-docs/
       nfr-design/                   # Patterns, logical components
       infrastructure-design/        # Service mapping
       code/                         # Code summaries (code itself at workspace root)
-    build-and-test/                 # Build and test instructions
+    build-and-test/                 # Build and test instructions + execution report
   operations/
     deployment-checklist.md         # Deployment steps and validation
     developer-readme.md             # Developer onboarding and setup
+
+# Workspace root (application + operational artifacts)
+.env.example                        # Environment configuration template
+.github/workflows/ci.yml            # CI/CD pipeline (or .gitlab-ci.yml)
+Dockerfile                          # Container image (conditional)
+docker-compose.yml                  # Multi-service setup (conditional, multi-unit)
+README.md                           # Project README (generated or updated)
+tests/                              # Generated test files alongside application code
+  integration/                      # Integration tests (multi-unit)
+  e2e/                              # E2E test scaffolds (web apps, optional)
 ```
 
 ## Plugin Structure

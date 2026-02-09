@@ -82,6 +82,20 @@ Run the appropriate install command via Bash:
 
 Capture stdout and stderr. If install fails, proceed to Step 12 (retry loop).
 
+## Step 9.5: Dependency Security Scan
+After dependencies are installed, run a security audit:
+- Node.js: `npm audit --audit-level=high` (report high/critical only)
+- Python: `pip audit` (if pip-audit installed) or `safety check` (if safety installed)
+- Rust: `cargo audit` (if cargo-audit installed)
+- Go: `govulncheck ./...` (if govulncheck installed)
+- Java Maven: `mvn org.owasp:dependency-check-maven:check` (if plugin configured)
+
+**This step is INFORMATIONAL, not gating:**
+- If audit tool is not installed: skip silently (do not fail)
+- If vulnerabilities found: record them in the execution report but do NOT block the build
+- Filter output to high/critical severity only to avoid noise
+- Include vulnerability summary in Step 13 execution report
+
 ## Step 10: Execute Build
 Run the build command via Bash:
 - Node.js: `npm run build` (if build script exists) or `npx tsc` (if TypeScript)
@@ -94,15 +108,47 @@ Run the build command via Bash:
 Capture stdout and stderr. If build fails, proceed to Step 12 (retry loop).
 
 ## Step 11: Execute Tests
-Run the test command via Bash:
-- Node.js: `npm test` (if test script exists)
-- Python: `pytest` or `python -m unittest discover`
-- Rust: `cargo test`
-- Go: `go test ./...`
-- Java Maven: `mvn test`
-- Java Gradle: `gradle test`
+Run the test command via Bash with coverage flags where possible:
+- Node.js: `npm test -- --coverage` (if Jest) or `npx vitest --coverage` (if Vitest)
+- Python: `pytest --cov --cov-report=term-missing` (if pytest-cov installed) or `pytest` as fallback
+- Rust: `cargo test` (coverage via `cargo tarpaulin` if installed)
+- Go: `go test -cover ./...`
+- Java Maven: `mvn test` (coverage via JaCoCo if configured)
+- Java Gradle: `gradle test jacocoTestReport` (if JaCoCo plugin exists)
 
-Capture test output including: number of tests passed/failed/skipped, failure details with file:line references. If tests fail, proceed to Step 12 (retry loop).
+If the coverage flag causes an error (tool not installed), re-run without coverage and note "coverage not measured" in the report.
+
+Capture test output including: number of tests passed/failed/skipped, failure details with file:line references, and coverage percentage if available. If tests fail, proceed to Step 12 (retry loop).
+
+## Step 11.5: Generate Integration Tests (CONDITIONAL — multi-unit only)
+**Skip this step if**: single-unit project or only one unit has been code-generated.
+
+When 2+ units exist, generate executable integration test files:
+1. Read `aidlc-docs/inception/application-design/component-dependency.md` and `services.md` for inter-unit interfaces
+2. Read each unit's functional-design for shared domain entities and API contracts
+3. Generate integration test files at the workspace root (e.g., `tests/integration/` or `tests/e2e/`):
+   - **API contract tests**: Verify that Unit A's client calls match Unit B's server interface
+   - **Shared data model tests**: Verify domain entities are consistent across units
+   - **Event/message tests**: If units communicate via events/queues, verify message schemas match
+4. Run the generated integration tests via Bash
+5. If tests fail, apply fixes and re-run (included in the Step 12 retry budget)
+6. Record integration test results in the execution report
+
+## Step 11.7: Generate E2E Test Scaffold (CONDITIONAL — web apps only)
+**Skip this step if**: project has no frontend components, or infrastructure-design does not include a web server/UI layer.
+
+For projects with frontend components:
+1. Ask the user via AskUserQuestion which E2E framework to use:
+   - Playwright (Recommended)
+   - Cypress
+   - Skip E2E scaffolding
+2. If user chooses a framework:
+   - Generate a basic test scaffold file (e.g., `tests/e2e/smoke.spec.ts`)
+   - Include smoke tests: page loads, basic navigation, form submission (if applicable)
+   - Reference `data-testid` attributes from generated UI components
+   - Generate E2E config file (`playwright.config.ts` or `cypress.config.ts`)
+   - **Do NOT run E2E tests** during this stage (they require a running server)
+   - Record "E2E scaffold generated, manual execution required" in the execution report
 
 ## Step 12: Fix-and-Retry Loop (if any step failed)
 If install, build, or tests failed:
@@ -118,8 +164,10 @@ After max retries exhausted OR all steps passing, proceed to Step 13.
 Create `aidlc-docs/construction/build-and-test/execution-report.md` containing:
 - Build system detected
 - Install result: success/failure + output summary
+- **Security scan result**: vulnerabilities found (high/critical) or "clean" or "skipped (tool not available)"
 - Build result: success/failure + output summary
 - Test result: passed count, failed count, skipped count + output summary
+- **Test coverage**: coverage percentage if available, or "not measured"
 - Retry attempts (if any): what was fixed and the outcome
 - Final status: `ALL_PASSED` / `BUILD_FAILED` / `TESTS_FAILED` / `INSTALL_FAILED` / `MANUAL_BUILD_REQUIRED`
 
@@ -136,11 +184,13 @@ Build and Test Complete!
 
 Build System: [detected system]
 Install: [Success/Failed]
+Security Scan: [X high/critical vulnerabilities / clean / skipped]
 Build: [Success/Failed]
 Test Results:
 - Unit Tests: [X passed, Y failed]
 - Integration Tests: [result or "not executed"]
 - Performance Tests: [result or "not applicable"]
+- Coverage: [X% / not measured]
 
 Retry Attempts: [N attempts — describe fixes if any]
 

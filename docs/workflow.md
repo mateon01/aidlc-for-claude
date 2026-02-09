@@ -93,29 +93,42 @@ For each unit defined in Inception:
 
     Two-part stage:
 
-    1. **Planning** (Opus) -- Creates a detailed code generation plan with file-by-file breakdown
-    2. **Execution** (Sonnet) -- Generates actual code following the plan
+    1. **Planning** (Opus) -- Creates a detailed code generation plan with file-by-file breakdown and **mandatory test plan** per module (test file paths, test cases, assertions, coverage targets)
+    2. **Execution** (Sonnet) -- Generates actual application code **and test files** following the plan
 
     For brownfield projects, a git branch (`aidlc/{unit-name}`) is created before modifying existing files, providing a safe rollback point.
 
-    After code generation, a **quality gate** runs a type/syntax check (tsc, py_compile, cargo check, go vet) and auto-fixes issues up to 2 times before presenting results.
+    After code generation, a **multi-layer quality gate** runs:
+
+    - Type/syntax check (tsc, py_compile, cargo check, go vet)
+    - Lint check (ESLint, Ruff, Clippy, golangci-lint) if linter is configured
+    - Unit test execution on generated tests
+    - Optional design conformance check (verifies code matches design artifacts)
+
+    Issues are auto-fixed up to 3 times before presenting results.
 
 ### Build and Test
 
-After all units are complete, generates build instructions and test plans, then **executes actual builds and tests**. The agent detects the project's build system (npm, pip, cargo, etc.), installs dependencies, runs the build, and executes tests. Failed builds are retried up to 3 times with automated fix attempts.
+After all units are complete, generates build instructions and test plans, then **executes actual builds and tests**. The agent detects the project's build system (npm, pip, cargo, etc.), installs dependencies, runs a **dependency security scan**, runs the build, executes tests **with coverage tracking**, and generates **integration tests** for multi-unit projects. Failed builds are retried up to 3 times with automated fix attempts. For web applications, an optional **E2E test scaffold** (Playwright/Cypress) can be generated.
 
 ### Operations
 
-Generates two operational artifacts:
+Generates operational artifacts at the workspace root and in aidlc-docs:
 
 1. **Deployment Checklist** -- Step-by-step deployment guide with environment validation, dependency checks, configuration steps, and smoke test procedures
 2. **Developer README** -- Onboarding guide with setup instructions, development workflow, testing procedures, and troubleshooting tips
+3. **`.env.example`** -- Environment configuration template with all required variables extracted from design artifacts and code
+4. **CI/CD Pipeline** -- GitHub Actions or GitLab CI workflow with install, lint, build, test, and security audit steps
+5. **Dockerfile** (conditional) -- Multi-stage production Dockerfile optimized for the detected stack
+6. **Docker Compose** (conditional, multi-unit) -- Local development stack with all services and dependencies
+7. **Root README.md** -- Project README at workspace root with quick start and architecture overview
+8. **Monitoring config** (conditional) -- Structured logging configuration and health check setup
 
 ---
 
 ## OPERATIONS Phase
 
-The Operations phase ensures smooth deployment and developer onboarding. It produces deployment procedures and developer documentation based on the completed construction artifacts.
+The Operations phase ensures smooth deployment and developer onboarding. It produces both documentation artifacts (in `aidlc-docs/operations/`) and executable artifacts (at the workspace root) based on the completed construction artifacts. Executable artifacts include CI/CD pipelines, Dockerfiles, environment templates, and README files -- making the generated project immediately deployable and developer-ready.
 
 ---
 

@@ -55,6 +55,19 @@ If `aidlc-state.md` indicates `fast-path: simple`:
   - Deployment Artifacts
 - Include story mapping references and checkboxes
 
+### Mandatory Test Plan Per Module
+For EACH code module in the plan, include a **Test Plan** subsection with:
+- **Test file path**: e.g., `tests/unit/test_auth_service.py` or `src/__tests__/AuthService.test.ts`
+- **Test cases**: List specific test function names and what they verify
+  - Happy path tests (expected behavior)
+  - Edge case tests (boundary values, empty inputs)
+  - Error handling tests (invalid input, failure scenarios)
+- **Assertions**: Key assertions each test must include
+- **Test framework**: The testing framework to use (Jest, pytest, go test, cargo test, JUnit, etc.)
+- **Coverage target**: Minimum coverage target per module (aim for 80%+)
+
+The test plan ensures that the Code Generator (Part 2) produces test files alongside application code, not as an afterthought.
+
 ## Step 3: Include Unit Context
 Stories, dependencies, interfaces, database entities, service boundaries.
 

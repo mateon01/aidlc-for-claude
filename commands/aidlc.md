@@ -219,7 +219,11 @@ Execute per-unit loop for each unit from Units Generation:
 **Fast Path Note:** In simple fast path mode, the per-unit loop is skipped. Code Generation operates directly on the workspace without unit decomposition. A single implicit unit covers the entire change scope.
 
 ### OPERATIONS PHASE
-Placeholder for future deployment and monitoring workflows.
+
+After Build and Test completes:
+7. **Operations** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-ops-generator` → APPROVAL GATE
+   - Generates: deployment checklist, developer README, CI/CD pipeline, Dockerfile (conditional), .env.example, root README.md
+   - Marks AI-DLC workflow as COMPLETE
 
 ## Agent Delegation Pattern
 
