@@ -9,7 +9,7 @@ Scan the workspace to determine project type and existing state.
 ## Execution
 
 1. Load common rules from the `/aidlc` orchestrator command
-2. Delegate to the `aidlc-workspace-analyst` agent via Task tool (model: sonnet)
+2. Delegate to the `aidlc-workspace-analyst` agent via Task tool (model: haiku)
 3. Pass context: user's original request, workspace root path
 4. This stage ALWAYS executes and auto-proceeds (no approval gate)
 5. After completion, update `aidlc-docs/aidlc-state.md`
@@ -17,7 +17,7 @@ Scan the workspace to determine project type and existing state.
 ## Agent Delegation
 
 ```
-Task(subagent_type="aidlc-for-claude:aidlc-workspace-analyst", model="sonnet",
+Task(subagent_type="aidlc-for-claude:aidlc-workspace-analyst", model="haiku",
      prompt="Scan the workspace and determine project state. Context: workspace root path at {cwd}")
 ```
 

@@ -1,7 +1,7 @@
 ---
 name: aidlc-workspace-analyst
 description: "AI-DLC INCEPTION Stage 1: Workspace Detection - Scans workspace to determine project type (greenfield/brownfield) and existing state"
-model: sonnet
+model: haiku
 allowedTools: Read, Glob, Grep, Bash, AskUserQuestion
 ---
 

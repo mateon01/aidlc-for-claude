@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 16 slash commands and 16 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
 
-**Version**: 1.2.0 | **License**: Apache-2.0
+**Version**: 1.3.0 | **License**: Apache-2.0
 
 ## Build & Development
 
@@ -101,3 +101,10 @@ OPERATIONS (1 stage): Deployment Checklist + Developer README
 - MkDocs Material theme (standard edition, NOT Insiders) -- grid cards and some advanced features are unavailable
 - `:material-icon:` syntax requires `pymdownx.emoji` extension (configured in `mkdocs.yml`)
 - ASCII diagrams use only `+`, `-`, `|`, `^`, `v`, `<`, `>` characters -- no Unicode box-drawing
+
+## Issue and Project Management
+
+- **Issues**: All tasks, bugs, and feature requests MUST be registered as GitHub Issues before starting work
+- **Projects**: All issues MUST be added to the appropriate GitHub Project board for tracking
+- **Todo Lists**: Before beginning any work, ensure the task is tracked in both GitHub Issues and Projects
+- Work should only commence after proper issue and project registration is complete
