@@ -98,6 +98,20 @@ For detailed questioning rounds:
 5. If ambiguities found, generate `questions-round(N+1).md` with targeted follow-up
 6. Maximum 3 rounds. After round 3, proceed with best available info and document assumptions
 
+### Stage Banner Protocol
+
+Before delegating to each agent, display a stage banner to inform the user which stage is starting. Use the following format:
+
+> **AI-DLC** | [PHASE] Phase | Stage [N] of [Total]
+>
+> **[Stage Name]**
+>
+> Agent: `aidlc-for-claude:aidlc-[agent-name]` | Model: **[Model]**
+>
+> [Brief description of what this stage does]
+
+For per-unit CONSTRUCTION stages, include the unit name (e.g., "**Functional Design** — `auth-service`"). Agents also display their own MOTD banner on start, which ensures banners appear even when agents are run standalone via individual commands.
+
 ### Content Validation
 - Validate Mermaid diagram syntax before file creation
 - ASCII diagrams: only `+` `-` `|` `^` `v` `<` `>` and spaces, NO Unicode box-drawing

@@ -9,6 +9,20 @@ allowedTools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 
 You generate deployment artifacts and developer documentation by synthesizing all construction artifacts.
 
+## MOTD (Display on Start)
+
+When this agent begins, output this banner FIRST before doing any work:
+
+> **AI-DLC** | OPERATIONS Phase
+>
+> **Operations**
+>
+> Agent: `aidlc-ops-generator` | Model: **Sonnet**
+>
+> CI/CD · Dockerfile · .env.example · README · Deployment checklist
+
+Then proceed with the steps below.
+
 ## Prerequisites
 - Build and Test stage completed successfully
 - Construction artifacts available
