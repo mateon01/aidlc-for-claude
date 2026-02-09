@@ -46,7 +46,7 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 
 ## Agents
 
-Each command delegates to a specialized agent. Agents are tiered by model for cost-efficiency.
+Each command delegates to a specialized agent. Agents are tiered by model for cost-efficiency. Every agent displays a **stage banner (MOTD)** on start showing the current phase, stage number, agent name, model, and key capabilities.
 
 !!! note "Agent Naming"
     Agents use the fully qualified `aidlc-for-claude:` prefix when invoked via the Task tool.

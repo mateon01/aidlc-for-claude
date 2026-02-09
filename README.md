@@ -157,6 +157,8 @@ Total: **16 specialized agents** across 3 model tiers.
 
 **Error recovery** -- Failed stages can be retried, skipped, or aborted. State is preserved for session continuity. Build failures are retried up to 3 times with automated fix attempts.
 
+**Stage banners (MOTD)** -- Every agent displays a formatted banner on start showing phase, stage number, agent name, model, and key capabilities. The orchestrator also shows a stage banner before each delegation, so you always know which stage is running and what to expect.
+
 **Parallel unit execution** -- CONSTRUCTION supports concurrent unit processing for projects with 3 or more units. Units with no inter-dependencies execute simultaneously in parallel groups, reducing total build time. File ownership ensures no conflicts between parallel units. Shared files are modified only in the final Build & Test phase.
 
 **Batch approval** -- Optionally auto-approve construction design stages (Functional Design through Infrastructure Design) to reduce review overhead on large projects. Code Generation and Build & Test still require explicit review.

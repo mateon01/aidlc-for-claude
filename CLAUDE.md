@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 16 slash commands and 16 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
 
-**Version**: 1.3.1 | **License**: Apache-2.0
+**Version**: 1.3.2 | **License**: Apache-2.0
 
 ## Build & Development
 
@@ -81,6 +81,7 @@ OPERATIONS (1 stage): Deployment Checklist + Developer README
 - **Parallel unit execution**: CONSTRUCTION supports concurrent unit processing for 3+ unit projects via parallel groups
 - **Cross-unit context**: Unit N receives summaries of units 1 through N-1 for consistency
 - **Fast paths**: Brownfield projects offer simple/complex/new-component/full scope options
+- **Stage banners (MOTD)**: Every agent displays a formatted banner on start showing phase, stage number, agent name, model, and capabilities. The orchestrator also displays a stage banner before each delegation.
 - **Batch approval**: Auto-approve design stages, review only code generation and build/test
 
 ## File Naming Conventions

@@ -148,6 +148,33 @@ All decisions are documented in the `aidlc-docs/` audit trail with ISO 8601 time
 
 ---
 
+## Stage Banners (MOTD)
+
+Every agent displays a **formatted banner** when it starts, so you always know which stage is running:
+
+```
+AI-DLC | INCEPTION Phase | Stage 3 of 7
+
+Requirements Analysis
+
+Agent: aidlc-requirements-analyst | Model: Opus
+
+12-category deep questioning · Multi-round Q&A · Hybrid interactive + document
+```
+
+The banner shows:
+
+- **Phase** (INCEPTION, CONSTRUCTION, or OPERATIONS)
+- **Stage number** out of total stages in that phase
+- **Agent name** and **model tier** (Opus, Sonnet, or Haiku)
+- **Key capabilities** of that stage
+
+For per-unit CONSTRUCTION stages, the banner also includes the unit name being processed (e.g., "Functional Design -- `auth-service`").
+
+The orchestrator displays its own stage banner before delegating to each agent, ensuring banners appear even when agents are run standalone via individual commands like `/aidlc-requirements-analysis`.
+
+---
+
 ## Parallel Unit Execution
 
 For projects with 3 or more units, AI-DLC offers **parallel execution mode** during the Construction phase:

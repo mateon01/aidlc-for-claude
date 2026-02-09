@@ -161,6 +161,14 @@ The Operations phase ensures smooth deployment and developer onboarding. It prod
 
 ---
 
+## Stage Banners (MOTD)
+
+Every agent displays a formatted banner when it starts, showing the current phase, stage number, agent name, model tier, and key capabilities. This provides clear visibility into which stage is running and what to expect. The orchestrator also displays a stage banner before each delegation.
+
+For per-unit CONSTRUCTION stages, the banner includes the unit name (e.g., "Functional Design -- `auth-service`"). This ensures clarity even when multiple units are being processed sequentially or in parallel.
+
+---
+
 ## Model Strategy
 
 AI-DLC uses three model tiers for cost-efficiency:
