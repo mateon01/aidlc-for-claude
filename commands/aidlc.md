@@ -74,6 +74,30 @@ Format for Tier 2:
 - Create clarification question files if issues found
 - NEVER proceed with unresolved ambiguities
 
+### Minimum Question Standards
+
+INCEPTION stage agents MUST meet these question minimums:
+
+| Agent | Minimum Questions (Round 1) | Follow-up Rounds |
+|-------|----------------------------|-------------------|
+| Requirements Analyst | 15 (Simple) / 20 (Moderate) / 25 (Complex) | 1-2 rounds |
+| Story Writer | 10 | 1 round |
+| Application Designer | 10 | 1 round |
+| Units Planner | 8 | 1 round (if 3+ units) |
+
+Agents MUST NOT skip categories. Every listed category requires at least 1 question.
+An agent may ask FEWER questions only if the user explicitly says "proceed with what you have."
+
+### MD File Q&A Workflow
+
+For detailed questioning rounds:
+1. Agent writes questions to `aidlc-docs/inception/{stage}/questions-roundN.md` (or the stage-specific path)
+2. Agent presents: "I've written a questionnaire. Please open the file and fill in the [Answer]: tags. Let me know when you're done."
+3. Agent waits for user to indicate answers are ready
+4. Agent reads the file and analyzes ALL answers for vague responses ("depends", "not sure", "maybe"), contradictions, and missing details
+5. If ambiguities found, generate `questions-round(N+1).md` with targeted follow-up
+6. Maximum 3 rounds. After round 3, proceed with best available info and document assumptions
+
 ### Content Validation
 - Validate Mermaid diagram syntax before file creation
 - ASCII diagrams: only `+` `-` `|` `^` `v` `<` `>` and spaces, NO Unicode box-drawing
@@ -199,7 +223,15 @@ Execute stages in order. For each stage, delegate to the corresponding agent via
 - Establishes cross-cutting NFR decisions (auth, observability, error handling, shared infrastructure, API conventions)
 - Per-unit NFR analysts MUST read this document to ensure consistency
 
-**Per-unit Construction Loop:**
+**Parallel Unit Execution Decision:**
+
+After System NFR Assessment (or immediately if single unit, skip this):
+- If 3+ units exist AND `unit-of-work-dependency.md` contains parallel group assignments, offer parallel execution via AskUserQuestion:
+  - **Sequential** (default) — One unit at a time, maximum context consistency
+  - **Parallel** — Independent units execute simultaneously, faster completion
+- Record `parallel-execution: true/false` in aidlc-state.md
+
+**Per-unit Construction Loop (Sequential Mode — Default):**
 
 Execute per-unit loop for each unit from Units Generation:
 
@@ -213,8 +245,33 @@ Execute per-unit loop for each unit from Units Generation:
 4. **Infrastructure Design** (CONDITIONAL) → Agent: `aidlc-for-claude:aidlc-infra-designer` → APPROVAL GATE
 5. **Code Generation** (ALWAYS) → Agents: `aidlc-for-claude:aidlc-code-planner` then `aidlc-for-claude:aidlc-code-generator` → APPROVAL GATE x2
 
+**Per-unit Construction Loop (Parallel Mode):**
+
+When `parallel-execution: true` in aidlc-state.md:
+
+1. Read `unit-of-work-dependency.md` to identify dependency graph and parallel groups
+2. Group units into parallel groups:
+   - **Group A**: Units with NO dependencies (can all start immediately)
+   - **Group B**: Units that depend on Group A units (start after Group A completes)
+   - Continue until all units grouped
+3. For each parallel group:
+   a. Launch each unit's FULL construction pipeline as a background Task agent:
+      - Each agent runs: Functional Design → NFR Requirements → NFR Design → Infrastructure Design → Code Generation
+      - Each agent operates independently with its own approval gates
+      - Each agent reads `system-nfr-decisions.md` for shared constraints
+      - Each agent does NOT read other units' in-progress artifacts (they may be incomplete)
+   b. Wait for ALL units in the group to complete
+   c. Verify no file conflicts between parallel units
+4. After all groups complete → proceed to Build and Test
+
+**File Ownership in Parallel Mode:**
+- Each unit's code lives in distinct directories (e.g., `src/auth/`, `src/user/`)
+- System NFR decisions prevent conflicting infrastructure choices
+- Shared files (`package.json`, `docker-compose.yml`) are modified ONLY in Build & Test phase
+- If file conflicts are detected after a parallel group completes, resolve manually before proceeding
+
 **After all units:**
-6. **Build and Test** (ALWAYS) → Agent: `aidlc-for-claude:aidlc-build-test-engineer` → APPROVAL GATE
+6. **Build and Test** (ALWAYS, sequential) → Agent: `aidlc-for-claude:aidlc-build-test-engineer` → APPROVAL GATE
 
 **Fast Path Note:** In simple fast path mode, the per-unit loop is skipped. Code Generation operates directly on the workspace without unit decomposition. A single implicit unit covers the entire change scope.
 

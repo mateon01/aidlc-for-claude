@@ -38,9 +38,11 @@
     Just run `/aidlc` and the workflow adapts to your project automatically.
 
 - :material-auto-fix: **Adaptive Depth** -- Simple bug fixes skip unnecessary stages. Complex systems get full architectural treatment.
+- :material-chat-question: **Deep Questioning** -- INCEPTION stages ask 15-30 practical questions across mandatory categories with multi-round follow-up. No more shallow Q&A.
 - :material-transit-connection-variant: **Three-Phase Lifecycle** -- INCEPTION (what and why) &rarr; CONSTRUCTION (how) &rarr; OPERATIONS (deploy and monitor).
 - :material-account-check: **Human-in-the-Loop** -- Every stage requires your explicit approval before proceeding.
 - :material-robot: **Multi-Agent Delegation** -- Opus handles strategic reasoning, Sonnet handles volume work, Haiku handles fast detection.
+- :material-run-fast: **Parallel Unit Execution** -- For multi-unit projects (3+), independent units execute simultaneously in parallel groups, reducing total build time.
 - :material-file-document-check: **Full Audit Trail** -- Every decision documented with ISO 8601 timestamps.
 - :material-restart: **Session Continuity** -- Interrupted workflows can be resumed from where you left off.
 - :material-magnify-scan: **Brownfield Support** -- Deep reverse engineering for existing codebases with 8 analysis artifacts.
@@ -60,10 +62,10 @@ Workspace Detection → Reverse Engineering → Requirements Analysis
 
 ### :material-hammer-wrench:{ .lg } CONSTRUCTION -- How
 
-Implements the system. For each unit: designs business logic, evaluates non-functional requirements, maps infrastructure, generates code. Finishes with build and test.
+Implements the system. For each unit (sequentially or in parallel): designs business logic, evaluates non-functional requirements, maps infrastructure, generates code. Finishes with build and test.
 
 ```
-Per-Unit Loop:
+Per-Unit Loop (sequential or parallel):
   Functional Design → NFR Requirements → NFR Design
   → Infrastructure Design → Code Generation
 

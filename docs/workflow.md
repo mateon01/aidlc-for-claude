@@ -27,11 +27,11 @@ For existing codebases, performs deep analysis producing 8 artifacts:
 
 ### Stage 3: Requirements Analysis
 
-Gathers and analyzes requirements using file-based questionnaires. Depth adapts to complexity -- simple bug fixes get minimal questions, complex systems get thorough analysis.
+Gathers and analyzes requirements using a multi-round questioning system across 12 mandatory analysis categories (Business Goals, Target Users, Core Features, User Workflows, Data Model, API/Integration, Security/Compliance, Performance/Scalability, Deployment, Error Handling, Technical Constraints, Timeline). Depth adapts to complexity -- simple projects get minimum 15 questions, moderate projects 20, and complex systems 25+. Follow-up rounds resolve ambiguities and contradictions. Critical decisions (tech stack, deployment target, auth method) use interactive Q&A for immediate response.
 
 ### Stage 4: User Stories (Conditional)
 
-Creates user stories following INVEST criteria (Independent, Negotiable, Valuable, Estimable, Small, Testable). Includes persona definition and acceptance criteria.
+Creates user stories following INVEST criteria (Independent, Negotiable, Valuable, Estimable, Small, Testable). Includes persona definition and acceptance criteria. Questions cover 12 mandatory categories including error scenarios, edge cases, accessibility/i18n, and data privacy/consent. Minimum 10 questions required.
 
 ### Stage 5: Workflow Planning
 
@@ -42,17 +42,19 @@ Evaluates all gathered context and produces an execution plan. You can override 
 
 ### Stage 6: Application Design (Conditional)
 
-Designs component architecture, service layers, and inter-service dependencies. Produces design documents with ASCII diagrams.
+Designs component architecture, service layers, and inter-service dependencies across 10 mandatory categories (Component Identification, Methods, Service Layer, Dependencies, Design Patterns, Scalability, Data Architecture, Security Architecture, Error Handling Strategy, API Design). Minimum 10 questions. Critical architectural choices (monolith vs microservices, DB type, communication pattern) use interactive Q&A. Produces design documents with ASCII diagrams.
 
 ### Stage 7: Units Generation (Conditional)
 
-Decomposes the system into implementation units. Each unit becomes the scope for the Construction phase's per-unit loop.
+Decomposes the system into implementation units across 9 mandatory categories including team assignment, parallel execution feasibility, and integration points. Each unit includes parallel group metadata (dependency graph, parallel group assignment, integration contracts). For projects with 3+ units, offers parallel execution mode where independent units are processed simultaneously in the Construction phase.
 
 ---
 
 ## CONSTRUCTION Phase -- How
 
-The Construction phase implements the system. For multi-unit projects, it begins with system-level NFR assessment, then runs a loop of stages for each unit, followed by final build and test stages and operations generation.
+The Construction phase implements the system. For multi-unit projects, it begins with system-level NFR assessment, then runs a loop of stages for each unit (sequentially or in parallel), followed by final build and test stages and operations generation.
+
+**Parallel execution** is available for projects with 3+ units. Units with no inter-dependencies are grouped and processed simultaneously. The orchestrator reads the dependency graph from Units Generation and groups units into parallel batches (Group A = no dependencies, Group B = depends on Group A, etc.). Each unit's construction pipeline runs independently with its own approval gates. Shared files are only modified in the final Build & Test phase to avoid conflicts.
 
 ### Stage 0: System NFR Assessment
 
@@ -66,7 +68,7 @@ For projects with 2 or more units, AI-DLC performs a one-time system-level NFR a
 
 This prevents contradictory choices across units and ensures architectural coherence. Single-unit projects skip this stage and make NFR decisions during the unit's own NFR Requirements stage.
 
-### Per-Unit Loop
+### Per-Unit Loop (Sequential or Parallel)
 
 For each unit defined in Inception:
 

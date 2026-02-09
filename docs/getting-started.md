@@ -120,13 +120,50 @@ If your session is interrupted, simply run `/aidlc` again. The orchestrator dete
 
 ## How Questions Work
 
-AI-DLC uses Claude Code's interactive question UI to gather your preferences. Questions appear as clickable multiple-choice options directly in the terminal:
+AI-DLC uses a **hybrid questioning system** to gather thorough requirements:
 
-- **Tech stack**, **database**, **authentication**, and **scope** decisions
+**Interactive Q&A (AskUserQuestion)** -- For high-impact decisions that need immediate answers:
+
+- Tech stack, database, authentication, deployment target, MVP scope
+- Clickable multiple-choice options directly in the terminal
 - Each question offers recommended defaults you can accept with one click
-- You can also type custom responses
+
+**Document-based questionnaires (.md files)** -- For detailed analysis requiring thoughtful answers:
+
+- Written to `aidlc-docs/inception/` with `[Answer]:` tags
+- Organized by mandatory analysis categories (12 for requirements, 10 for design, 12 for stories, 9 for units)
+- Multi-round: Round 1 covers all categories, Round 2 follows up on ambiguities, Round 3 (optional) confirms remaining decisions
+
+!!! info "Minimum Question Standards"
+    INCEPTION agents have mandatory minimums to prevent shallow analysis:
+
+    | Agent | Minimum Questions |
+    |:------|:------------------|
+    | Requirements Analyst | 15 (simple) / 20 (moderate) / 25 (complex) |
+    | Story Writer | 10 |
+    | Application Designer | 10 |
+    | Units Planner | 8 |
 
 All decisions are documented in the `aidlc-docs/` audit trail with ISO 8601 timestamps.
+
+---
+
+## Parallel Unit Execution
+
+For projects with 3 or more units, AI-DLC offers **parallel execution mode** during the Construction phase:
+
+- **Sequential** (default) -- One unit at a time, maximum context consistency between units
+- **Parallel** -- Independent units execute simultaneously in parallel groups, faster completion
+
+!!! tip
+    The Units Generation stage automatically identifies which units can run in parallel by analyzing inter-unit dependencies. Units are grouped: Group A (no dependencies, start immediately), Group B (depends on Group A), etc.
+
+When parallel mode is active:
+
+- Each unit's construction pipeline runs as an independent background agent
+- System NFR decisions ensure consistent architectural choices across all units
+- Each unit's code lives in distinct directories to avoid file conflicts
+- Shared files (package.json, docker-compose.yml) are modified only in the final Build & Test phase
 
 ---
 

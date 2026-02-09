@@ -49,7 +49,7 @@ AI-DLC has three phases. Each phase contains stages that may execute conditional
 |                     CONSTRUCTION (HOW)                                |
 |                                                                       |
 |  System NFR Assessment -->                                            |
-|  FOR each unit:                                                       |
+|  FOR each unit (sequential or parallel):                              |
 |    Functional Design --> NFR Requirements --> NFR Design               |
 |    --> Infrastructure Design --> Code Generation                      |
 |                                                                       |
@@ -139,6 +139,8 @@ Total: **16 specialized agents** across 3 model tiers.
 
 ## Key Conventions
 
+**Deep questioning** -- INCEPTION stages ask 15-30 practical questions across mandatory analysis categories (12 for requirements, 10 for application design, 12 for stories, 9 for units) with multi-round md file Q&A. Each category requires at least 1 question, and agents have mandatory minimums to prevent shallow analysis.
+
 **Interactive Q&A** -- Simple preference questions use Claude Code's interactive question UI (AskUserQuestion) with clickable options. Complex questions with many items use document-based questionnaires. All decisions are documented in the audit trail.
 
 **Brownfield fast path** -- For existing codebases, a scope assessment after workspace detection lets you choose between four options: simple change (fast path to code generation), complex change (streamlined path), new component within existing repo, or full structured workflow.
@@ -154,6 +156,8 @@ Total: **16 specialized agents** across 3 model tiers.
 **Session continuity** is handled via `aidlc-docs/aidlc-state.md`. Re-running `/aidlc` detects existing state and offers to resume.
 
 **Error recovery** -- Failed stages can be retried, skipped, or aborted. State is preserved for session continuity. Build failures are retried up to 3 times with automated fix attempts.
+
+**Parallel unit execution** -- CONSTRUCTION supports concurrent unit processing for projects with 3 or more units. Units with no inter-dependencies execute simultaneously in parallel groups, reducing total build time. File ownership ensures no conflicts between parallel units. Shared files are modified only in the final Build & Test phase.
 
 **Batch approval** -- Optionally auto-approve construction design stages (Functional Design through Infrastructure Design) to reduce review overhead on large projects. Code Generation and Build & Test still require explicit review.
 

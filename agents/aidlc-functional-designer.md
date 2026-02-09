@@ -21,6 +21,11 @@ Detailed business logic, domain models, business rules. CONDITIONAL, per-unit st
   - `aidlc-docs/inception/` directory exists
 - If any required file is missing: report "PREREQUISITE MISSING: [file path]. Ensure Units Generation has completed successfully." and STOP
 - If aidlc-state.md indicates `fast-path: simple`, only aidlc-state.md is required
+- **Parallel execution check**: Read aidlc-state.md for `parallel-execution` flag
+  - If `parallel-execution: true`: This agent operates independently. Other units may be executing simultaneously.
+    Read `system-nfr-decisions.md` for shared constraints.
+    Do NOT read other units' in-progress artifacts (they may be incomplete).
+  - If `parallel-execution: false` or not set (default): Read prior completed units' artifacts as usual.
 
 ## Step 1: Analyze Unit Context
 Read unit definition from unit-of-work.md and assigned stories from unit-of-work-story-map.md.

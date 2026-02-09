@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 16 slash commands and 16 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
 
-**Version**: 1.3.0 | **License**: Apache-2.0
+**Version**: 1.3.1 | **License**: Apache-2.0
 
 ## Build & Development
 
@@ -24,7 +24,7 @@ This is a **pure markdown plugin** -- no build step, no dependencies, no test fr
 - `plugin.json` has a `"skills"` field pointing to `./commands/` -- NO `"agents"` field (agents are auto-discovered by convention)
 - **Commands** (`commands/`) = thin orchestration (10-30 lines each), define delegation and approval gates
 - **Agents** (`agents/`) = detailed execution protocols (60-150 lines each), do the actual work
-- The orchestrator `commands/aidlc.md` is the central file (~230 lines) that coordinates all stages
+- The orchestrator `commands/aidlc.md` is the central file (~300 lines) that coordinates all stages
 
 ### Agent References
 
@@ -63,8 +63,9 @@ allowedTools: Read, Write, Edit, Glob, Grep, AskUserQuestion
 INCEPTION (7 stages): Workspace Detection → [Scope Assessment] → Reverse Engineering
   → Requirements → User Stories → Workflow Planning → Application Design → Units
 
-CONSTRUCTION (8 stages): System NFR → per-unit(Functional Design → NFR Requirements
-  → NFR Design → Infrastructure Design → Code Generation) → Build & Test
+CONSTRUCTION (8 stages): System NFR → per-unit [sequential or parallel]
+  (Functional Design → NFR Requirements → NFR Design → Infrastructure Design
+  → Code Generation) → Build & Test
 
 OPERATIONS (1 stage): Deployment Checklist + Developer README
 ```
@@ -76,6 +77,8 @@ OPERATIONS (1 stage): Deployment Checklist + Developer README
 - **Audit trail**: `aidlc-docs/audit.md` is append-only with ISO 8601 timestamps; managed by the orchestrator, not individual agents
 - **Code location**: Application code at workspace root ONLY; `aidlc-docs/` for documentation only
 - **Prerequisite validation**: Construction agents validate input files exist (Step 0) before proceeding
+- **Deep questioning**: INCEPTION agents have mandatory question minimums (15-25 for requirements, 10 for design/stories, 8 for units) with multi-round follow-up
+- **Parallel unit execution**: CONSTRUCTION supports concurrent unit processing for 3+ unit projects via parallel groups
 - **Cross-unit context**: Unit N receives summaries of units 1 through N-1 for consistency
 - **Fast paths**: Brownfield projects offer simple/complex/new-component/full scope options
 - **Batch approval**: Auto-approve design stages, review only code generation and build/test

@@ -56,11 +56,11 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | Agent | Purpose |
 |:------|:--------|
 | `aidlc-for-claude:aidlc-reverse-engineer` | Deep codebase analysis for brownfield projects |
-| `aidlc-for-claude:aidlc-requirements-analyst` | Requirements gathering with adaptive depth |
-| `aidlc-for-claude:aidlc-story-writer` | User story creation with INVEST criteria |
+| `aidlc-for-claude:aidlc-requirements-analyst` | Requirements gathering with 12-category deep questioning (15-25 questions, multi-round) |
+| `aidlc-for-claude:aidlc-story-writer` | User story creation with 12-category analysis (error scenarios, edge cases, accessibility, privacy) |
 | `aidlc-for-claude:aidlc-workflow-planner` | Execution planning and stage determination |
-| `aidlc-for-claude:aidlc-application-designer` | Component and service layer design |
-| `aidlc-for-claude:aidlc-units-planner` | System decomposition into implementation units |
+| `aidlc-for-claude:aidlc-application-designer` | Component and service design with 10-category architecture analysis |
+| `aidlc-for-claude:aidlc-units-planner` | System decomposition with parallel group assignment and dependency analysis |
 | `aidlc-for-claude:aidlc-code-planner` | Code generation plan with mandatory test plans per module |
 
 ### :material-lightning-bolt: Sonnet Agents (Volume Work)
