@@ -54,7 +54,7 @@ AI-DLC has three phases. Each phase contains stages that may execute conditional
 |    --> Infrastructure Design --> Code Generation                      |
 |                                                                       |
 |  Build and Test (after all units) + security scan + coverage          |
-|  Operations (CI/CD, Dockerfile, .env, README, deploy checklist)      |
+|  Operations (CI/CD, PR Review, Dockerfile, .env, README, deploy)     |
 +-----------------------------------+-----------------------------------+
                                     |
                                     v
@@ -97,6 +97,7 @@ You can override any recommendation at the Workflow Planning approval gate.
 | `/aidlc-code-generation` | CONSTRUCTION 5 | Code generation (per-unit) |
 | `/aidlc-build-and-test` | CONSTRUCTION 6 | Build, test (coverage), security scan, integration/E2E tests |
 | `/aidlc-operations` | OPERATIONS | CI/CD, Dockerfile, .env.example, README, deployment checklist |
+| `/aidlc-review-pr` | UTILITY | Analyze PR diffs for code quality, security, and consistency |
 
 ## Agents
 
@@ -126,6 +127,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 | `aidlc-for-claude:aidlc-code-generator` | Code + test generation with multi-layer quality gate |
 | `aidlc-for-claude:aidlc-build-test-engineer` | Build, test (coverage), security scan, integration/E2E scaffolding |
 | `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
+| `aidlc-for-claude:aidlc-pr-reviewer` | PR diff analysis for code quality, security, performance, and consistency |
 
 ### Haiku (Fast Detection)
 
@@ -135,7 +137,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 
 **Model strategy:** Opus handles stages requiring deep reasoning (requirements analysis, architectural decisions, planning). Sonnet handles volume work (design documents, code generation, testing, operations). Haiku handles fast detection (workspace scanning, project classification).
 
-Total: **16 specialized agents** across 3 model tiers.
+Total: **17 specialized agents** across 3 model tiers.
 
 ## Key Conventions
 
@@ -183,6 +185,8 @@ Total: **16 specialized agents** across 3 model tiers.
 
 **Cross-unit consistency** -- When building multi-unit systems, each unit receives summaries of all previously completed units to maintain consistent domain models, tech stack choices, and conventions.
 
+**PR review** -- The `/aidlc-review-pr` standalone utility analyzes PR diffs or local changes across 6 categories (correctness, security, performance, consistency, testing, documentation). It can review GitHub PRs, local changes, or branch diffs independently of the three-phase workflow.
+
 **Adaptive depth** means all defined artifacts for a stage are created, but the detail level adapts to problem complexity. A simple bug fix gets concise artifacts; a complex system gets comprehensive treatment.
 
 **ASCII diagrams** use only `+`, `-`, `|`, `^`, `v`, `<`, `>` characters. No Unicode box-drawing characters.
@@ -218,6 +222,9 @@ aidlc-docs/
 # Workspace root (application + operational artifacts)
 .env.example                        # Environment configuration template
 .github/workflows/ci.yml            # CI/CD pipeline (or .gitlab-ci.yml)
+.github/workflows/pr-review.yml     # AI-powered PR review (conditional)
+.github/ISSUE_TEMPLATE/             # Issue form templates (feature, bug)
+.github/PULL_REQUEST_TEMPLATE.md    # PR template
 Dockerfile                          # Container image (conditional)
 docker-compose.yml                  # Multi-service setup (conditional, multi-unit)
 README.md                           # Project README (generated or updated)
@@ -233,7 +240,7 @@ aidlc-for-claude/
   .claude-plugin/
     plugin.json                     # Plugin metadata
     marketplace.json                # Marketplace listing
-  commands/                         # 16 slash commands
+  commands/                         # 17 slash commands
     aidlc.md                        # Entry point orchestrator
     aidlc-workspace-detection.md
     aidlc-reverse-engineering.md
@@ -250,7 +257,8 @@ aidlc-for-claude/
     aidlc-code-generation.md
     aidlc-build-and-test.md
     aidlc-operations.md
-  agents/                           # 16 specialized agents
+    aidlc-review-pr.md
+  agents/                           # 17 specialized agents
     aidlc-workspace-analyst.md
     aidlc-reverse-engineer.md
     aidlc-requirements-analyst.md
@@ -267,6 +275,7 @@ aidlc-for-claude/
     aidlc-code-generator.md
     aidlc-build-test-engineer.md
     aidlc-ops-generator.md
+    aidlc-pr-reviewer.md
   docs/                             # GitHub Pages (Material for MkDocs)
   .github/workflows/                # CI/CD (docs deployment)
   .gitignore

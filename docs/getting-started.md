@@ -112,6 +112,31 @@ You can run any stage independently:
 
 ---
 
+## PR Review
+
+AI-DLC includes a standalone PR review utility that can analyze code changes independently of the three-phase workflow.
+
+=== "Review a GitHub PR"
+
+    ```
+    /aidlc-review-pr
+    ```
+
+    Select "Review a GitHub PR" and provide the PR number. The agent fetches the diff via `gh pr diff` and performs a 6-category analysis: correctness, security, performance, consistency, testing, and documentation.
+
+=== "Review Local Changes"
+
+    ```
+    /aidlc-review-pr
+    ```
+
+    Select "Review local changes" to analyze uncommitted or staged changes in your working directory. Useful for pre-commit review.
+
+!!! tip
+    The PR review agent is read-only -- it analyzes code but does not modify files. No approval gate is required.
+
+---
+
 ## Session Continuity
 
 If your session is interrupted, simply run `/aidlc` again. The orchestrator detects the existing state file (`aidlc-docs/aidlc-state.md`) and offers to resume from where you left off.

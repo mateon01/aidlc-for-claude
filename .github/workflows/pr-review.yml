@@ -1,0 +1,114 @@
+name: AI PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR diff
+        id: diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          gh pr diff "$PR_NUMBER" > pr_diff.txt || true
+          # Truncate to 100KB to stay within API limits
+          head -c 102400 pr_diff.txt > pr_diff_truncated.txt
+          mv pr_diff_truncated.txt pr_diff.txt
+          echo "diff_size=$(wc -c < pr_diff.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Get changed files
+        id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          gh pr diff "$PR_NUMBER" --name-only > changed_files.txt || true
+
+      - name: AI Review
+        id: review
+        if: steps.diff.outputs.diff_size != '0'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          DIFF=$(cat pr_diff.txt)
+          FILES=$(cat changed_files.txt)
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_BODY=$(echo '${{ github.event.pull_request.body }}' | head -c 2000)
+
+          PROMPT="You are a code reviewer for the AI-DLC for Claude Code plugin. This is a pure markdown plugin with commands/ and agents/ directories.
+
+          Review this PR for:
+          1. **Correctness**: Valid YAML frontmatter (name, description, model, allowedTools), agent references use aidlc-for-claude: prefix, step numbering is sequential
+          2. **Consistency**: MOTD banners follow the standard format, approval gates use 2-option format, state management patterns are correct
+          3. **Documentation**: ASCII diagrams use only + - | ^ v < > characters, all content is in English, README/docs are updated for new commands/agents
+          4. **Completeness**: If adding a new stage/agent — orchestrator (commands/aidlc.md), README.md, and docs/ are all updated, counts are consistent
+          5. **Style**: Markdown formatting, consistent naming conventions, file naming follows patterns
+
+          Format your response as:
+
+          ## Summary
+          [2-3 sentence overview of the PR]
+
+          ## Issues Found
+          [List issues with file:line references, or 'No issues found']
+
+          ## Suggestions
+          [Optional improvement suggestions]
+
+          ## Verdict
+          [APPROVE / REQUEST_CHANGES / COMMENT]
+
+          PR Title: ${PR_TITLE}
+          PR Description: ${PR_BODY}
+          Changed Files: ${FILES}
+          Diff:
+          ${DIFF}"
+
+          RESPONSE=$(curl -s https://api.anthropic.com/v1/messages \
+            -H "content-type: application/json" \
+            -H "x-api-key: ${ANTHROPIC_API_KEY}" \
+            -H "anthropic-version: 2023-06-01" \
+            -d "$(jq -n \
+              --arg prompt "$PROMPT" \
+              '{
+                "model": "claude-sonnet-4-20250514",
+                "max_tokens": 4096,
+                "messages": [{"role": "user", "content": $prompt}]
+              }')")
+
+          REVIEW=$(echo "$RESPONSE" | jq -r '.content[0].text // "Review failed: unable to parse API response"')
+
+          # Write review to file for the comment step
+          echo "$REVIEW" > review_output.txt
+
+      - name: Post review comment
+        if: steps.diff.outputs.diff_size != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          REVIEW=$(cat review_output.txt)
+          COMMENT="## :robot: AI Code Review
+
+          ${REVIEW}
+
+          ---
+          *Automated review by Claude AI. This is advisory only — human review is still required.*"
+
+          gh pr comment "$PR_NUMBER" --body "$COMMENT"

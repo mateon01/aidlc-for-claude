@@ -19,7 +19,7 @@ When this agent begins, output this banner FIRST before doing any work:
 >
 > Agent: `aidlc-ops-generator` | Model: **Sonnet**
 >
-> CI/CD · Dockerfile · .env.example · README · Deployment checklist
+> CI/CD · PR Review · Issue Templates · Dockerfile · .env.example · README · Deploy checklist
 
 Then proceed with the steps below.
 
@@ -85,7 +85,50 @@ Pipeline should include:
 - **Security audit**: dependency audit command if available
 - Use the same language/runtime version detected in the project
 
-### Step 2.7: Generate Dockerfile (CONDITIONAL)
+### Step 2.6: Generate PR Review Workflow (CONDITIONAL)
+
+Ask the user which AI backend to use for automated PR review via AskUserQuestion:
+- Claude API (Recommended) — Uses `claude-sonnet-4-20250514`, requires `ANTHROPIC_API_KEY` secret
+- OpenAI API — Uses `gpt-4o`, requires `OPENAI_API_KEY` secret
+- Skip — Do not generate PR review workflow
+
+**If not skipped**, generate `.github/workflows/pr-review.yml` at the **workspace root**:
+- **Trigger**: `pull_request` to `main` (types: opened, synchronize, reopened)
+- **Permissions**: `contents: read`, `pull-requests: write`
+- **Steps**: checkout (fetch-depth: 0), get PR diff (truncate to 100KB), get changed files list, call AI API with review prompt, post review as PR comment
+- **Review prompt**: Tailor to the project's tech stack (use build system detection results from Step 1)
+- **Review categories**: Correctness, Security, Performance, Consistency, Style
+- **Output format**: Summary, Issues Found (file:line references), Suggestions, Verdict (APPROVE/REQUEST_CHANGES/COMMENT)
+- **Footer**: "Automated review by AI. This is advisory only — human review is still required."
+- Use `jq` for JSON construction to avoid shell escaping issues
+- Use single PR comment approach (not line-level review) for reliability
+
+### Step 2.6.5: Generate Issue Templates and PR Template
+
+Generate GitHub issue and PR templates customized to the project:
+
+**`.github/ISSUE_TEMPLATE/feature-request.yml`**:
+- YAML-based issue form with fields: Feature description (required), affected component (dropdown populated from project's unit names or main modules), use case (required), additional context
+- Labels: `["enhancement"]`
+
+**`.github/ISSUE_TEMPLATE/bug-report.yml`**:
+- YAML-based issue form with fields: Version (input), environment details (input), component where bug occurred (dropdown from project modules), bug description (required), steps to reproduce (required), expected/actual behavior (required), error logs (optional with shell render)
+- Labels: `["bug"]`
+
+**`.github/ISSUE_TEMPLATE/config.yml`**:
+- `blank_issues_enabled: true`
+- Contact link to project README or docs if available
+
+**`.github/PULL_REQUEST_TEMPLATE.md`**:
+- Summary section, Type of Change (checkboxes matching project conventions), Changes list, Testing checklist (tailored to project's test framework), Related Issues section, Review checklist
+
+**Deployment checklist addition**:
+- Add a "Branch Protection" section to `aidlc-docs/operations/deployment-checklist.md` with guidance on:
+  - Requiring PR reviews before merge
+  - Requiring status checks (CI pipeline, AI review if configured)
+  - Protecting the main branch from force pushes
+
+### Step 2.8: Generate Dockerfile (CONDITIONAL)
 **Skip this step if**:
 - Infrastructure design specifies "serverless" or "bare metal" deployment
 - No infrastructure-design artifacts exist
@@ -100,7 +143,7 @@ If applicable, generate `Dockerfile` at the **workspace root**:
 - Expose correct ports from infrastructure-design
 - For multi-unit microservice projects: generate one Dockerfile per independently deployable unit at `{unit-name}/Dockerfile`
 
-### Step 2.8: Generate Docker Compose (CONDITIONAL — multi-unit only)
+### Step 2.9: Generate Docker Compose (CONDITIONAL — multi-unit only)
 **Skip this step if**: single-unit project OR Dockerfile was skipped.
 
 Generate `docker-compose.yml` at the **workspace root**:
@@ -111,7 +154,7 @@ Generate `docker-compose.yml` at the **workspace root**:
 - Reference `.env` file for configuration
 - Add comments explaining each service
 
-### Step 2.9: Generate Monitoring Configuration (CONDITIONAL)
+### Step 2.10: Generate Monitoring Configuration (CONDITIONAL)
 **Skip this step if**: no system-nfr-decisions.md exists OR observability was not addressed in NFR artifacts.
 
 If observability decisions exist in `aidlc-docs/construction/system-nfr-decisions.md` or unit nfr-design artifacts:
@@ -162,6 +205,9 @@ Present all generated artifacts:
 ## Application Files (workspace root)
 - `.env.example` — environment configuration template
 - CI/CD pipeline file (if generated)
+- `.github/workflows/pr-review.yml` (if AI review configured)
+- `.github/ISSUE_TEMPLATE/` — issue form templates (feature request, bug report)
+- `.github/PULL_REQUEST_TEMPLATE.md` — PR template
 - `Dockerfile` (if applicable)
 - `docker-compose.yml` (if applicable, multi-unit only)
 - `README.md` (generated or updated)

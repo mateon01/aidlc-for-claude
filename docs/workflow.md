@@ -132,6 +132,26 @@ Generates operational artifacts at the workspace root and in aidlc-docs:
 
 The Operations phase ensures smooth deployment and developer onboarding. It produces both documentation artifacts (in `aidlc-docs/operations/`) and executable artifacts (at the workspace root) based on the completed construction artifacts. Executable artifacts include CI/CD pipelines, Dockerfiles, environment templates, and README files -- making the generated project immediately deployable and developer-ready.
 
+### PR Review Workflow
+
+The Operations phase can optionally generate an AI-powered PR review workflow (`.github/workflows/pr-review.yml`) that automatically reviews pull requests. You choose between Claude API or OpenAI API as the AI backend. The workflow posts a single review comment on each PR with findings organized by category.
+
+### Issue and PR Templates
+
+The Operations phase also generates GitHub issue templates (`.github/ISSUE_TEMPLATE/`) and a PR template (`.github/PULL_REQUEST_TEMPLATE.md`) customized to the project's components and conventions. These standardize how contributors report bugs, request features, and describe pull requests.
+
+---
+
+## Standalone Utilities
+
+These commands can be run independently of the three-phase workflow at any time:
+
+| Command | Description |
+|:--------|:------------|
+| `/aidlc-review-pr` | Analyze PR diffs or local changes for code quality, security, performance, and consistency |
+
+The PR review utility performs a 6-category analysis (correctness, security, performance, consistency, testing, documentation) and presents a structured report with per-file findings and a verdict.
+
 ---
 
 ## Stage Execution Matrix

@@ -296,6 +296,12 @@ After Build and Test completes:
    - Generates: deployment checklist, developer README, CI/CD pipeline, Dockerfile (conditional), .env.example, root README.md
    - Marks AI-DLC workflow as COMPLETE
 
+### Standalone Utilities (Available Anytime)
+
+These commands can be run independently of the three-phase workflow:
+
+- `/aidlc-review-pr` — PR code review (code quality, security, performance analysis)
+
 ## Agent Delegation Pattern
 
 For each stage:

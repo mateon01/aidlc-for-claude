@@ -47,6 +47,7 @@
 - :material-format-header-pound: **Stage Banners (MOTD)** -- Every agent displays a formatted banner on start showing phase, stage number, agent name, model, and capabilities.
 - :material-restart: **Session Continuity** -- Interrupted workflows can be resumed from where you left off.
 - :material-magnify-scan: **Brownfield Support** -- Deep reverse engineering for existing codebases with 8 analysis artifacts.
+- :material-source-pull: **PR Review** -- Standalone utility for analyzing PR diffs across 6 categories (correctness, security, performance, consistency, testing, documentation).
 
 ---
 
