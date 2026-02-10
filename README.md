@@ -98,6 +98,7 @@ You can override any recommendation at the Workflow Planning approval gate.
 | `/aidlc-build-and-test` | CONSTRUCTION 6 | Build, test (coverage), security scan, integration/E2E tests |
 | `/aidlc-operations` | OPERATIONS | CI/CD, Dockerfile, .env.example, README, deployment checklist |
 | `/aidlc-review-pr` | UTILITY | Analyze PR diffs for code quality, security, and consistency |
+| `/aidlc-ci-setup` | UTILITY | Generate CI/CD pipelines, PR review workflows, and issue/PR templates |
 
 ## Agents
 
@@ -128,6 +129,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 | `aidlc-for-claude:aidlc-build-test-engineer` | Build, test (coverage), security scan, integration/E2E scaffolding |
 | `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
 | `aidlc-for-claude:aidlc-pr-reviewer` | PR diff analysis for code quality, security, performance, and consistency |
+| `aidlc-for-claude:aidlc-ci-setup-engineer` | CI/CD pipeline, PR review workflow, and issue/PR template generation |
 
 ### Haiku (Fast Detection)
 
@@ -137,7 +139,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 
 **Model strategy:** Opus handles stages requiring deep reasoning (requirements analysis, architectural decisions, planning). Sonnet handles volume work (design documents, code generation, testing, operations). Haiku handles fast detection (workspace scanning, project classification).
 
-Total: **17 specialized agents** across 3 model tiers.
+Total: **18 specialized agents** across 3 model tiers.
 
 ## Key Conventions
 
@@ -186,6 +188,8 @@ Total: **17 specialized agents** across 3 model tiers.
 **Cross-unit consistency** -- When building multi-unit systems, each unit receives summaries of all previously completed units to maintain consistent domain models, tech stack choices, and conventions.
 
 **PR review** -- The `/aidlc-review-pr` standalone utility analyzes PR diffs or local changes across 6 categories (correctness, security, performance, consistency, testing, documentation). It can review GitHub PRs, local changes, or branch diffs independently of the three-phase workflow.
+
+**CI setup** -- The `/aidlc-ci-setup` standalone utility generates CI/CD infrastructure for any project. It detects the tech stack automatically and generates CI/CD pipelines, AI-powered PR review workflows, issue templates, and PR templates -- no prior AI-DLC stages required.
 
 **Adaptive depth** means all defined artifacts for a stage are created, but the detail level adapts to problem complexity. A simple bug fix gets concise artifacts; a complex system gets comprehensive treatment.
 
@@ -240,7 +244,7 @@ aidlc-for-claude/
   .claude-plugin/
     plugin.json                     # Plugin metadata
     marketplace.json                # Marketplace listing
-  commands/                         # 17 slash commands
+  commands/                         # 18 slash commands
     aidlc.md                        # Entry point orchestrator
     aidlc-workspace-detection.md
     aidlc-reverse-engineering.md
@@ -258,7 +262,8 @@ aidlc-for-claude/
     aidlc-build-and-test.md
     aidlc-operations.md
     aidlc-review-pr.md
-  agents/                           # 17 specialized agents
+    aidlc-ci-setup.md
+  agents/                           # 18 specialized agents
     aidlc-workspace-analyst.md
     aidlc-reverse-engineer.md
     aidlc-requirements-analyst.md
@@ -276,6 +281,7 @@ aidlc-for-claude/
     aidlc-build-test-engineer.md
     aidlc-ops-generator.md
     aidlc-pr-reviewer.md
+    aidlc-ci-setup-engineer.md
   docs/                             # GitHub Pages (Material for MkDocs)
   .github/workflows/                # CI/CD (docs deployment)
   .gitignore

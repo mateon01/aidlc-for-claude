@@ -137,6 +137,26 @@ AI-DLC includes a standalone PR review utility that can analyze code changes ind
 
 ---
 
+## CI Setup
+
+Generate CI/CD infrastructure for any project without running the full AI-DLC workflow:
+
+```
+/aidlc-ci-setup
+```
+
+The agent automatically detects your tech stack (language, build system, test framework, linter) and offers to generate:
+
+- **CI/CD Pipeline** -- GitHub Actions or GitLab CI with build, test, lint, and security audit
+- **PR Review Workflow** -- AI-powered code review using Claude API or OpenAI API
+- **Issue Templates** -- Feature request and bug report forms customized to your project
+- **PR Template** -- Standardized pull request description with project-specific checklists
+
+!!! tip
+    This is the fastest way to add CI/CD to an existing project. No prior AI-DLC stages are required.
+
+---
+
 ## Session Continuity
 
 If your session is interrupted, simply run `/aidlc` again. The orchestrator detects the existing state file (`aidlc-docs/aidlc-state.md`) and offers to resume from where you left off.

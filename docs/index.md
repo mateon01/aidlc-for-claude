@@ -48,6 +48,7 @@
 - :material-restart: **Session Continuity** -- Interrupted workflows can be resumed from where you left off.
 - :material-magnify-scan: **Brownfield Support** -- Deep reverse engineering for existing codebases with 8 analysis artifacts.
 - :material-source-pull: **PR Review** -- Standalone utility for analyzing PR diffs across 6 categories (correctness, security, performance, consistency, testing, documentation).
+- :material-pipe: **CI Setup** -- Standalone utility to generate CI/CD pipelines, PR review workflows, and issue/PR templates with automatic tech stack detection.
 
 ---
 

@@ -149,8 +149,11 @@ These commands can be run independently of the three-phase workflow at any time:
 | Command | Description |
 |:--------|:------------|
 | `/aidlc-review-pr` | Analyze PR diffs or local changes for code quality, security, performance, and consistency |
+| `/aidlc-ci-setup` | Generate CI/CD pipelines, PR review workflows, and issue/PR templates for any project |
 
-The PR review utility performs a 6-category analysis (correctness, security, performance, consistency, testing, documentation) and presents a structured report with per-file findings and a verdict.
+The **PR review** utility performs a 6-category analysis (correctness, security, performance, consistency, testing, documentation) and presents a structured report with per-file findings and a verdict.
+
+The **CI setup** utility detects your project's tech stack automatically and generates selected infrastructure files (CI/CD pipeline, PR review workflow, issue templates, PR template). It also provides branch protection recommendations.
 
 ---
 

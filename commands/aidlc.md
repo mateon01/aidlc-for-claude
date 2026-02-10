@@ -301,6 +301,7 @@ After Build and Test completes:
 These commands can be run independently of the three-phase workflow:
 
 - `/aidlc-review-pr` — PR code review (code quality, security, performance analysis)
+- `/aidlc-ci-setup` — Generate CI/CD pipelines, PR review workflows, and issue/PR templates
 
 ## Agent Delegation Pattern
 
