@@ -283,7 +283,15 @@ aidlc-for-claude/
     aidlc-pr-reviewer.md
     aidlc-ci-setup-engineer.md
   docs/                             # GitHub Pages (Material for MkDocs)
-  .github/workflows/                # CI/CD (docs deployment)
+  .github/
+    workflows/
+      deploy-docs.yml               # GitHub Pages deployment
+      pr-review.yml                 # AI-powered PR review
+    ISSUE_TEMPLATE/
+      feature-request.yml           # Feature request form
+      bug-report.yml                # Bug report form
+      config.yml                    # Template config
+    PULL_REQUEST_TEMPLATE.md        # PR template
   .gitignore
   package.json
   LICENSE

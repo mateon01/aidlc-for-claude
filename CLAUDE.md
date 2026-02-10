@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 18 slash commands and 18 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
 
-**Version**: 1.4.0 | **License**: Apache-2.0
+**Version**: 1.4.1 | **License**: Apache-2.0
 
 ## Build & Development
 
