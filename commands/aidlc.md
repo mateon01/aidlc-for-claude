@@ -351,6 +351,7 @@ When `graphEnabled: true` is set in the execution plan (from Workflow Planning S
    - **Reverse Engineer** (INCEPTION Stage 2) — triggers Step 9.5 graph construction (pass backend type + connection details)
    - **Code Generator** (CONSTRUCTION Stage 5) — triggers Step 14.7 graph update (pass backend type + connection details)
    - **Build & Test** (CONSTRUCTION Stage 6) — triggers Step 10.5 impact analysis (pass backend type + connection details)
+   - **Orchestrator itself** — manages DB lifecycle: initialization before first graph op, health checks between stages, parallel coordination, teardown offer at completion
 
 3. When graphEnabled is true, stage banners should indicate graph status:
 ```
@@ -363,6 +364,35 @@ When `graphEnabled: true` is set in the execution plan (from Workflow Planning S
    - Circular dependencies found
    - Impact analysis effectiveness (if Build & Test ran)
    - Verification report status (if verification was configured)
+
+### Graph DB Lifecycle Management
+
+When `graphEnabled: true` and `graphBackend` is `neo4j` or `neptune`, the orchestrator manages the DB lifecycle:
+
+**1. Initialization (before first graph operation):**
+- Before RE Step 9.5 (brownfield) or Code Gen Step 14.7 first unit (greenfield):
+  - Check if graph DB is already running (Neo4j: `docker ps --filter name=aidlc-neo4j`)
+  - If not running: delegate to `aidlc-for-claude:aidlc-graph-analyzer` with mode "build"
+    (the graph-analyzer handles container start/provisioning in its Step 6.1 or 7.2)
+  - Update `graphInitialized: true` in aidlc-state.md
+
+**2. Health check (between stages):**
+- Before each graph-dependent stage (Code Gen per-unit, Build&Test):
+  - Quick connectivity check (Neo4j: `docker exec aidlc-neo4j cypher-shell -u neo4j -p aidlc-graph "RETURN 1"`)
+  - If failed: warn user and offer to skip graph operations or reinitialize
+
+**3. Parallel mode coordination:**
+- When `parallel-execution: true` AND `graphEnabled: true`:
+  - Graph updates from parallel units MUST be serialized (not concurrent)
+  - After each parallel group completes: run graph verify mode to check consistency
+  - Option A: Each unit queues graph updates, orchestrator applies them sequentially after the group
+  - Option B: Units skip graph update, orchestrator runs a bulk update after each parallel group
+
+**4. Teardown offer (workflow completion):**
+- After Operations phase completes (or on workflow abort):
+  - If Neo4j: ask user whether to keep container running or teardown
+  - If Neptune: remind user of running resources and cost implications
+  - File-based: no action needed
 
 ## Directory Structure
 

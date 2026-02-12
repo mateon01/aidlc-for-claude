@@ -181,7 +181,13 @@ Three backends are supported:
 - **File-based** -- Simple JSON file with no external dependencies
 
 !!! tip "Integrated Workflow"
-    When using the full AI-DLC workflow (`/aidlc`), you can opt-in to dependency graph analysis during Workflow Planning. A multi-tier configuration flow lets you choose the backend (Neo4j, Neptune, or File-based) and configure deployment verification. The graph is then built during Reverse Engineering (brownfield) or Code Generation (greenfield), and used for impact-based test prioritization during Build & Test.
+    When using the full AI-DLC workflow (`/aidlc`), you can opt-in to dependency graph analysis during Workflow Planning. A multi-tier configuration flow lets you choose the backend (Neo4j, Neptune, or File-based) and configure deployment verification. The graph is then automatically maintained throughout the pipeline:
+
+    - **Reverse Engineering** builds the initial graph from existing code (brownfield projects)
+    - **Code Generation** updates the graph incrementally per unit with post-update integrity verification (node count, circular dependency check, cross-unit edge resolution)
+    - **Build & Test** uses impact analysis for prioritized test execution -- direct changes first (P1), 1-hop dependents second (P2), then the full suite (P3)
+
+    The orchestrator manages graph DB lifecycle: initialization before the first graph operation, health checks between stages, serialized updates during parallel execution, and a teardown offer at workflow completion. All graph operations are non-blocking -- failures log warnings and continue the workflow. You can retry any graph operation later with `/aidlc-graph`.
 
 !!! note "Graph Storage"
     File-based graphs are stored in `aidlc-docs/graph/dependency-graph.json`. Neo4j and Neptune backends store data in the graph database with a local summary at `aidlc-docs/graph/graph-summary.md`. Mermaid visualizations are generated at `aidlc-docs/graph/dependency-graph.md`. Neptune IaC files go to `aidlc-docs/graph/infra/`.

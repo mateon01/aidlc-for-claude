@@ -125,7 +125,14 @@ For each unit defined in Inception:
 
 ### Build and Test
 
-When dependency graph analysis is enabled (`graphEnabled: true`), an **impact analysis** step runs before test execution. It reads the dependency graph, identifies affected modules via BFS/DFS traversal, maps them to test files, and prioritizes test execution: direct dependencies first (high confidence), transitive 1-hop second (medium), then the full suite.
+When dependency graph analysis is enabled (`graphEnabled: true`), an **impact analysis** step runs before test execution. It reads the dependency graph, identifies affected modules via BFS/DFS traversal, maps them to test files, and constructs a prioritized test execution plan:
+
+- **Priority 1** (direct changes): Tests for directly changed files, run first with `--bail`
+- **Priority 2** (1-hop dependents): Tests for direct dependents, run second
+- **Priority 3** (full suite): All tests to catch transitive effects, run last
+- Modules with no matching test files are flagged as "untested dependencies"
+
+Test execution follows priority order. If P1 fails, P2 and P3 still run for completeness. If P1+P2 pass but P3 fails, the report highlights the unexpected transitive effect.
 
 After all units are complete, generates build instructions and test plans, then **executes actual builds and tests**. The agent detects the project's build system (npm, pip, cargo, etc.), installs dependencies, runs a **dependency security scan**, runs the build, executes tests **with coverage tracking**, and generates **integration tests** for multi-unit projects. Failed builds are retried up to 3 times with automated fix attempts. For web applications, an optional **E2E test scaffold** (Playwright/Cypress) can be generated.
 
@@ -173,6 +180,9 @@ The **PR review** utility performs a 6-category analysis (correctness, security,
 The **CI setup** utility detects your project's tech stack automatically and generates selected infrastructure files (CI/CD pipeline, PR review workflow, issue templates, PR template). It also provides branch protection recommendations.
 
 The **graph analysis** utility supports six modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), impact analysis (affected module detection with test prioritization), verify (9-point DB health check), and teardown (stop/remove graph DB). It supports three backends: File-based JSON, Neo4j (local Docker with Cypher), and AWS Neptune (managed graph DB with IaC provisioning). E2E verified with Neo4j backend on a 15-module TypeScript project -- 15 nodes, 41 edges loaded, all 9 verification checks passed, hub analysis identified critical modules, and impact analysis correctly traced direct and transitive dependencies.
+
+!!! info "Automatic Graph Maintenance"
+    When using the full AI-DLC workflow with `graphEnabled: true`, the dependency graph is automatically maintained throughout the pipeline. Reverse Engineering builds the initial graph (brownfield), Code Generation updates it incrementally per unit with post-update integrity verification, and Build & Test uses impact analysis for prioritized test execution. The orchestrator manages graph DB lifecycle -- initialization before the first graph operation, health checks between stages, serialization of updates during parallel execution, and a teardown offer at workflow completion. All graph operations are non-blocking: failures log warnings and continue the workflow. You can retry any graph operation later with `/aidlc-graph`.
 
 ---
 

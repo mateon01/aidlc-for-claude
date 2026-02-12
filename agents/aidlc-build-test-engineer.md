@@ -135,10 +135,45 @@ When graphEnabled is true:
 3. Delegate to `aidlc-for-claude:aidlc-graph-analyzer` with mode "impact":
    - Pass: list of changed files
    - Receive: affected modules with confidence scores and related test files
-4. Use impact analysis results to prioritize test execution in Step 11:
-   - **Priority 1** (High confidence — direct dependencies): Run first
-   - **Priority 2** (Medium confidence — 1-hop transitive): Run second
-   - **Priority 3** (Low confidence — 2+ hops): Run with full suite
+4. **Construct prioritized test execution plan:**
+
+   From impact analysis results, build an ordered test file list:
+
+   a. Map affected modules to test files:
+      - Convention: `src/foo/bar.ts` maps to `tests/foo/bar.test.ts` or `src/foo/__tests__/bar.test.ts`
+      - Also check: `test/`, `spec/`, `__tests__/` directories
+      - If no matching test file found: flag module as "untested dependency"
+
+   b. Order test execution by priority tier:
+      ```
+      # Priority 1: Tests for directly changed files
+      npx jest --testPathPattern="auth-controller|user-service" --bail
+
+      # Priority 2: Tests for direct dependents (1-hop)
+      npx jest --testPathPattern="auth-guard|login" --bail
+
+      # Priority 3: Full test suite (catches transitive effects)
+      npx jest
+      ```
+
+   c. For Python projects:
+      ```
+      # Priority 1+2: Targeted
+      pytest tests/test_auth.py tests/test_user.py -x
+
+      # Priority 3: Full suite
+      pytest
+      ```
+
+   d. Record test execution plan in execution report:
+      ```markdown
+      ## Test Prioritization (Graph-Based)
+      - Priority 1 (direct): [file list] — run first with --bail
+      - Priority 2 (1-hop): [file list] — run second
+      - Priority 3 (full): all tests — run last
+      - Untested dependencies: [file list] — no matching test files
+      ```
+
 5. Include impact analysis report in Step 13 execution report
 
 ```markdown
@@ -160,6 +195,12 @@ Run the test command via Bash with coverage flags where possible:
 - Java Gradle: `gradle test jacocoTestReport` (if JaCoCo plugin exists)
 
 If the coverage flag causes an error (tool not installed), re-run without coverage and note "coverage not measured" in the report.
+
+**When impact analysis is available (Step 10.5 ran):**
+- Execute tests in priority order (P1 then P2 then P3)
+- If P1 fails: report immediately, still run P2+P3 for completeness
+- If P1+P2 pass: P3 failure indicates unexpected transitive effect — highlight in report
+- Track per-tier pass/fail rates in execution report
 
 Capture test output including: number of tests passed/failed/skipped, failure details with file:line references, and coverage percentage if available. If tests fail, proceed to Step 12 (retry loop).
 

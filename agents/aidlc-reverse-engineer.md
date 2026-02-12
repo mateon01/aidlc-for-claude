@@ -148,6 +148,19 @@ The graph analysis complements existing RE artifacts:
 - `dependencies.md` — graph provides fine-grained file-level dependency data
 - `code-structure.md` — graph confirms module relationships
 
+**Error Handling:**
+- If graph-analyzer delegation fails (timeout, crash):
+  1. Log error in graph summary section: "Graph construction failed: [error]"
+  2. Set `graphInitialized: false` in context
+  3. Continue RE workflow — graph is optional, NOT blocking
+  4. Warn user: "Dependency graph construction failed. RE analysis will continue without graph metrics. You can retry later with `/aidlc-graph`."
+- If graph file is created but incomplete (missing nodes/edges vs expected):
+  1. Include partial results in RE report with warning
+  2. Log discrepancy count
+- If graph verification fails (Mermaid not generated):
+  1. Skip visualization reference in RE report
+  2. Note: "Visualization unavailable. Raw graph data at dependency-graph.json"
+
 ## Step 10: Create Timestamp File
 Create `reverse-engineering-timestamp.md` with analysis date, analyzer, workspace path, files analyzed, artifacts checklist.
 

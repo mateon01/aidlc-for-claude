@@ -266,6 +266,13 @@ MERGE (m:Module {path: $newFile})
 SET m.type = $type, m.loc = $loc, m.exports = $exports;
 ```
 
+**Parallel Execution Note:**
+When called from parallel unit execution, the orchestrator serializes graph update calls.
+However, if concurrent updates occur:
+- Neo4j handles concurrent writes via its transaction system
+- MERGE operations are idempotent and safe for concurrent use
+- If a lock conflict occurs: retry the operation once after 2 seconds
+
 ### 6.4 Impact Analysis (mode: impact)
 
 Precise graph traversal with Cypher:

@@ -112,6 +112,24 @@ When graphEnabled is true:
 
 Include the graph update summary in the Step 16 completion message.
 
+**Post-Update Verification:**
+After graph-analyzer returns from update mode:
+
+1. **Quick integrity check** (always):
+   - Verify updated node count >= previous count (no accidental deletions)
+   - Verify no new circular dependencies introduced by this unit
+   - If either fails: warn in graph update summary but do NOT block code generation
+
+2. **Cross-unit edge verification** (when unit N > 1):
+   - Check that cross-unit imports resolve to existing graph nodes
+   - Log any unresolved imports (may indicate missing unit or wrong import path)
+   - Include in Step 16 completion: "Cross-unit dependencies: [N] resolved, [M] unresolved"
+
+3. **Error handling:**
+   - If graph-analyzer fails: log warning, continue code generation
+   - Graph update is informational, NOT a blocking gate
+   - User can manually update later with `/aidlc-graph update`
+
 ## Step 15: Code Quality Check
 Before presenting results to the user, run a quick quality check via Bash:
 - TypeScript project: `npx tsc --noEmit`
