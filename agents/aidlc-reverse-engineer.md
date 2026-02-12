@@ -119,6 +119,35 @@ Create `aidlc-docs/inception/reverse-engineering/code-quality-assessment.md`:
 - Technical debt
 - Patterns/anti-patterns
 
+## Step 9.5: Build Dependency Graph (CONDITIONAL)
+
+**Skip this step unless** `aidlc-state.md` or the execution plan has `graphEnabled: true`.
+
+When graphEnabled is true:
+
+1. Read project language and source directories from prior analysis steps (Step 1)
+2. Delegate graph construction to `aidlc-for-claude:aidlc-graph-analyzer` with mode "build":
+   - Pass: primary language(s), source directories, entry points
+   - The graph analyzer performs full static analysis and writes `aidlc-docs/graph/dependency-graph.json`
+3. Verify graph file was created at `aidlc-docs/graph/dependency-graph.json`
+4. Read the graph summary and include it in the RE report:
+
+```markdown
+## Dependency Graph Summary
+- Total modules: [node count]
+- Total dependencies: [edge count]
+- Hub nodes (most depended-on): [top 5]
+- Circular dependencies: [count and paths, or "None"]
+- Isolated modules: [list]
+```
+
+5. Verify Mermaid visualization was generated at `aidlc-docs/graph/dependency-graph.md`
+
+The graph analysis complements existing RE artifacts:
+- `architecture.md` — graph provides quantitative structure metrics
+- `dependencies.md` — graph provides fine-grained file-level dependency data
+- `code-structure.md` — graph confirms module relationships
+
 ## Step 10: Create Timestamp File
 Create `reverse-engineering-timestamp.md` with analysis date, analyzer, workspace path, files analyzed, artifacts checklist.
 

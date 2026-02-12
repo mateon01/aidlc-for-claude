@@ -48,6 +48,7 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 |:--------|:------------|
 | `/aidlc-review-pr` | Analyze PR diffs for code quality, security, performance, and consistency |
 | `/aidlc-ci-setup` | Generate CI/CD pipelines, PR review workflows, and issue/PR templates |
+| `/aidlc-graph` | Build, update, visualize, or analyze code dependency graphs |
 
 ---
 
@@ -84,6 +85,7 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
 | `aidlc-for-claude:aidlc-pr-reviewer` | PR diff analysis for code quality, security, performance, and consistency |
 | `aidlc-for-claude:aidlc-ci-setup-engineer` | CI/CD pipeline, PR review workflow, and issue/PR template generation |
+| `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph construction, incremental update, impact analysis, and Mermaid visualization |
 
 ### :material-speedometer: Haiku Agents (Fast Detection)
 

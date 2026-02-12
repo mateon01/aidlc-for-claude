@@ -121,6 +121,35 @@ Run the build command via Bash:
 
 Capture stdout and stderr. If build fails, proceed to Step 12 (retry loop).
 
+## Step 10.5: Impact Analysis (CONDITIONAL)
+
+**Skip this step unless** `aidlc-state.md` has `graphEnabled: true`.
+
+When graphEnabled is true:
+
+1. Read `aidlc-docs/graph/dependency-graph.json`
+   - If graph file is missing or corrupted: skip impact analysis, fall back to running all tests
+2. Identify changed files:
+   - From git diff (if git available): `git diff --name-only HEAD~1` or compare with main branch
+   - From code generation records in aidlc-state.md
+3. Delegate to `aidlc-for-claude:aidlc-graph-analyzer` with mode "impact":
+   - Pass: list of changed files
+   - Receive: affected modules with confidence scores and related test files
+4. Use impact analysis results to prioritize test execution in Step 11:
+   - **Priority 1** (High confidence — direct dependencies): Run first
+   - **Priority 2** (Medium confidence — 1-hop transitive): Run second
+   - **Priority 3** (Low confidence — 2+ hops): Run with full suite
+5. Include impact analysis report in Step 13 execution report
+
+```markdown
+## Impact Analysis
+- Changed files: [count]
+- Directly affected modules: [count]
+- Transitively affected modules: [count]
+- Prioritized test files: [count]
+- Circular dependencies detected: [yes/no]
+```
+
 ## Step 11: Execute Tests
 Run the test command via Bash with coverage flags where possible:
 - Node.js: `npm test -- --coverage` (if Jest) or `npx vitest --coverage` (if Vitest)

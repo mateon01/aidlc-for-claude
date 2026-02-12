@@ -1,6 +1,6 @@
 {
   "name": "aidlc-for-claude",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "AI-DLC (AI-Driven Development Life Cycle) - A structured, adaptive software development workflow for Claude Code",
   "skills": "./commands/"
 }

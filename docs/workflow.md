@@ -40,6 +40,14 @@ Creates user stories following INVEST criteria (Independent, Negotiable, Valuabl
 
 Evaluates all gathered context and produces an execution plan. You can override any recommendation.
 
+During Workflow Planning, you are offered an opt-in for **dependency graph analysis**. When enabled:
+
+- **Reverse Engineering** includes dependency graph construction from existing code
+- **Code Generation** includes real-time graph updates as code is generated
+- **Build & Test** includes graph-based impact analysis for test prioritization
+
+The recommendation is context-aware: enabled by default for complex brownfield changes and multi-unit greenfield projects, disabled for simple changes.
+
 ### Stage 6: Application Design (Conditional)
 
 Designs component architecture, service layers, and inter-service dependencies across 10 mandatory categories (Component Identification, Methods, Service Layer, Dependencies, Design Patterns, Scalability, Data Architecture, Security Architecture, Error Handling Strategy, API Design). Minimum 10 questions. Critical architectural choices (monolith vs microservices, DB type, communication pattern) use interactive Q&A. Produces design documents with ASCII diagrams.
@@ -111,6 +119,8 @@ For each unit defined in Inception:
 
 ### Build and Test
 
+When dependency graph analysis is enabled (`graphEnabled: true`), an **impact analysis** step runs before test execution. It reads the dependency graph, identifies affected modules via BFS/DFS traversal, maps them to test files, and prioritizes test execution: direct dependencies first (high confidence), transitive 1-hop second (medium), then the full suite.
+
 After all units are complete, generates build instructions and test plans, then **executes actual builds and tests**. The agent detects the project's build system (npm, pip, cargo, etc.), installs dependencies, runs a **dependency security scan**, runs the build, executes tests **with coverage tracking**, and generates **integration tests** for multi-unit projects. Failed builds are retried up to 3 times with automated fix attempts. For web applications, an optional **E2E test scaffold** (Playwright/Cypress) can be generated.
 
 ### Operations
@@ -150,10 +160,13 @@ These commands can be run independently of the three-phase workflow at any time:
 |:--------|:------------|
 | `/aidlc-review-pr` | Analyze PR diffs or local changes for code quality, security, performance, and consistency |
 | `/aidlc-ci-setup` | Generate CI/CD pipelines, PR review workflows, and issue/PR templates for any project |
+| `/aidlc-graph` | Build, update, visualize, or analyze code dependency graphs |
 
 The **PR review** utility performs a 6-category analysis (correctness, security, performance, consistency, testing, documentation) and presents a structured report with per-file findings and a verdict.
 
 The **CI setup** utility detects your project's tech stack automatically and generates selected infrastructure files (CI/CD pipeline, PR review workflow, issue templates, PR template). It also provides branch protection recommendations.
+
+The **graph analysis** utility supports four modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), and impact analysis (affected module detection with test prioritization). It supports TypeScript/JavaScript and Python with file-level analysis for other languages.
 
 ---
 

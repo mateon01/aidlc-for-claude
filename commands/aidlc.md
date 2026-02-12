@@ -302,6 +302,7 @@ These commands can be run independently of the three-phase workflow:
 
 - `/aidlc-review-pr` — PR code review (code quality, security, performance analysis)
 - `/aidlc-ci-setup` — Generate CI/CD pipelines, PR review workflows, and issue/PR templates
+- `/aidlc-graph` — Dependency graph analysis and visualization
 
 ## Agent Delegation Pattern
 
@@ -318,6 +319,34 @@ For each stage:
 
 After Workflow Planning, the execution plan in `aidlc-docs/inception/plans/execution-plan.md` becomes the authority for which stages execute. The user can override any recommendation at the Workflow Planning approval gate.
 
+## Graph State Propagation
+
+When `graphEnabled: true` is set in the execution plan (from Workflow Planning Step 6.5), the orchestrator must:
+
+1. Record graph configuration in `aidlc-docs/aidlc-state.md`:
+```markdown
+## Graph Configuration
+- graphEnabled: true/false
+- graphPath: aidlc-docs/graph/dependency-graph.json
+- graphInitialized: true/false
+- lastGraphUpdate: <ISO 8601 timestamp>
+```
+
+2. Pass `graphEnabled: true` context to downstream agents:
+   - **Reverse Engineer** (INCEPTION Stage 2) — triggers Step 9.5 graph construction
+   - **Code Generator** (CONSTRUCTION Stage 5) — triggers Step 14.7 graph update
+   - **Build & Test** (CONSTRUCTION Stage 6) — triggers Step 10.5 impact analysis
+
+3. When graphEnabled is true, stage banners should indicate graph status:
+```
+> Graph: **Enabled** — dependency tracking active
+```
+
+4. After workflow completion, include graph statistics in the final summary when graph was enabled:
+   - Total nodes/edges in final graph
+   - Circular dependencies found
+   - Impact analysis effectiveness (if Build & Test ran)
+
 ## Directory Structure
 
 ```
@@ -330,6 +359,9 @@ aidlc-docs/
     requirements/
     user-stories/
     application-design/
+  graph/
+    dependency-graph.json            # Code dependency graph (when graphEnabled)
+    dependency-graph.md              # Mermaid visualization (when graphEnabled)
   construction/
     system-nfr-decisions.md
     plans/

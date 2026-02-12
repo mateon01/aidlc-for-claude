@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 18 slash commands and 18 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
+AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 19 slash commands and 19 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
 
-**Version**: 1.4.1 | **License**: Apache-2.0
+**Version**: 1.5.0 | **License**: Apache-2.0
 
 ## Build & Development
 
@@ -85,6 +85,7 @@ OPERATIONS (1 stage): Deployment Checklist + Developer README
 - **Batch approval**: Auto-approve design stages, review only code generation and build/test
 - **PR review**: Standalone `/aidlc-review-pr` utility for analyzing PR diffs (code quality, security, performance, consistency) -- independent of the three-phase workflow
 - **CI setup**: Standalone `/aidlc-ci-setup` utility for generating CI/CD pipelines, PR review workflows, and issue/PR templates -- detects tech stack automatically
+- **Dependency graph**: Optional graph-based code dependency analysis. Opt-in during Workflow Planning. Brownfield projects get graph from existing code analysis; greenfield projects build graph incrementally during code generation. Impact analysis in Build & Test prioritizes tests based on dependency traversal. Standalone `/aidlc-graph` utility available anytime.
 
 ## File Naming Conventions
 
@@ -114,3 +115,9 @@ OPERATIONS (1 stage): Deployment Checklist + Developer README
 - **Projects**: All issues MUST be added to the appropriate GitHub Project board for tracking
 - **Todo Lists**: Before beginning any work, ensure the task is tracked in both GitHub Issues and Projects
 - Work should only commence after proper issue and project registration is complete
+
+
+## Release Management Rule
+
+- **Version Release Requirement**: Whenever the project version changes (major, minor, or patch), you **MUST** create a new GitHub release that matches the new version.
+- **Agent & Role Documentation**: When adding a new agent role (such as in `aidlc-for-claude/CLAUDE.md`), update all related documentation (README, workflow docs, agent lists) to ensure the new role is properly described and integrated into the workflow and release notes.

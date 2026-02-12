@@ -77,11 +77,53 @@ Create Mermaid flowchart with Material Design styling:
 - Gray: Conditional SKIP
 - Purple: Start/End
 
+## Step 6.5: Graph Dependency Analysis Opt-in
+
+After generating the workflow visualization and before creating the execution plan, ask the user whether to enable dependency graph analysis via AskUserQuestion:
+
+```
+"Enable dependency graph analysis for this project?"
+
+- Yes (Recommended for medium-large projects)
+  "Build and maintain a code dependency graph for impact analysis,
+   visualization, and change-aware test execution"
+
+- No
+  "Standard workflow without dependency graph tracking"
+```
+
+**Context-aware recommendation:**
+- Brownfield (complex change): Recommend Yes — graph from existing code aids impact analysis
+- Brownfield (simple change): Recommend No — overhead too high for small scope
+- Greenfield (multi-unit): Recommend Yes — build graph as code is generated
+- Greenfield (single-unit): Recommend No — less value for small scope
+
+Record the choice:
+
+When user selects "Yes":
+```markdown
+## Graph Configuration
+- graphEnabled: true
+- graphPath: aidlc-docs/graph/dependency-graph.json
+```
+
+When user selects "No":
+```markdown
+## Graph Configuration
+- graphEnabled: false
+```
+
+When graphEnabled is true, annotate the execution plan:
+- Reverse Engineering: "includes dependency graph construction"
+- Code Generation: "includes real-time graph updates"
+- Build & Test: "includes graph-based impact analysis"
+
 ## Step 7: Create Execution Plan
 Create `aidlc-docs/inception/plans/execution-plan.md` with:
 - Detailed analysis summary, change impact, risk assessment
 - Workflow visualization (Mermaid)
 - Stages to execute/skip with rationale
+- Graph configuration (graphEnabled: true/false with rationale)
 - Package change sequence (brownfield)
 - Success criteria
 

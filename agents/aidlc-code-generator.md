@@ -84,6 +84,34 @@ After all code modules are generated, verify that test files were created alongs
 - For brownfield projects: verify test files do NOT overwrite existing tests — add new tests alongside existing ones
 - Track test file creation in the code generation plan checkboxes
 
+## Step 14.7: Update Dependency Graph (CONDITIONAL)
+
+**Skip this step unless** `aidlc-state.md` has `graphEnabled: true`.
+
+When graphEnabled is true:
+
+1. Collect the list of all generated/modified files from this unit's code generation
+2. Delegate to `aidlc-for-claude:aidlc-graph-analyzer` with mode "update":
+   - Pass: changed file list, unit name
+   - The analyzer re-parses only changed files and updates the graph incrementally
+3. Log the graph update summary:
+
+```markdown
+## Graph Update
+- Files analyzed: [count]
+- New nodes: [count]
+- New edges: [count]
+- Cross-unit edges: [count]
+- Circular dependencies: [none detected / list]
+```
+
+**Greenfield vs Brownfield behavior:**
+- Greenfield (first unit): Initialize new graph if it doesn't exist, add all generated files
+- Greenfield (subsequent units): Incremental update — add new files, update cross-unit edges
+- Brownfield: Incremental update — modify existing nodes, add new edges
+
+Include the graph update summary in the Step 16 completion message.
+
 ## Step 15: Code Quality Check
 Before presenting results to the user, run a quick quality check via Bash:
 - TypeScript project: `npx tsc --noEmit`

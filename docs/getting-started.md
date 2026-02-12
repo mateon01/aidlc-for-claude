@@ -157,6 +157,29 @@ The agent automatically detects your tech stack (language, build system, test fr
 
 ---
 
+## Graph Analysis
+
+Build and visualize code dependency graphs for any project:
+
+```
+/aidlc-graph
+```
+
+The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers four modes:
+
+- **Build graph** -- Full static analysis to construct dependency graph from scratch
+- **Update graph** -- Incrementally update existing graph with recent changes
+- **Visualize** -- Generate Mermaid diagram from existing graph
+- **Impact analysis** -- Show which modules are affected by recent file changes
+
+!!! tip "Integrated Workflow"
+    When using the full AI-DLC workflow (`/aidlc`), you can opt-in to dependency graph analysis during Workflow Planning. The graph is then built during Reverse Engineering (brownfield) or Code Generation (greenfield), and used for impact-based test prioritization during Build & Test.
+
+!!! note "Graph Storage"
+    Graphs are stored in `aidlc-docs/graph/dependency-graph.json` with a Mermaid visualization at `aidlc-docs/graph/dependency-graph.md`.
+
+---
+
 ## Session Continuity
 
 If your session is interrupted, simply run `/aidlc` again. The orchestrator detects the existing state file (`aidlc-docs/aidlc-state.md`) and offers to resume from where you left off.
@@ -247,6 +270,9 @@ All documentation goes to the `aidlc-docs/` directory. Application code and oper
 aidlc-docs/
   aidlc-state.md                    # Workflow state tracking
   audit.md                          # Append-only audit trail
+  graph/
+    dependency-graph.json           # Code dependency graph (when enabled)
+    dependency-graph.md             # Mermaid visualization (when enabled)
   inception/
     plans/                          # Execution plans
     reverse-engineering/            # 8 RE artifacts (brownfield)

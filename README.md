@@ -99,6 +99,7 @@ You can override any recommendation at the Workflow Planning approval gate.
 | `/aidlc-operations` | OPERATIONS | CI/CD, Dockerfile, .env.example, README, deployment checklist |
 | `/aidlc-review-pr` | UTILITY | Analyze PR diffs for code quality, security, and consistency |
 | `/aidlc-ci-setup` | UTILITY | Generate CI/CD pipelines, PR review workflows, and issue/PR templates |
+| `/aidlc-graph` | UTILITY | Build, update, and visualize code dependency graphs |
 
 ## Agents
 
@@ -130,6 +131,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 | `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
 | `aidlc-for-claude:aidlc-pr-reviewer` | PR diff analysis for code quality, security, performance, and consistency |
 | `aidlc-for-claude:aidlc-ci-setup-engineer` | CI/CD pipeline, PR review workflow, and issue/PR template generation |
+| `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph construction, incremental update, impact analysis, and Mermaid visualization |
 
 ### Haiku (Fast Detection)
 
@@ -139,7 +141,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 
 **Model strategy:** Opus handles stages requiring deep reasoning (requirements analysis, architectural decisions, planning). Sonnet handles volume work (design documents, code generation, testing, operations). Haiku handles fast detection (workspace scanning, project classification).
 
-Total: **18 specialized agents** across 3 model tiers.
+Total: **19 specialized agents** across 3 model tiers.
 
 ## Key Conventions
 
@@ -191,6 +193,8 @@ Total: **18 specialized agents** across 3 model tiers.
 
 **CI setup** -- The `/aidlc-ci-setup` standalone utility generates CI/CD infrastructure for any project. It detects the tech stack automatically and generates CI/CD pipelines, AI-powered PR review workflows, issue templates, and PR templates -- no prior AI-DLC stages required.
 
+**Dependency graph** -- Optional graph-based code dependency analysis, enabled via opt-in during Workflow Planning. For brownfield projects, the Reverse Engineer constructs a full dependency graph from existing code. For greenfield projects, the Code Generator incrementally builds the graph during code generation. The Build & Test stage uses the graph for impact analysis -- prioritizing tests based on dependency traversal (direct, 1-hop, 2+ hops). The standalone `/aidlc-graph` utility can build, update, visualize, or analyze the graph at any time.
+
 **Adaptive depth** means all defined artifacts for a stage are created, but the detail level adapts to problem complexity. A simple bug fix gets concise artifacts; a complex system gets comprehensive treatment.
 
 **ASCII diagrams** use only `+`, `-`, `|`, `^`, `v`, `<`, `>` characters. No Unicode box-drawing characters.
@@ -203,6 +207,9 @@ All documentation is generated in the `aidlc-docs/` directory. Application code 
 aidlc-docs/
   aidlc-state.md                    # Workflow state tracking
   audit.md                          # Append-only audit trail
+  graph/
+    dependency-graph.json           # Code dependency graph (when enabled)
+    dependency-graph.md             # Mermaid visualization (when enabled)
   inception/
     plans/                          # Execution plans
     reverse-engineering/            # 8 RE artifacts (brownfield)
@@ -244,7 +251,7 @@ aidlc-for-claude/
   .claude-plugin/
     plugin.json                     # Plugin metadata
     marketplace.json                # Marketplace listing
-  commands/                         # 18 slash commands
+  commands/                         # 19 slash commands
     aidlc.md                        # Entry point orchestrator
     aidlc-workspace-detection.md
     aidlc-reverse-engineering.md
@@ -263,7 +270,8 @@ aidlc-for-claude/
     aidlc-operations.md
     aidlc-review-pr.md
     aidlc-ci-setup.md
-  agents/                           # 18 specialized agents
+    aidlc-graph.md
+  agents/                           # 19 specialized agents
     aidlc-workspace-analyst.md
     aidlc-reverse-engineer.md
     aidlc-requirements-analyst.md
@@ -282,6 +290,7 @@ aidlc-for-claude/
     aidlc-ops-generator.md
     aidlc-pr-reviewer.md
     aidlc-ci-setup-engineer.md
+    aidlc-graph-analyzer.md
   docs/                             # GitHub Pages (Material for MkDocs)
   .github/
     workflows/
