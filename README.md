@@ -131,7 +131,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 | `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
 | `aidlc-for-claude:aidlc-pr-reviewer` | PR diff analysis for code quality, security, performance, and consistency |
 | `aidlc-for-claude:aidlc-ci-setup-engineer` | CI/CD pipeline, PR review workflow, and issue/PR template generation |
-| `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph construction, incremental update, impact analysis, and Mermaid visualization |
+| `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph with multi-backend support (File/Neo4j/Neptune), impact analysis, and visualization |
 
 ### Haiku (Fast Detection)
 
@@ -193,7 +193,7 @@ Total: **19 specialized agents** across 3 model tiers.
 
 **CI setup** -- The `/aidlc-ci-setup` standalone utility generates CI/CD infrastructure for any project. It detects the tech stack automatically and generates CI/CD pipelines, AI-powered PR review workflows, issue templates, and PR templates -- no prior AI-DLC stages required.
 
-**Dependency graph** -- Optional graph-based code dependency analysis, enabled via opt-in during Workflow Planning. For brownfield projects, the Reverse Engineer constructs a full dependency graph from existing code. For greenfield projects, the Code Generator incrementally builds the graph during code generation. The Build & Test stage uses the graph for impact analysis -- prioritizing tests based on dependency traversal (direct, 1-hop, 2+ hops). The standalone `/aidlc-graph` utility can build, update, visualize, or analyze the graph at any time.
+**Dependency graph** -- Optional graph-based code dependency analysis with multi-backend support. During Workflow Planning, choose from three backends: **Neo4j Local** (Docker-based with Cypher queries and browser visualization), **AWS Neptune** (managed graph DB with IaC provisioning via CDK/Terraform/CloudFormation), or **File-based** (simple JSON, no dependencies). Deployment verification ensures graph DB health after setup. The standalone `/aidlc-graph` utility can build, update, visualize, verify, or tear down the graph at any time.
 
 **Adaptive depth** means all defined artifacts for a stage are created, but the detail level adapts to problem complexity. A simple bug fix gets concise artifacts; a complex system gets comprehensive treatment.
 
@@ -210,6 +210,9 @@ aidlc-docs/
   graph/
     dependency-graph.json           # Code dependency graph (when enabled)
     dependency-graph.md             # Mermaid visualization (when enabled)
+    graph-summary.md                # Graph statistics summary (all backends)
+    verification-report.md          # DB verification report (neo4j/neptune)
+    infra/                          # IaC files for Neptune (neptune only)
   inception/
     plans/                          # Execution plans
     reverse-engineering/            # 8 RE artifacts (brownfield)

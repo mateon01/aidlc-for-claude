@@ -327,25 +327,42 @@ When `graphEnabled: true` is set in the execution plan (from Workflow Planning S
 ```markdown
 ## Graph Configuration
 - graphEnabled: true/false
+- graphBackend: file | neo4j | neptune
 - graphPath: aidlc-docs/graph/dependency-graph.json
 - graphInitialized: true/false
+- graphVerification: standard | full | skip
 - lastGraphUpdate: <ISO 8601 timestamp>
+# Neo4j-specific (when graphBackend: neo4j)
+- neo4jEndpoint: bolt://localhost:7687
+- neo4jAuth: neo4j/aidlc-graph
+- neo4jPersistence: volume | ephemeral
+- neo4jHttpPort: 7474
+- neo4jBoltPort: 7687
+# Neptune-specific (when graphBackend: neptune)
+- neptuneEndpoint: <endpoint>
+- neptuneRegion: <region>
+- neptuneIaC: cdk | terraform | cloudformation | none
+- neptuneInstanceClass: db.t3.medium
+- neptuneMultiAZ: false
+- neptuneQueryLanguage: openCypher | gremlin
 ```
 
-2. Pass `graphEnabled: true` context to downstream agents:
-   - **Reverse Engineer** (INCEPTION Stage 2) — triggers Step 9.5 graph construction
-   - **Code Generator** (CONSTRUCTION Stage 5) — triggers Step 14.7 graph update
-   - **Build & Test** (CONSTRUCTION Stage 6) — triggers Step 10.5 impact analysis
+2. Pass graph configuration context to downstream agents:
+   - **Reverse Engineer** (INCEPTION Stage 2) — triggers Step 9.5 graph construction (pass backend type + connection details)
+   - **Code Generator** (CONSTRUCTION Stage 5) — triggers Step 14.7 graph update (pass backend type + connection details)
+   - **Build & Test** (CONSTRUCTION Stage 6) — triggers Step 10.5 impact analysis (pass backend type + connection details)
 
 3. When graphEnabled is true, stage banners should indicate graph status:
 ```
-> Graph: **Enabled** — dependency tracking active
+> Graph: **Enabled** ([backend]) — dependency tracking active
 ```
 
 4. After workflow completion, include graph statistics in the final summary when graph was enabled:
+   - Backend type and connection status
    - Total nodes/edges in final graph
    - Circular dependencies found
    - Impact analysis effectiveness (if Build & Test ran)
+   - Verification report status (if verification was configured)
 
 ## Directory Structure
 
@@ -362,6 +379,9 @@ aidlc-docs/
   graph/
     dependency-graph.json            # Code dependency graph (when graphEnabled)
     dependency-graph.md              # Mermaid visualization (when graphEnabled)
+    graph-summary.md                 # Graph statistics summary (all backends)
+    verification-report.md           # DB verification report (neo4j/neptune)
+    infra/                           # IaC files for Neptune provisioning (neptune only)
   construction/
     system-nfr-decisions.md
     plans/

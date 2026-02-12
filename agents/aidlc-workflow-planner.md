@@ -77,9 +77,13 @@ Create Mermaid flowchart with Material Design styling:
 - Gray: Conditional SKIP
 - Purple: Start/End
 
-## Step 6.5: Graph Dependency Analysis Opt-in
+## Step 6.5: Graph Dependency Analysis Configuration
 
-After generating the workflow visualization and before creating the execution plan, ask the user whether to enable dependency graph analysis via AskUserQuestion:
+After generating the workflow visualization and before creating the execution plan, walk the user through a multi-tier questioning flow for dependency graph analysis.
+
+### Tier 1: Enable Graph?
+
+Ask via AskUserQuestion:
 
 ```
 "Enable dependency graph analysis for this project?"
@@ -98,25 +102,228 @@ After generating the workflow visualization and before creating the execution pl
 - Greenfield (multi-unit): Recommend Yes — build graph as code is generated
 - Greenfield (single-unit): Recommend No — less value for small scope
 
-Record the choice:
-
-When user selects "Yes":
-```markdown
-## Graph Configuration
-- graphEnabled: true
-- graphPath: aidlc-docs/graph/dependency-graph.json
-```
-
-When user selects "No":
+If user selects "No", record and skip to Step 7:
 ```markdown
 ## Graph Configuration
 - graphEnabled: false
 ```
 
+### Tier 2: Backend Selection (only if graphEnabled)
+
+Ask via AskUserQuestion:
+
+```
+"Which graph backend to use?"
+
+- Neo4j Local (Recommended)
+  "Docker-based Neo4j with Cypher queries, browser visualization at localhost:7474"
+
+- AWS Neptune
+  "AWS managed graph DB with openCypher, IAM auth, and IaC provisioning"
+
+- File-based
+  "Simple JSON file — no external dependencies, works everywhere"
+```
+
+**Recommendation logic:**
+- Default: Neo4j Local (best balance of power and ease)
+- If project already uses AWS or cloud-deployed: consider Neptune
+- If minimal scope or no Docker: File-based
+
+### Tier 3a: Neo4j Local Configuration (only if graphBackend: neo4j)
+
+Ask via AskUserQuestion (multi-select NOT needed, ask sequentially):
+
+**Q1 — Docker availability:**
+```
+"Is Docker available in your development environment?"
+
+- Yes (Recommended)
+  "Docker is installed and running"
+
+- No
+  "Fall back to file-based backend instead"
+```
+
+If "No", override backend to file-based and skip remaining Tier 3a questions.
+
+**Q2 — Neo4j port configuration:**
+```
+"Use default Neo4j ports?"
+
+- Yes, use defaults (Recommended)
+  "HTTP: 7474, Bolt: 7687"
+
+- No, customize
+  "Specify custom ports to avoid conflicts"
+```
+
+If "No, customize", ask for HTTP port and Bolt port values.
+
+**Q3 — Data persistence:**
+```
+"Persist Neo4j data between sessions?"
+
+- Yes, use Docker volume (Recommended)
+  "Graph data survives container restarts via named volume"
+
+- No, ephemeral
+  "Graph data is lost when container stops — rebuilt each session"
+```
+
+Record Neo4j configuration:
+```markdown
+## Graph Configuration
+- graphEnabled: true
+- graphBackend: neo4j
+- neo4jEndpoint: bolt://localhost:7687
+- neo4jAuth: neo4j/aidlc-graph
+- neo4jPersistence: volume | ephemeral
+- neo4jHttpPort: 7474
+- neo4jBoltPort: 7687
+- graphPath: aidlc-docs/graph/dependency-graph.json
+```
+
+### Tier 3b: AWS Neptune Configuration (only if graphBackend: neptune)
+
+Ask via AskUserQuestion sequentially:
+
+**Q1 — IaC tool:**
+```
+"Which Infrastructure as Code tool for Neptune provisioning?"
+
+- AWS CDK (Recommended)
+  "TypeScript CDK stack with VPC, Neptune cluster, IAM roles"
+
+- Terraform
+  "HCL configuration with aws_neptune_cluster resources"
+
+- CloudFormation
+  "YAML template with Neptune::DBCluster"
+
+- None (manual)
+  "Skip IaC — use an existing Neptune endpoint"
+```
+
+**Q2 — AWS Region:**
+```
+"Which AWS region for Neptune?"
+
+- us-east-1 (Recommended)
+  "US East (N. Virginia) — lowest latency for most users"
+
+- ap-northeast-2
+  "Asia Pacific (Seoul)"
+
+- eu-west-1
+  "Europe (Ireland)"
+```
+
+If user selects "Other", ask for the region code.
+
+**Q3 — Instance class:**
+```
+"Neptune instance class?"
+
+- db.t3.medium (Recommended)
+  "Development/testing — 2 vCPU, 4 GB RAM, ~$0.07/hr"
+
+- db.r5.large
+  "Production — 2 vCPU, 16 GB RAM, ~$0.35/hr"
+
+- db.r5.xlarge
+  "Large production — 4 vCPU, 32 GB RAM, ~$0.70/hr"
+```
+
+**Q4 — High availability:**
+```
+"Enable Multi-AZ for Neptune?"
+
+- No (Recommended for development)
+  "Single AZ — lower cost, sufficient for dev/test"
+
+- Yes
+  "Multi-AZ — automatic failover, recommended for production"
+```
+
+**Q5 — Query language:**
+```
+"Preferred Neptune query language?"
+
+- openCypher (Recommended)
+  "SQL-like graph query language — compatible with Neo4j Cypher"
+
+- Gremlin
+  "Apache TinkerPop traversal language"
+```
+
+If IaC is "None (manual)", ask for the existing Neptune endpoint:
+```
+"Enter your Neptune cluster endpoint (e.g., your-cluster.cluster-xxxx.us-east-1.neptune.amazonaws.com):"
+```
+
+Record Neptune configuration:
+```markdown
+## Graph Configuration
+- graphEnabled: true
+- graphBackend: neptune
+- neptuneEndpoint: <endpoint or to-be-provisioned>
+- neptuneRegion: <region>
+- neptuneIaC: cdk | terraform | cloudformation | none
+- neptuneInstanceClass: db.t3.medium
+- neptuneMultiAZ: false
+- neptuneQueryLanguage: openCypher | gremlin
+- graphPath: aidlc-docs/graph/dependency-graph.json
+```
+
+### Tier 3c: File-based Configuration (only if graphBackend: file)
+
+No additional questions needed. Record:
+```markdown
+## Graph Configuration
+- graphEnabled: true
+- graphBackend: file
+- graphPath: aidlc-docs/graph/dependency-graph.json
+```
+
+### Tier 4: Deployment Verification (only if graphBackend: neo4j or neptune)
+
+Ask via AskUserQuestion:
+
+```
+"Configure deployment verification for graph DB?"
+
+- Standard verification (Recommended)
+  "Connection test + schema validation + data integrity check"
+
+- Full verification
+  "Standard + performance baseline benchmarking + rollback plan"
+
+- Skip verification
+  "No automatic verification after graph DB setup"
+```
+
+Record verification level:
+```markdown
+- graphVerification: standard | full | skip
+```
+
+When verification is configured:
+- **standard**: Connection test, schema validation (constraints exist), data integrity (no orphan edges, no duplicates)
+- **full**: All standard checks PLUS performance baseline (traversal latency vs project-size thresholds) PLUS generate rollback plan in verification report
+- **skip**: No automatic verification — user handles manually
+
+### Record Final Graph Configuration
+
+Append complete graph configuration to `aidlc-docs/inception/plans/execution-plan.md`.
+
 When graphEnabled is true, annotate the execution plan:
 - Reverse Engineering: "includes dependency graph construction"
 - Code Generation: "includes real-time graph updates"
 - Build & Test: "includes graph-based impact analysis"
+
+For neo4j/neptune backends, also annotate:
+- Build & Test: "includes graph DB deployment verification"
 
 ## Step 7: Create Execution Plan
 Create `aidlc-docs/inception/plans/execution-plan.md` with:

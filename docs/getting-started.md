@@ -165,18 +165,26 @@ Build and visualize code dependency graphs for any project:
 /aidlc-graph
 ```
 
-The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers four modes:
+The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers six modes:
 
 - **Build graph** -- Full static analysis to construct dependency graph from scratch
 - **Update graph** -- Incrementally update existing graph with recent changes
 - **Visualize** -- Generate Mermaid diagram from existing graph
 - **Impact analysis** -- Show which modules are affected by recent file changes
+- **Verify** -- Test connectivity and data integrity of graph DB
+- **Teardown** -- Stop graph DB container or clean up cloud resources
+
+Three backends are supported:
+
+- **Neo4j Local** (recommended) -- Docker-based with Cypher queries and browser visualization at localhost:7474
+- **AWS Neptune** -- AWS managed graph DB with IaC provisioning (CDK/Terraform/CloudFormation) and IAM auth
+- **File-based** -- Simple JSON file with no external dependencies
 
 !!! tip "Integrated Workflow"
-    When using the full AI-DLC workflow (`/aidlc`), you can opt-in to dependency graph analysis during Workflow Planning. The graph is then built during Reverse Engineering (brownfield) or Code Generation (greenfield), and used for impact-based test prioritization during Build & Test.
+    When using the full AI-DLC workflow (`/aidlc`), you can opt-in to dependency graph analysis during Workflow Planning. A multi-tier configuration flow lets you choose the backend (Neo4j, Neptune, or File-based) and configure deployment verification. The graph is then built during Reverse Engineering (brownfield) or Code Generation (greenfield), and used for impact-based test prioritization during Build & Test.
 
 !!! note "Graph Storage"
-    Graphs are stored in `aidlc-docs/graph/dependency-graph.json` with a Mermaid visualization at `aidlc-docs/graph/dependency-graph.md`.
+    File-based graphs are stored in `aidlc-docs/graph/dependency-graph.json`. Neo4j and Neptune backends store data in the graph database with a local summary at `aidlc-docs/graph/graph-summary.md`. Mermaid visualizations are generated at `aidlc-docs/graph/dependency-graph.md`. Neptune IaC files go to `aidlc-docs/graph/infra/`.
 
 ---
 
@@ -273,6 +281,9 @@ aidlc-docs/
   graph/
     dependency-graph.json           # Code dependency graph (when enabled)
     dependency-graph.md             # Mermaid visualization (when enabled)
+    graph-summary.md                # Graph statistics summary (all backends)
+    verification-report.md          # DB verification report (neo4j/neptune)
+    infra/                          # IaC files for Neptune (neptune only)
   inception/
     plans/                          # Execution plans
     reverse-engineering/            # 8 RE artifacts (brownfield)

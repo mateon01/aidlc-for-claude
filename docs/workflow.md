@@ -40,11 +40,17 @@ Creates user stories following INVEST criteria (Independent, Negotiable, Valuabl
 
 Evaluates all gathered context and produces an execution plan. You can override any recommendation.
 
-During Workflow Planning, you are offered an opt-in for **dependency graph analysis**. When enabled:
+During Workflow Planning, you are offered an opt-in for **dependency graph analysis** with a multi-tier configuration flow. If you enable graph analysis, you choose a backend:
+
+- **Neo4j Local** (recommended) -- Docker-based with Cypher queries and browser visualization at localhost:7474
+- **AWS Neptune** -- Managed graph DB with IaC provisioning (CDK, Terraform, or CloudFormation) and IAM auth
+- **File-based** -- Simple JSON file with no external dependencies
+
+For Neo4j and Neptune backends, additional configuration questions cover ports, persistence, AWS region, instance class, and deployment verification level. When enabled:
 
 - **Reverse Engineering** includes dependency graph construction from existing code
 - **Code Generation** includes real-time graph updates as code is generated
-- **Build & Test** includes graph-based impact analysis for test prioritization
+- **Build & Test** includes graph-based impact analysis for test prioritization and deployment verification
 
 The recommendation is context-aware: enabled by default for complex brownfield changes and multi-unit greenfield projects, disabled for simple changes.
 
@@ -166,7 +172,7 @@ The **PR review** utility performs a 6-category analysis (correctness, security,
 
 The **CI setup** utility detects your project's tech stack automatically and generates selected infrastructure files (CI/CD pipeline, PR review workflow, issue templates, PR template). It also provides branch protection recommendations.
 
-The **graph analysis** utility supports four modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), and impact analysis (affected module detection with test prioritization). It supports TypeScript/JavaScript and Python with file-level analysis for other languages.
+The **graph analysis** utility supports six modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), impact analysis (affected module detection with test prioritization), verify (DB health check), and teardown (stop/remove graph DB). It supports three backends: File-based JSON, Neo4j (local Docker with Cypher), and AWS Neptune (managed graph DB with IaC provisioning).
 
 ---
 

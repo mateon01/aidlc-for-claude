@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 19 slash commands and 19 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
 
-**Version**: 1.5.0 | **License**: Apache-2.0
+**Version**: 1.6.0 | **License**: Apache-2.0
 
 ## Build & Development
 
@@ -85,7 +85,7 @@ OPERATIONS (1 stage): Deployment Checklist + Developer README
 - **Batch approval**: Auto-approve design stages, review only code generation and build/test
 - **PR review**: Standalone `/aidlc-review-pr` utility for analyzing PR diffs (code quality, security, performance, consistency) -- independent of the three-phase workflow
 - **CI setup**: Standalone `/aidlc-ci-setup` utility for generating CI/CD pipelines, PR review workflows, and issue/PR templates -- detects tech stack automatically
-- **Dependency graph**: Optional graph-based code dependency analysis. Opt-in during Workflow Planning. Brownfield projects get graph from existing code analysis; greenfield projects build graph incrementally during code generation. Impact analysis in Build & Test prioritizes tests based on dependency traversal. Standalone `/aidlc-graph` utility available anytime.
+- **Dependency graph**: Optional graph-based code dependency analysis with multi-backend support (File-based JSON, Neo4j local Docker, AWS Neptune). Opt-in during Workflow Planning with detailed backend configuration. Neo4j provides Cypher queries and browser visualization; Neptune supports IaC provisioning (CDK/Terraform/CloudFormation) and IAM auth. Deployment verification ensures graph DB health. Standalone `/aidlc-graph` utility available anytime.
 
 ## File Naming Conventions
 
