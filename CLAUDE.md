@@ -85,7 +85,7 @@ OPERATIONS (1 stage): Deployment Checklist + Developer README
 - **Batch approval**: Auto-approve design stages, review only code generation and build/test
 - **PR review**: Standalone `/aidlc-review-pr` utility for analyzing PR diffs (code quality, security, performance, consistency) -- independent of the three-phase workflow
 - **CI setup**: Standalone `/aidlc-ci-setup` utility for generating CI/CD pipelines, PR review workflows, and issue/PR templates -- detects tech stack automatically
-- **Dependency graph**: Optional graph-based code dependency analysis with multi-backend support (File-based JSON, Neo4j local Docker, AWS Neptune). Opt-in during Workflow Planning with detailed backend configuration. Neo4j provides Cypher queries and browser visualization; Neptune supports IaC provisioning (CDK/Terraform/CloudFormation) and IAM auth. Deployment verification ensures graph DB health. Standalone `/aidlc-graph` utility available anytime.
+- **Dependency graph**: Optional graph-based code dependency analysis with multi-backend support (File-based JSON, Neo4j local Docker, AWS Neptune). Opt-in during Workflow Planning with detailed backend configuration. Neo4j provides Cypher queries and browser visualization; Neptune supports IaC provisioning (CDK/Terraform/CloudFormation) and IAM auth. Deployment verification (9 checks) ensures graph DB health. Standalone `/aidlc-graph` utility available anytime. E2E verified with Neo4j backend (15-node/41-edge TypeScript project, all verification checks passed). Note: use MERGE (not CREATE) for idempotent Cypher operations; cypher-shell has JVM cold-start overhead (~1s) separate from actual query latency.
 
 ## File Naming Conventions
 

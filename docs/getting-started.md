@@ -186,6 +186,21 @@ Three backends are supported:
 !!! note "Graph Storage"
     File-based graphs are stored in `aidlc-docs/graph/dependency-graph.json`. Neo4j and Neptune backends store data in the graph database with a local summary at `aidlc-docs/graph/graph-summary.md`. Mermaid visualizations are generated at `aidlc-docs/graph/dependency-graph.md`. Neptune IaC files go to `aidlc-docs/graph/infra/`.
 
+!!! success "Deployment Verification"
+    After graph construction, a 9-point verification suite runs automatically:
+
+    1. **Connection test** -- DB connectivity and response time
+    2. **Schema validation** -- Uniqueness constraints applied
+    3. **Node count** -- All modules loaded correctly
+    4. **Edge count** -- All import relationships loaded
+    5. **Orphan edge detection** -- No edges pointing to non-existent nodes
+    6. **Duplicate edge detection** -- No duplicate relationships
+    7. **Hub node analysis** -- Identifies critical dependency hubs
+    8. **Circular dependency detection** -- Finds import cycles
+    9. **Impact analysis** -- Calculates change impact radius for critical modules
+
+    Results are saved to `aidlc-docs/graph/verification-report.md`.
+
 ---
 
 ## Session Continuity

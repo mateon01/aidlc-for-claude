@@ -172,7 +172,7 @@ The **PR review** utility performs a 6-category analysis (correctness, security,
 
 The **CI setup** utility detects your project's tech stack automatically and generates selected infrastructure files (CI/CD pipeline, PR review workflow, issue templates, PR template). It also provides branch protection recommendations.
 
-The **graph analysis** utility supports six modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), impact analysis (affected module detection with test prioritization), verify (DB health check), and teardown (stop/remove graph DB). It supports three backends: File-based JSON, Neo4j (local Docker with Cypher), and AWS Neptune (managed graph DB with IaC provisioning).
+The **graph analysis** utility supports six modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), impact analysis (affected module detection with test prioritization), verify (9-point DB health check), and teardown (stop/remove graph DB). It supports three backends: File-based JSON, Neo4j (local Docker with Cypher), and AWS Neptune (managed graph DB with IaC provisioning). E2E verified with Neo4j backend on a 15-module TypeScript project -- 15 nodes, 41 edges loaded, all 9 verification checks passed, hub analysis identified critical modules, and impact analysis correctly traced direct and transitive dependencies.
 
 ---
 

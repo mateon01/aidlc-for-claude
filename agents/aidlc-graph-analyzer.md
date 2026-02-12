@@ -186,7 +186,6 @@ docker run -d \
   --name aidlc-neo4j \
   -p 7474:7474 -p 7687:7687 \
   -e NEO4J_AUTH=neo4j/aidlc-graph \
-  -e NEO4J_PLUGINS='["apoc"]' \
   -v aidlc-neo4j-data:/data \
   neo4j:community
 ```
@@ -237,11 +236,12 @@ Execute via Bash:
 docker exec aidlc-neo4j cypher-shell -u neo4j -p aidlc-graph "<CYPHER>"
 ```
 
-For large projects (100+ files), batch Cypher statements in groups of 50 using UNWIND:
+For large projects (100+ files), batch Cypher statements in groups of 50 using UNWIND with MERGE for idempotent operations:
 
 ```cypher
 UNWIND $nodes AS node
-CREATE (m:Module {path: node.path, type: node.type, loc: node.loc})
+MERGE (m:Module {path: node.path})
+SET m.type = node.type, m.loc = node.loc
 ```
 
 ### 6.3 Update (mode: update)
