@@ -23,7 +23,7 @@
         "code-generation"
       ],
       "homepage": "https://github.com/mateon01/aidlc-for-claude",
-      "version": "1.6.1",
+      "version": "1.7.0",
       "author": {
         "name": "AI-DLC",
         "email": "mateon01@gmail.com"

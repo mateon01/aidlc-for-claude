@@ -112,6 +112,20 @@ When graphEnabled is true:
 
 Include the graph update summary in the Step 16 completion message.
 
+**GraphRAG Summary Update (CONDITIONAL):**
+
+If `graphRAGEnabled: true` in aidlc-state.md:
+1. Pass `graphRAGEnabled: true` in the delegation context to graph-analyzer
+2. The graph-analyzer automatically re-summarizes changed/new files (Step 10) during update mode
+3. Community assignments are preserved — no community re-detection during incremental updates
+4. Include in graph update summary:
+
+```markdown
+## GraphRAG Update
+- Modules re-summarized: [count of changed/new files]
+- New keywords added: [any new terms detected]
+```
+
 **Post-Update Verification:**
 After graph-analyzer returns from update mode:
 

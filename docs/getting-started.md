@@ -165,12 +165,13 @@ Build and visualize code dependency graphs for any project:
 /aidlc-graph
 ```
 
-The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers six modes:
+The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers seven modes:
 
 - **Build graph** -- Full static analysis to construct dependency graph from scratch
 - **Update graph** -- Incrementally update existing graph with recent changes
 - **Visualize** -- Generate Mermaid diagram from existing graph
 - **Impact analysis** -- Show which modules are affected by recent file changes
+- **Search (GraphRAG)** -- Find modules by semantic query using summaries and graph context (requires graphRAGEnabled)
 - **Verify** -- Test connectivity and data integrity of graph DB
 - **Teardown** -- Stop graph DB container or clean up cloud resources
 
@@ -188,6 +189,8 @@ Three backends are supported:
     - **Build & Test** uses impact analysis for prioritized test execution -- direct changes first (P1), 1-hop dependents second (P2), then the full suite (P3)
 
     The orchestrator manages graph DB lifecycle: initialization before the first graph operation, health checks between stages, serialized updates during parallel execution, and a teardown offer at workflow completion. All graph operations are non-blocking -- failures log warnings and continue the workflow. You can retry any graph operation later with `/aidlc-graph`.
+
+    **GraphRAG (optional):** When `graphRAGEnabled: true` is selected during Workflow Planning, module summaries (purpose, keywords, architectural layer) and community structure are generated alongside the dependency graph. This enables semantic code search via `/aidlc-graph search` -- finding modules by what they do, not just their file path. No external embedding models or vector databases required.
 
 !!! note "Graph Storage"
     File-based graphs are stored in `aidlc-docs/graph/dependency-graph.json`. Neo4j and Neptune backends store data in the graph database with a local summary at `aidlc-docs/graph/graph-summary.md`. Mermaid visualizations are generated at `aidlc-docs/graph/dependency-graph.md`. Neptune IaC files go to `aidlc-docs/graph/infra/`.

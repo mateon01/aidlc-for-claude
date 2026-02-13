@@ -1,6 +1,6 @@
 ---
 name: aidlc-graph-analyzer
-description: "AI-DLC Graph Analysis: Builds, updates, and visualizes code dependency graphs with multi-backend support (File, Neo4j, Neptune)"
+description: "AI-DLC Graph Analysis: Builds, updates, and visualizes code dependency graphs with multi-backend support (File, Neo4j, Neptune) and optional GraphRAG summary-based retrieval"
 model: sonnet
 allowedTools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 ---
@@ -17,13 +17,13 @@ When this agent begins, output this banner FIRST before doing any work:
 >
 > Agent: `aidlc-graph-analyzer` | Model: **Sonnet**
 >
-> Static analysis · Multi-backend (File/Neo4j/Neptune) · Impact analysis · Visualization
+> Static analysis · Multi-backend (File/Neo4j/Neptune) · Impact analysis · Visualization · GraphRAG
 
 Then proceed with the steps below.
 
 ## Purpose
 
-Build and maintain a code dependency graph for impact analysis, visualization, and change-aware test execution. Supports three backends: File-based JSON, Neo4j (local Docker), and AWS Neptune (cloud).
+Build and maintain a code dependency graph for impact analysis, visualization, change-aware test execution, and optional GraphRAG-based semantic code retrieval. Supports three backends: File-based JSON, Neo4j (local Docker), and AWS Neptune (cloud).
 
 ---
 
@@ -37,6 +37,7 @@ Check the context passed from the calling command or orchestrator:
 - **update** — Incremental graph update for changed/new files
 - **visualize** — Generate visualization from existing graph
 - **impact** — Analyze affected modules from changed files
+- **search** — GraphRAG retrieval: find modules by semantic query (requires graphRAGEnabled)
 - **verify** — Run deployment verification on graph DB
 - **teardown** — Stop and optionally remove graph DB container/resources
 
@@ -49,6 +50,7 @@ If no mode is specified (standalone via `/aidlc-graph`), ask via AskUserQuestion
 - Update graph — "Incrementally update existing graph with recent changes"
 - Visualize — "Generate visualization from existing graph"
 - Impact analysis — "Show which modules are affected by recent changes"
+- Search (GraphRAG) — "Find modules by semantic query using summaries and graph context"
 - Verify graph DB — "Test connectivity and data integrity"
 - Teardown — "Stop graph DB container or clean up resources"
 ```
@@ -61,6 +63,7 @@ Read `aidlc-docs/aidlc-state.md` for graph configuration:
 ## Graph Configuration
 - graphEnabled: true
 - graphBackend: file | neo4j | neptune
+- graphRAGEnabled: true | false
 - graphPath: aidlc-docs/graph/dependency-graph.json   (file backend)
 - neo4jEndpoint: bolt://localhost:7687                 (neo4j backend)
 - neo4jAuth: neo4j/aidlc-graph                        (neo4j backend)
@@ -68,6 +71,8 @@ Read `aidlc-docs/aidlc-state.md` for graph configuration:
 - neptuneRegion: us-east-1                              (neptune backend)
 - neptuneIaC: cdk | terraform | cloudformation | none   (neptune backend)
 ```
+
+If mode is **search** and `graphRAGEnabled` is not true, inform the user that GraphRAG must be enabled during Workflow Planning and suggest running `/aidlc-graph` with build mode first.
 
 If no backend configured (standalone invocation), ask via AskUserQuestion:
 
@@ -144,7 +149,21 @@ Write graph to `aidlc-docs/graph/dependency-graph.json`:
   "nodes": {
     "src/auth/login.ts": {
       "type": "module", "exports": ["LoginService"], "loc": 145,
-      "dependencies": 3, "dependents": 5
+      "dependencies": 3, "dependents": 5,
+      "summary": "(GraphRAG) One-line module purpose",
+      "keywords": "(GraphRAG) comma-separated keywords",
+      "purpose": "(GraphRAG) detailed purpose description",
+      "layer": "(GraphRAG) controller | service | repository | util | config | test",
+      "community": "(GraphRAG) community-id"
+    }
+  },
+  "communities": {
+    "auth": {
+      "name": "Authentication",
+      "summary": "(GraphRAG) Community-level summary",
+      "keywords": "(GraphRAG) community keywords",
+      "moduleCount": 3,
+      "modules": ["src/auth/login.ts", "src/auth/guard.ts", "src/auth/token.ts"]
     }
   },
   "edges": [
@@ -206,6 +225,19 @@ Create schema constraints:
 ```bash
 docker exec aidlc-neo4j cypher-shell -u neo4j -p aidlc-graph \
   "CREATE CONSTRAINT module_path IF NOT EXISTS FOR (m:Module) REQUIRE m.path IS UNIQUE"
+```
+
+When `graphRAGEnabled: true`, also create Community constraint and full-text indexes:
+
+```bash
+docker exec aidlc-neo4j cypher-shell -u neo4j -p aidlc-graph \
+  "CREATE CONSTRAINT community_id IF NOT EXISTS FOR (c:Community) REQUIRE c.id IS UNIQUE"
+
+docker exec aidlc-neo4j cypher-shell -u neo4j -p aidlc-graph \
+  "CREATE FULLTEXT INDEX module_search IF NOT EXISTS FOR (m:Module) ON EACH [m.summary, m.keywords, m.purpose]"
+
+docker exec aidlc-neo4j cypher-shell -u neo4j -p aidlc-graph \
+  "CREATE FULLTEXT INDEX community_search IF NOT EXISTS FOR (c:Community) ON EACH [c.summary, c.keywords]"
 ```
 
 ### 6.2 Build (mode: build)
@@ -620,6 +652,252 @@ Always ask user before executing rollback. Record rollback decision in graph sta
 
 ---
 
+## PART F: GraphRAG — Summary-Based Retrieval
+
+**Skip this entire part unless** `graphRAGEnabled: true` in aidlc-state.md or the user explicitly requests GraphRAG operations.
+
+GraphRAG adds semantic understanding on top of the structural dependency graph. It uses Claude-generated summaries stored as node properties — no external embedding models or vector databases required.
+
+## Step 10: Module Summary Generation
+
+**Runs automatically after:** build (all modules) or update (changed/new modules only).
+
+For each module that needs summarization:
+
+1. **Read the source file** via the Read tool
+2. **Generate a summary object** with these fields:
+   - `summary` — One-line description of the module's purpose (max 100 chars)
+   - `keywords` — 5-10 comma-separated terms (function names, domain concepts, technologies)
+   - `purpose` — 2-3 sentence detailed description of what the module does and why
+   - `layer` — Architectural layer classification: `controller`, `service`, `repository`, `util`, `config`, `test`, or `entry`
+
+3. **Store summaries per backend:**
+
+### File Backend
+
+Add/update the `summary`, `keywords`, `purpose`, `layer` fields in each node entry in `dependency-graph.json`.
+
+### Neo4j Backend
+
+```cypher
+MATCH (m:Module {path: $path})
+SET m.summary = $summary,
+    m.keywords = $keywords,
+    m.purpose = $purpose,
+    m.layer = $layer
+```
+
+For batch summarization (build mode), collect all summaries and apply with UNWIND:
+
+```cypher
+UNWIND $modules AS mod
+MATCH (m:Module {path: mod.path})
+SET m.summary = mod.summary,
+    m.keywords = mod.keywords,
+    m.purpose = mod.purpose,
+    m.layer = mod.layer
+```
+
+### Neptune Backend
+
+Same Cypher logic as Neo4j, executed via Neptune openCypher HTTP API.
+
+### Performance Considerations
+
+- **Build mode (full)**: Summarize all modules. For large projects (100+ files), batch file reads and summarize in groups of 20 to manage context window.
+- **Update mode (incremental)**: Only re-summarize files that were changed or newly created. Unchanged modules retain existing summaries.
+- Summaries are generated by Claude (this agent) reading each file — no external LLM calls needed.
+
+## Step 11: Hybrid Community Detection
+
+**Runs automatically after:** Step 10 (summary generation), during build mode only. Update mode skips community detection unless explicitly requested.
+
+### Phase 1: Directory-Based Grouping
+
+Group modules into communities based on directory structure:
+
+1. Extract the top-level source directory for each module (e.g., `src/auth/`, `src/user/`, `src/db/`)
+2. Each directory becomes a community candidate
+3. Assign community ID based on directory path (e.g., `auth`, `user`, `db`)
+4. Modules in the root `src/` directory (no subdirectory) form a `core` community
+
+### Phase 2: Cross-Directory Semantic Analysis
+
+Analyze cross-directory relationships to refine communities:
+
+1. For each pair of communities with cross-community edges (imports between directories), evaluate whether they represent a single logical domain
+2. Merge communities if:
+   - More than 50% of one community's edges point to the other
+   - Module summaries share significant keyword overlap
+3. Split oversized communities (10+ modules) if subgroups have distinct purposes based on summaries
+
+### Phase 3: Community Summary Generation
+
+For each final community:
+
+1. Read all module summaries within the community
+2. Generate a community-level summary:
+   - `name` — Human-readable community name (e.g., "Authentication & Authorization")
+   - `summary` — 2-3 sentence description of the community's collective purpose
+   - `keywords` — Aggregated keywords from member modules (deduplicated, top 10)
+   - `moduleCount` — Number of modules in the community
+
+### Store Communities per Backend:
+
+**File Backend:**
+
+Add/update the `communities` object in `dependency-graph.json` and set each node's `community` field.
+
+**Neo4j Backend:**
+
+```cypher
+// Create community nodes
+MERGE (c:Community {id: $communityId})
+SET c.name = $name,
+    c.summary = $summary,
+    c.keywords = $keywords,
+    c.moduleCount = $moduleCount;
+
+// Link modules to communities
+MATCH (m:Module {path: $modulePath}), (c:Community {id: $communityId})
+MERGE (m)-[:BELONGS_TO]->(c);
+```
+
+**Neptune Backend:**
+
+Same Cypher logic via Neptune openCypher HTTP API.
+
+## Step 12: Full-Text Index Setup
+
+**Runs automatically after:** Step 10 (build mode only). Indexes enable the search mode.
+
+### Neo4j Backend
+
+Full-text indexes are created in Step 6.1 (schema setup). Verify they exist:
+
+```cypher
+SHOW INDEXES
+YIELD name WHERE name IN ['module_search', 'community_search']
+RETURN name
+```
+
+If missing, recreate:
+
+```bash
+docker exec aidlc-neo4j cypher-shell -u neo4j -p aidlc-graph \
+  "CREATE FULLTEXT INDEX module_search IF NOT EXISTS FOR (m:Module) ON EACH [m.summary, m.keywords, m.purpose]"
+
+docker exec aidlc-neo4j cypher-shell -u neo4j -p aidlc-graph \
+  "CREATE FULLTEXT INDEX community_search IF NOT EXISTS FOR (c:Community) ON EACH [c.summary, c.keywords]"
+```
+
+### File Backend
+
+No index setup needed — search is performed via in-memory keyword matching on the JSON file.
+
+### Neptune Backend
+
+Neptune does not support full-text indexes natively. Search uses property-based filtering:
+
+```cypher
+MATCH (m:Module)
+WHERE m.summary CONTAINS $searchTerm OR m.keywords CONTAINS $searchTerm
+RETURN m.path, m.summary, m.keywords
+```
+
+## Step 13: Search Mode (mode: search)
+
+When mode is `search`, perform GraphRAG retrieval:
+
+### 13.1 Accept Search Query
+
+If no query is provided, ask via AskUserQuestion:
+
+```
+"What are you looking for in the codebase?"
+
+(free-text input)
+```
+
+### 13.2 Execute Search per Backend
+
+**Neo4j Backend (full-text index):**
+
+```cypher
+// Step 1: Find matching modules via full-text search
+CALL db.index.fulltext.queryNodes('module_search', $query)
+YIELD node, score
+WHERE score > 0.5
+RETURN node.path AS path, node.summary AS summary,
+       node.purpose AS purpose, node.layer AS layer, score
+ORDER BY score DESC LIMIT 10
+
+// Step 2: Find matching communities
+CALL db.index.fulltext.queryNodes('community_search', $query)
+YIELD node, score
+WHERE score > 0.5
+RETURN node.id AS community, node.name AS name,
+       node.summary AS summary, score
+ORDER BY score DESC LIMIT 5
+
+// Step 3: Expand context — get neighbors of top matches
+MATCH (m:Module {path: $topMatchPath})-[:IMPORTS]->(dep:Module)
+RETURN dep.path AS dependency, dep.summary AS summary
+UNION
+MATCH (m:Module {path: $topMatchPath})<-[:IMPORTS]-(dep:Module)
+RETURN dep.path AS dependent, dep.summary AS summary
+```
+
+**File Backend (keyword matching):**
+
+1. Read `dependency-graph.json`
+2. Tokenize the search query into keywords
+3. Score each node by keyword overlap with `summary`, `keywords`, `purpose` fields
+4. Return top 10 matches with their summaries and edge context
+5. Also search `communities` entries for matching community-level results
+
+**Neptune Backend (property filtering):**
+
+Same Cypher as Neo4j Step 1-3 but without full-text index — uses `CONTAINS` filtering instead.
+
+### 13.3 Present Search Results
+
+```markdown
+## GraphRAG Search Results
+
+**Query**: "[user query]"
+
+### Top Modules
+| # | Module | Layer | Summary | Score |
+|---|--------|-------|---------|-------|
+| 1 | src/auth/login.ts | controller | Handles user login with JWT | 0.95 |
+| 2 | src/auth/token.ts | service | JWT token generation and validation | 0.87 |
+
+### Related Communities
+| Community | Summary | Modules |
+|-----------|---------|---------|
+| Authentication | Handles user auth flows | 3 |
+
+### Dependency Context (for top match)
+- **Imports**: src/db/users.ts (User repository), src/config/jwt.ts (JWT config)
+- **Imported by**: src/routes/auth.ts (Auth routes), src/middleware/guard.ts (Auth guard)
+```
+
+### 13.4 Offer Follow-Up Actions
+
+After presenting search results, offer via AskUserQuestion:
+
+```
+"What would you like to do next?"
+
+- Read a specific module — "Open and display the source code"
+- Impact analysis — "Show what would be affected by changing this module"
+- Search again — "Run another query"
+- Done — "Exit search mode"
+```
+
+---
+
 ## PART E: Reporting
 
 ## Step 9: Summary Report
@@ -639,6 +917,7 @@ Generate summary at the end of any mode:
 - **Circular Dependencies**: [count and paths, or "None"]
 - **Max Dependency Depth**: [longest chain]
 - **Verification**: [PASSED/FAILED/NOT RUN]
+- **GraphRAG**: [ENABLED — N modules summarized, M communities / DISABLED]
 - **Visualization**: [Mermaid file / Neo4j Browser URL / Neptune Explorer]
 - **Generated**: [timestamp]
 ```
@@ -652,3 +931,7 @@ Also export summary to `aidlc-docs/graph/dependency-graph.json` (file backend) o
 - Handle file paths with spaces by quoting in Bash commands
 - Always test DB connectivity before executing write operations
 - Batch large Cypher operations (50+ statements) to avoid timeout
+- GraphRAG summaries must be plain text (no markdown, no code blocks)
+- Module summary max 100 characters; purpose max 300 characters
+- Keywords must be comma-separated, lowercase, 5-10 terms
+- Community detection is non-blocking: failures skip communities, graph still works

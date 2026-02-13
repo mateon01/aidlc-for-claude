@@ -130,6 +130,29 @@ Ask via AskUserQuestion:
 - If project already uses AWS or cloud-deployed: consider Neptune
 - If minimal scope or no Docker: File-based
 
+### Tier 2.5: GraphRAG Opt-In (only if graphEnabled)
+
+Ask via AskUserQuestion:
+
+```
+"Enable GraphRAG (summary-based code retrieval) for this project?"
+
+- Yes (Recommended for medium-large projects)
+  "Generate module summaries and community structure for semantic code search.
+   No external dependencies — uses Claude-generated summaries stored in the graph."
+
+- No
+  "Standard dependency graph without semantic retrieval"
+```
+
+**Context-aware recommendation:**
+- Medium-large brownfield projects: Recommend Yes — summaries aid code understanding
+- Multi-unit greenfield: Recommend Yes — summaries help cross-unit consistency
+- Simple changes or small projects: Recommend No — overhead outweighs benefit
+
+If "Yes", record `graphRAGEnabled: true` in graph configuration.
+If "No", record `graphRAGEnabled: false`.
+
 ### Tier 3a: Neo4j Local Configuration (only if graphBackend: neo4j)
 
 Ask via AskUserQuestion (multi-select NOT needed, ask sequentially):
@@ -176,6 +199,7 @@ Record Neo4j configuration:
 ## Graph Configuration
 - graphEnabled: true
 - graphBackend: neo4j
+- graphRAGEnabled: true | false
 - neo4jEndpoint: bolt://localhost:7687
 - neo4jAuth: neo4j/aidlc-graph
 - neo4jPersistence: volume | ephemeral
@@ -267,6 +291,7 @@ Record Neptune configuration:
 ## Graph Configuration
 - graphEnabled: true
 - graphBackend: neptune
+- graphRAGEnabled: true | false
 - neptuneEndpoint: <endpoint or to-be-provisioned>
 - neptuneRegion: <region>
 - neptuneIaC: cdk | terraform | cloudformation | none
@@ -283,6 +308,7 @@ No additional questions needed. Record:
 ## Graph Configuration
 - graphEnabled: true
 - graphBackend: file
+- graphRAGEnabled: true | false
 - graphPath: aidlc-docs/graph/dependency-graph.json
 ```
 
@@ -321,6 +347,11 @@ When graphEnabled is true, annotate the execution plan:
 - Reverse Engineering: "includes dependency graph construction"
 - Code Generation: "includes real-time graph updates"
 - Build & Test: "includes graph-based impact analysis"
+
+When graphRAGEnabled is true, additionally annotate:
+- Reverse Engineering: "includes GraphRAG summary generation and community detection"
+- Code Generation: "includes GraphRAG summary updates for changed modules"
+- Build & Test: "includes semantic context from module summaries"
 
 For neo4j/neptune backends, also annotate:
 - Build & Test: "includes graph DB deployment verification"

@@ -328,6 +328,7 @@ When `graphEnabled: true` is set in the execution plan (from Workflow Planning S
 ## Graph Configuration
 - graphEnabled: true/false
 - graphBackend: file | neo4j | neptune
+- graphRAGEnabled: true/false
 - graphPath: aidlc-docs/graph/dependency-graph.json
 - graphInitialized: true/false
 - graphVerification: standard | full | skip
@@ -356,6 +357,7 @@ When `graphEnabled: true` is set in the execution plan (from Workflow Planning S
 3. When graphEnabled is true, stage banners should indicate graph status:
 ```
 > Graph: **Enabled** ([backend]) — dependency tracking active
+> GraphRAG: **Enabled** / **Disabled** — summary-based code retrieval
 ```
 
 4. After workflow completion, include graph statistics in the final summary when graph was enabled:

@@ -148,6 +148,22 @@ The graph analysis complements existing RE artifacts:
 - `dependencies.md` — graph provides fine-grained file-level dependency data
 - `code-structure.md` — graph confirms module relationships
 
+**GraphRAG Summary Generation (CONDITIONAL):**
+
+If `graphRAGEnabled: true` in aidlc-state.md:
+1. After graph construction completes, the graph-analyzer automatically generates module summaries (Step 10) and runs community detection (Step 11)
+2. Pass `graphRAGEnabled: true` in the delegation context so the graph-analyzer knows to run PART F
+3. Include GraphRAG stats in the RE report:
+
+```markdown
+## GraphRAG Summary
+- Modules summarized: [count]
+- Communities detected: [count]
+- Community structure: [list of community names with module counts]
+```
+
+This provides semantic understanding of the codebase alongside structural analysis — enabling later stages to search modules by purpose rather than just by file path.
+
 **Error Handling:**
 - If graph-analyzer delegation fails (timeout, crash):
   1. Log error in graph summary section: "Graph construction failed: [error]"

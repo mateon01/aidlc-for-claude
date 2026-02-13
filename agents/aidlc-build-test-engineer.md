@@ -174,7 +174,20 @@ When graphEnabled is true:
       - Untested dependencies: [file list] — no matching test files
       ```
 
-5. Include impact analysis report in Step 13 execution report
+5. **GraphRAG-Enhanced Context (CONDITIONAL):**
+
+   When `graphRAGEnabled: true` in aidlc-state.md:
+   - Read module summaries from the graph for each affected module
+   - Use summaries to provide semantic context in the test execution report:
+     ```markdown
+     ## Impact Context (GraphRAG)
+     - src/auth/login.ts: "Handles user login with JWT token validation" — test token scenarios
+     - src/db/users.ts: "User repository with CRUD operations" — test data persistence
+     ```
+   - This helps developers understand WHY certain tests are prioritized
+   - GraphRAG context is informational only — it does NOT change which tests run
+
+6. Include impact analysis report in Step 13 execution report
 
 ```markdown
 ## Impact Analysis

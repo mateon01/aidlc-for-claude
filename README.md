@@ -99,7 +99,7 @@ You can override any recommendation at the Workflow Planning approval gate.
 | `/aidlc-operations` | OPERATIONS | CI/CD, Dockerfile, .env.example, README, deployment checklist |
 | `/aidlc-review-pr` | UTILITY | Analyze PR diffs for code quality, security, and consistency |
 | `/aidlc-ci-setup` | UTILITY | Generate CI/CD pipelines, PR review workflows, and issue/PR templates |
-| `/aidlc-graph` | UTILITY | Build, update, and visualize code dependency graphs |
+| `/aidlc-graph` | UTILITY | Build, update, visualize, and search code dependency graphs (with optional GraphRAG) |
 
 ## Agents
 
@@ -131,7 +131,7 @@ Each command delegates to a specialized agent via the Task tool. Agents use the 
 | `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
 | `aidlc-for-claude:aidlc-pr-reviewer` | PR diff analysis for code quality, security, performance, and consistency |
 | `aidlc-for-claude:aidlc-ci-setup-engineer` | CI/CD pipeline, PR review workflow, and issue/PR template generation |
-| `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph with multi-backend support (File/Neo4j/Neptune), impact analysis, and visualization |
+| `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph with multi-backend support (File/Neo4j/Neptune), impact analysis, visualization, and GraphRAG summary-based retrieval |
 
 ### Haiku (Fast Detection)
 
@@ -193,7 +193,9 @@ Total: **19 specialized agents** across 3 model tiers.
 
 **CI setup** -- The `/aidlc-ci-setup` standalone utility generates CI/CD infrastructure for any project. It detects the tech stack automatically and generates CI/CD pipelines, AI-powered PR review workflows, issue templates, and PR templates -- no prior AI-DLC stages required.
 
-**Dependency graph** -- Optional graph-based code dependency analysis with multi-backend support. During Workflow Planning, choose from three backends: **Neo4j Local** (Docker-based with Cypher queries and browser visualization), **AWS Neptune** (managed graph DB with IaC provisioning via CDK/Terraform/CloudFormation), or **File-based** (simple JSON, no dependencies). Deployment verification (9 checks: connection, schema, node/edge counts, orphan/duplicate edge detection, hub analysis, circular dependency detection, impact analysis) ensures graph DB health after setup. The standalone `/aidlc-graph` utility can build, update, visualize, verify, or tear down the graph at any time. When using the full workflow, the graph is automatically maintained: Reverse Engineering builds the initial graph (brownfield), Code Generation updates it incrementally per unit with integrity verification, and Build & Test uses impact analysis for prioritized test execution (direct dependencies first, then 1-hop, then full suite). The orchestrator manages graph DB lifecycle (initialization, health checks, parallel coordination, teardown). Graph operations are non-blocking -- failures log warnings and continue the workflow. E2E verified with Neo4j backend on a 15-module TypeScript project (15 nodes, 41 edges, all checks passed).
+**Dependency graph** -- Optional graph-based code dependency analysis with multi-backend support. During Workflow Planning, choose from three backends: **Neo4j Local** (Docker-based with Cypher queries and browser visualization), **AWS Neptune** (managed graph DB with IaC provisioning via CDK/Terraform/CloudFormation), or **File-based** (simple JSON, no dependencies). Deployment verification (9 checks: connection, schema, node/edge counts, orphan/duplicate edge detection, hub analysis, circular dependency detection, impact analysis) ensures graph DB health after setup. The standalone `/aidlc-graph` utility can build, update, visualize, search, verify, or tear down the graph at any time. When using the full workflow, the graph is automatically maintained: Reverse Engineering builds the initial graph (brownfield), Code Generation updates it incrementally per unit with integrity verification, and Build & Test uses impact analysis for prioritized test execution (direct dependencies first, then 1-hop, then full suite). The orchestrator manages graph DB lifecycle (initialization, health checks, parallel coordination, teardown). Graph operations are non-blocking -- failures log warnings and continue the workflow. E2E verified with Neo4j backend on a 15-module TypeScript project (15 nodes, 41 edges, all checks passed).
+
+**GraphRAG** -- Optional summary-based semantic code retrieval built on the dependency graph. Opt-in during Workflow Planning with `graphRAGEnabled: true`. Claude generates module summaries (purpose, keywords, architectural layer) stored as graph node properties -- no external embedding models or vector databases required. Hybrid community detection groups modules by directory structure plus cross-directory semantic analysis. The `/aidlc-graph search` mode enables semantic code retrieval: Neo4j uses full-text indexes, File backend uses keyword matching, all with graph-context expansion (neighboring modules). Integrated with the workflow pipeline: RE generates initial summaries and communities, Code Gen re-summarizes changed modules, Build & Test uses summaries for semantic test context.
 
 **Adaptive depth** means all defined artifacts for a stage are created, but the detail level adapts to problem complexity. A simple bug fix gets concise artifacts; a complex system gets comprehensive treatment.
 

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 19 slash commands and 19 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
 
-**Version**: 1.6.1 | **License**: Apache-2.0
+**Version**: 1.7.0 | **License**: Apache-2.0
 
 ## Build & Development
 
@@ -86,6 +86,7 @@ OPERATIONS (1 stage): Deployment Checklist + Developer README
 - **PR review**: Standalone `/aidlc-review-pr` utility for analyzing PR diffs (code quality, security, performance, consistency) -- independent of the three-phase workflow
 - **CI setup**: Standalone `/aidlc-ci-setup` utility for generating CI/CD pipelines, PR review workflows, and issue/PR templates -- detects tech stack automatically
 - **Dependency graph**: Optional graph-based code dependency analysis with multi-backend support (File-based JSON, Neo4j local Docker, AWS Neptune). Opt-in during Workflow Planning with detailed backend configuration. Neo4j provides Cypher queries and browser visualization; Neptune supports IaC provisioning (CDK/Terraform/CloudFormation) and IAM auth. Deployment verification (9 checks) ensures graph DB health. Standalone `/aidlc-graph` utility available anytime. E2E verified with Neo4j backend (15-node/41-edge TypeScript project, all verification checks passed). Note: use MERGE (not CREATE) for idempotent Cypher operations; cypher-shell has JVM cold-start overhead (~1s) separate from actual query latency. Integrated pipeline: RE builds initial graph (brownfield), Code Gen updates incrementally per unit with post-update verification, Build & Test uses impact analysis for prioritized test execution (P1 direct, P2 1-hop, P3 full suite). Graph DB lifecycle (init, health checks, parallel coordination, teardown) managed by orchestrator. Graph operations are non-blocking — failures log warnings and continue the workflow.
+- **GraphRAG**: Optional summary-based semantic code retrieval built on top of the dependency graph. Opt-in during Workflow Planning (Tier 2.5) with `graphRAGEnabled: true`. Claude generates module summaries (purpose, keywords, layer) stored as graph node properties — no external embedding models or vector databases required. Hybrid community detection groups modules by directory structure plus cross-directory semantic analysis. Neo4j uses full-text indexes for search; File backend uses in-memory keyword matching. New `search` mode in `/aidlc-graph` enables semantic code retrieval with graph-context expansion. Integrated with workflow: RE generates initial summaries and communities (brownfield), Code Gen re-summarizes changed modules, Build & Test uses summaries for semantic test context. All GraphRAG operations are non-blocking.
 
 ## File Naming Conventions
 
