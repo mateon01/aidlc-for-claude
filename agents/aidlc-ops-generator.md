@@ -51,6 +51,24 @@ Write `aidlc-docs/operations/deployment-checklist.md` with:
 - **Rollback Plan**: How to revert if deployment fails
 - **Monitoring Setup**: What to monitor post-deployment
 
+**Graph-Enabled Project Additions (CONDITIONAL):**
+
+If `graphEnabled: true` in aidlc-state.md, include these in the deployment checklist and README:
+
+1. **Deployment Checklist — Graph Infrastructure:**
+   - [ ] Graph DB backend is specified (file/neo4j/neptune)
+   - [ ] For Neo4j: Docker container `aidlc-neo4j` is running and healthy
+   - [ ] For Neptune: Cluster endpoint is accessible, IAM auth configured
+   - [ ] Graph data is current (last updated timestamp matches latest code generation)
+   - [ ] For Neptune: Document cleanup procedure (VPC Endpoints, GuardDuty SGs)
+
+2. **Developer README — Graph Section:**
+   - Graph backend configuration and connection details
+   - How to run `/aidlc-graph` for manual graph operations
+   - Impact analysis usage: `/aidlc-graph impact`
+   - If GraphRAG enabled: semantic search usage: `/aidlc-graph search`
+   - Teardown instructions per backend
+
 ### Step 2.3: Generate Environment Configuration Template
 Generate `.env.example` at the **workspace root** (application code, not aidlc-docs):
 - Scan infrastructure-design and nfr-design artifacts for required env vars

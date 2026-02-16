@@ -181,8 +181,13 @@ The **CI setup** utility detects your project's tech stack automatically and gen
 
 The **graph analysis** utility supports seven modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), impact analysis (affected module detection with test prioritization), search (GraphRAG semantic code retrieval), verify (9-point DB health check), and teardown (stop/remove graph DB). It supports three backends: File-based JSON, Neo4j (local Docker with Cypher), and AWS Neptune (managed graph DB with IaC provisioning). When GraphRAG is enabled (`graphRAGEnabled: true`), module summaries (purpose, keywords, architectural layer) and community structure are generated alongside the dependency graph -- no external embedding models required. Neo4j uses full-text indexes for search; File backend uses keyword matching. E2E verified with Neo4j backend on a 15-module TypeScript project -- 15 nodes, 41 edges loaded, all 9 verification checks passed, hub analysis identified critical modules, and impact analysis correctly traced direct and transitive dependencies.
 
+All graph node IDs follow a strict normalization convention for consistency across units and queries: `u-{NN}` for units (lowercase, zero-padded), `mod-{kebab-name}` for modules, `file-{kebab-name}` for files, `comm-{kebab-name}` for communities, and `summary-{parent-id}` for summaries. IDs are always lowercase, hyphen-separated, and type-prefixed.
+
 !!! info "Automatic Graph Maintenance"
     When using the full AI-DLC workflow with `graphEnabled: true`, the dependency graph is automatically maintained throughout the pipeline. Reverse Engineering builds the initial graph (brownfield), Code Generation updates it incrementally per unit with post-update integrity verification, and Build & Test uses impact analysis for prioritized test execution. The orchestrator manages graph DB lifecycle -- initialization before the first graph operation, health checks between stages, serialization of updates during parallel execution, and a teardown offer at workflow completion. All graph operations are non-blocking: failures log warnings and continue the workflow. You can retry any graph operation later with `/aidlc-graph`.
+
+!!! warning "Neptune CloudFormation Cleanup"
+    When tearing down Neptune via CloudFormation, stack deletion may be blocked by orphaned resources: VPC Endpoint ENIs (persist in private subnets after cluster deletion) and GuardDuty-managed security groups (auto-created if GuardDuty is enabled). Delete these resources manually before retrying `aws cloudformation delete-stack`. See the graph-analyzer teardown instructions for detailed cleanup commands.
 
 ---
 

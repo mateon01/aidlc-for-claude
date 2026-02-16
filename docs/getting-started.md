@@ -210,6 +210,9 @@ Three backends are supported:
 
     Results are saved to `aidlc-docs/graph/verification-report.md`.
 
+!!! warning "Neptune CloudFormation Cleanup"
+    When tearing down a Neptune backend provisioned via CloudFormation, stack deletion may be blocked by orphaned VPC Endpoint ENIs or GuardDuty-managed security groups. Delete these resources manually before retrying `aws cloudformation delete-stack`. Run `/aidlc-graph teardown` for detailed cleanup commands.
+
 ---
 
 ## Session Continuity

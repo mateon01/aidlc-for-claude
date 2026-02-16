@@ -25,6 +25,25 @@ Then proceed with the steps below.
 
 Build and maintain a code dependency graph for impact analysis, visualization, change-aware test execution, and optional GraphRAG-based semantic code retrieval. Supports three backends: File-based JSON, Neo4j (local Docker), and AWS Neptune (cloud).
 
+## Node ID Convention
+
+All graph node IDs MUST follow these normalization rules for consistency across units and queries:
+
+| Node Type | Pattern | Examples |
+|-----------|---------|----------|
+| Unit | `u-{NN}` | `u-01`, `u-02`, `u-10` |
+| Module | `mod-{kebab-name}` | `mod-auth`, `mod-prisma`, `mod-frontend-hooks` |
+| File | `file-{kebab-name}` | `file-auth-service`, `file-app`, `file-health-routes` |
+| Community | `comm-{kebab-name}` | `comm-backend-core`, `comm-frontend-ui` |
+| Summary | `summary-{parent-id}` | `summary-u-01`, `summary-mod-auth` |
+
+**Rules:**
+- All IDs are **lowercase** — never uppercase
+- Words separated by **hyphens** (`-`) — never underscores or dots
+- Unit numbers are **zero-padded** to 2 digits (`u-01` not `u-1`)
+- Each ID is **prefixed** by its node type for easy identification
+- IDs must be **deterministic** — same input always produces same ID
+
 ---
 
 ## PART A: Mode and Backend Resolution
@@ -127,6 +146,22 @@ File-level dependency detection via Grep for import/include/use/require patterns
 For each source file, collect:
 - File path (relative), type, exports, LOC, dependency list
 - For each dependency: source → target, type (import/call/inherit), symbols
+
+### 4.5 IMPORTS Edge Standardization
+
+When creating IMPORTS edges, follow these rules consistently across all units:
+
+1. **One edge per import statement**: Each `import`/`require`/`from X import Y` creates exactly one IMPORTS edge from the importing file to the imported file
+2. **Internal files only**: Only create IMPORTS edges for project-internal files. Exclude:
+   - External packages (node_modules, pip packages, cargo crates)
+   - Built-in language modules (fs, path, os, sys)
+   - Type-only imports in TypeScript (`import type { X }`)
+3. **Resolve to actual files**: Convert import paths to actual file node IDs:
+   - Relative paths (`./foo`, `../bar`) → resolve to absolute project path → convert to `file-{kebab-name}`
+   - Path aliases (`@/foo`, `~/foo`) → resolve via tsconfig.json paths or equivalent → convert to `file-{kebab-name}`
+   - Barrel imports (`./index`) → resolve to the barrel file itself, not re-exported modules
+4. **Deduplicate**: If file A imports file B multiple times (e.g., separate import statements), create only ONE IMPORTS edge. Use MERGE in Cypher to enforce idempotency.
+5. **Test edges**: Test files additionally get a TESTS edge to each file they test (by convention: `foo.test.ts` TESTS `foo.ts`). This is separate from IMPORTS.
 
 ---
 
@@ -557,6 +592,27 @@ aws cloudformation delete-stack --stack-name aidlc-graph
 # Manual
 aws neptune delete-db-cluster --db-cluster-identifier aidlc-graph --skip-final-snapshot
 ```
+
+**CloudFormation Cleanup Gotchas:**
+
+When deleting Neptune CloudFormation stacks, the following resources may block deletion:
+
+1. **VPC Endpoint ENIs**: Neptune creates VPC Endpoints whose ENIs persist in private subnets after cluster deletion. Fix:
+   ```bash
+   # Find and delete VPC endpoints in the VPC
+   aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=$VPC_ID" --query "VpcEndpoints[].VpcEndpointId" --output text | xargs -I{} aws ec2 delete-vpc-endpoints --vpc-endpoint-ids {}
+   ```
+
+2. **GuardDuty Security Groups**: If AWS GuardDuty is enabled, it auto-creates security groups (`GuardDutyManagedSecurityGroup-*`) in the VPC that block VPC deletion. Fix:
+   ```bash
+   # Find and delete GuardDuty SGs
+   aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$VPC_ID" "Name=group-name,Values=GuardDutyManagedSecurityGroup*" --query "SecurityGroups[].GroupId" --output text | xargs -I{} aws ec2 delete-security-group --group-id {}
+   ```
+
+3. After removing blocking resources, retry stack deletion:
+   ```bash
+   aws cloudformation delete-stack --stack-name $STACK_NAME --region $REGION
+   ```
 
 Ask user to confirm before destroying cloud resources.
 

@@ -94,6 +94,7 @@ When graphEnabled is true:
 2. Delegate to `aidlc-for-claude:aidlc-graph-analyzer` with mode "update":
    - Pass: changed file list, unit name
    - The analyzer re-parses only changed files and updates the graph incrementally
+   - Ensure all node IDs follow the convention: `u-{NN}` for units (lowercase, zero-padded), `mod-{name}` for modules, `file-{name}` for files — see graph-analyzer Node ID Convention
 3. Log the graph update summary:
 
 ```markdown

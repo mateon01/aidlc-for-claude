@@ -198,6 +198,16 @@ When graphEnabled is true:
 - Circular dependencies detected: [yes/no]
 ```
 
+**E2E Verification Checklist (for graph-based impact analysis):**
+
+When graph impact analysis is enabled, verify the following end-to-end:
+- [ ] Neptune/Neo4j/File graph is accessible and contains current data
+- [ ] Impact query returns affected modules for the changed files
+- [ ] Affected modules are correctly mapped to test files (convention: `src/foo.ts` → `tests/foo.test.ts`)
+- [ ] P1 (direct changes) → P2 (1-hop dependents) → P3 (full suite) execution order is followed
+- [ ] Execution report includes graph-based prioritization details
+- [ ] Untested dependencies (no matching test file) are flagged in the report
+
 ## Step 11: Execute Tests
 Run the test command via Bash with coverage flags where possible:
 - Node.js: `npm test -- --coverage` (if Jest) or `npx vitest --coverage` (if Vitest)

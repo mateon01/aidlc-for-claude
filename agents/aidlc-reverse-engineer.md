@@ -153,6 +153,7 @@ The graph analysis complements existing RE artifacts:
 If `graphRAGEnabled: true` in aidlc-state.md:
 1. After graph construction completes, the graph-analyzer automatically generates module summaries (Step 10) and runs community detection (Step 11)
 2. Pass `graphRAGEnabled: true` in the delegation context so the graph-analyzer knows to run PART F
+   - Ensure all node IDs follow the Node ID Convention defined in the graph-analyzer spec (lowercase, hyphen-separated, type-prefixed)
 3. Include GraphRAG stats in the RE report:
 
 ```markdown
