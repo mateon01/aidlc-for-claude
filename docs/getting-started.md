@@ -165,11 +165,12 @@ Build and visualize code dependency graphs for any project:
 /aidlc-graph
 ```
 
-The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers seven modes:
+The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers eight modes:
 
 - **Build graph** -- Full static analysis to construct dependency graph from scratch
 - **Update graph** -- Incrementally update existing graph with recent changes
 - **Visualize** -- Generate Mermaid diagram from existing graph
+- **Export as PNG** -- Export dependency graph as PNG images (requires Python matplotlib + networkx)
 - **Impact analysis** -- Show which modules are affected by recent file changes
 - **Search (GraphRAG)** -- Find modules by semantic query using summaries and graph context (requires graphRAGEnabled)
 - **Verify** -- Test connectivity and data integrity of graph DB
@@ -193,7 +194,7 @@ Three backends are supported:
     **GraphRAG (optional):** When `graphRAGEnabled: true` is selected during Workflow Planning, module summaries (purpose, keywords, architectural layer) and community structure are generated alongside the dependency graph. This enables semantic code search via `/aidlc-graph search` -- finding modules by what they do, not just their file path. No external embedding models or vector databases required.
 
 !!! note "Graph Storage"
-    File-based graphs are stored in `aidlc-docs/graph/dependency-graph.json`. Neo4j and Neptune backends store data in the graph database with a local summary at `aidlc-docs/graph/graph-summary.md`. Mermaid visualizations are generated at `aidlc-docs/graph/dependency-graph.md`. Neptune IaC files go to `aidlc-docs/graph/infra/`.
+    File-based graphs are stored in `aidlc-docs/graph/dependency-graph.json`. Neo4j and Neptune backends store data in the graph database with a local summary at `aidlc-docs/graph/graph-summary.md`. Mermaid visualizations are generated at `aidlc-docs/graph/dependency-graph.md`. PNG exports (three views: full graph, community architecture, impact analysis) are saved to `aidlc-docs/graph/`. Neptune IaC files go to `aidlc-docs/graph/infra/`.
 
 !!! success "Deployment Verification"
     After graph construction, a 9-point verification suite runs automatically:
@@ -308,6 +309,9 @@ aidlc-docs/
   graph/
     dependency-graph.json           # Code dependency graph (when enabled)
     dependency-graph.md             # Mermaid visualization (when enabled)
+    dependency-graph.png            # Full graph PNG export (export mode)
+    community-architecture.png      # Community view PNG (export mode)
+    impact-analysis.png             # Impact view PNG (export mode)
     graph-summary.md                # Graph statistics summary (all backends)
     verification-report.md          # DB verification report (neo4j/neptune)
     infra/                          # IaC files for Neptune (neptune only)

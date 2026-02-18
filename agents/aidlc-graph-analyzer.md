@@ -54,7 +54,8 @@ Check the context passed from the calling command or orchestrator:
 
 - **build** — Full graph construction from scratch
 - **update** — Incremental graph update for changed/new files
-- **visualize** — Generate visualization from existing graph
+- **visualize** — Generate visualization from existing graph (Mermaid markdown)
+- **export** — Export dependency graph as PNG images (requires Python matplotlib + networkx)
 - **impact** — Analyze affected modules from changed files
 - **search** — GraphRAG retrieval: find modules by semantic query (requires graphRAGEnabled)
 - **verify** — Run deployment verification on graph DB
@@ -67,7 +68,8 @@ If no mode is specified (standalone via `/aidlc-graph`), ask via AskUserQuestion
 
 - Build graph (Recommended) — "Analyze codebase and build full dependency graph"
 - Update graph — "Incrementally update existing graph with recent changes"
-- Visualize — "Generate visualization from existing graph"
+- Visualize — "Generate Mermaid markdown visualization from existing graph"
+- Export as PNG — "Export dependency graph as PNG images for documentation or review"
 - Impact analysis — "Show which modules are affected by recent changes"
 - Search (GraphRAG) — "Find modules by semantic query using summaries and graph context"
 - Verify graph DB — "Test connectivity and data integrity"
@@ -531,6 +533,34 @@ curl -X POST "https://${NEPTUNE_ENDPOINT}:8182/openCypher" \
   -d "query=RETURN 1 AS test"
 ```
 
+**Connectivity Troubleshooting — SSM Run Command Fallback:**
+
+If SSM port forwarding sessions fail with WebSocket timeout errors (`context deadline exceeded`), use SSM Run Command as an alternative to execute Neptune queries through the bastion:
+
+```bash
+# 1. Verify bastion SSM agent is online
+aws ssm describe-instance-information \
+  --filters "Key=InstanceIds,Values=$BASTION_ID" \
+  --query "InstanceInformationList[0].PingStatus" --output text
+
+# 2. Execute Neptune query via SSM Run Command
+# URL-encode the query, then send via curl on the bastion
+ENCODED_QUERY=$(echo -n "$CYPHER_QUERY" | python3 -c "import sys,urllib.parse; print(urllib.parse.quote(sys.stdin.read()))")
+CMD_ID=$(aws ssm send-command \
+  --instance-ids "$BASTION_ID" \
+  --document-name "AWS-RunShellScript" \
+  --parameters "file://<(echo '{\"commands\":[\"curl -s --connect-timeout 30 -X POST https://'$NEPTUNE_ENDPOINT':8182/openCypher -H Content-Type:application/x-www-form-urlencoded --insecure -d query='$ENCODED_QUERY'\"]}')" \
+  --region "$REGION" \
+  --query "Command.CommandId" --output text)
+
+# 3. Retrieve result (poll until Success/Failed)
+aws ssm get-command-invocation \
+  --command-id "$CMD_ID" --instance-id "$BASTION_ID" \
+  --region "$REGION" --query "StandardOutputContent" --output text
+```
+
+Note: SSM Run Command adds ~5s round-trip latency per query but works reliably when SSM sessions (WebSocket) are blocked by network configuration.
+
 Create schema (openCypher):
 
 ```
@@ -660,6 +690,38 @@ WITH a, b, collect(r) AS rels
 WHERE size(rels) > 1
 RETURN a.path, b.path, size(rels) AS dupes;
 ```
+
+**Node ID Convention Validation:**
+
+Verify that all node IDs follow the normalization convention. Use backend-appropriate queries:
+
+**Neo4j** (regex supported):
+
+```cypher
+// Find nodes violating ID convention
+MATCH (n)
+WHERE NOT (n.id =~ '^(u-[0-9]{2}|mod-[a-z0-9-]+|file-[a-z0-9-]+|comm-[a-z0-9-]+|summary-[a-z0-9-]+)$')
+RETURN n.id AS violatingId, labels(n) AS labels
+```
+
+**Neptune** (no regex — use STARTS WITH):
+
+```cypher
+// Neptune does not support =~ regex. Use STARTS WITH instead.
+MATCH (n)
+WHERE n.id IS NOT NULL
+  AND NOT (n.id STARTS WITH 'u-'
+    OR n.id STARTS WITH 'mod-'
+    OR n.id STARTS WITH 'file-'
+    OR n.id STARTS WITH 'comm-'
+    OR n.id STARTS WITH 'summary-')
+RETURN n.id AS violatingId, labels(n) AS labels
+```
+
+**File backend**: Iterate JSON node keys and check prefixes programmatically.
+
+!!! note "Neptune openCypher Limitations"
+    Neptune's openCypher implementation does not support `=~` regex matching (`UnsupportedOperationException: RegexMatch is not supported`). Always use `STARTS WITH`, `ENDS WITH`, or `CONTAINS` for string pattern matching on Neptune. For complex pattern matching, retrieve results and filter client-side.
 
 ### 8.4 Performance Baseline
 
@@ -979,6 +1041,132 @@ Generate summary at the end of any mode:
 ```
 
 Also export summary to `aidlc-docs/graph/dependency-graph.json` (file backend) or append to `aidlc-docs/graph/graph-summary.md` (all backends).
+
+---
+
+## PART G: PNG Export (mode: export)
+
+## Step 14: Export Dependency Graph as PNG
+
+Generate PNG image files from the dependency graph using Python (networkx + matplotlib). This mode works with all three backends by first extracting graph data, then rendering it.
+
+### 14.1 Check Prerequisites
+
+```bash
+python3 -c "import matplotlib; import networkx" 2>/dev/null
+```
+
+If not installed, inform the user:
+
+```
+matplotlib and networkx are required for PNG export.
+Install with: pip install matplotlib networkx
+
+Alternatively, use 'visualize' mode for Mermaid markdown output (no dependencies needed).
+```
+
+If installation fails or user declines, fall back to Mermaid visualization (mode: visualize).
+
+### 14.2 Extract Graph Data
+
+Retrieve nodes and edges from the configured backend:
+
+**File backend**: Read `aidlc-docs/graph/dependency-graph.json` directly.
+
+**Neo4j backend**:
+
+```cypher
+// Get all nodes
+MATCH (n) RETURN n.id AS id, labels(n)[0] AS type,
+  n.summary AS summary, n.layer AS layer;
+
+// Get all edges
+MATCH (a)-[r]->(b) RETURN a.id AS source, b.id AS target, type(r) AS edgeType;
+```
+
+**Neptune backend**: Same Cypher queries via openCypher HTTP API (or SSM Run Command fallback).
+
+### 14.3 Generate PNG Visualizations
+
+Generate a Python script at `/tmp/aidlc-graph-export.py` and execute it. The script creates three PNG files:
+
+**1. Full Dependency Graph** (`aidlc-docs/graph/dependency-graph.png`):
+
+- All nodes colored by type: Module (blue), File (green), Community (orange), Unit (purple)
+- All edges colored by type: IMPORTS (gray), CONTAINS (blue), DEPENDS_ON (red), BELONGS_TO (orange)
+- Node labels show shortened IDs
+- Legend for node and edge types
+- Layout: spring layout with k=2 for readability
+
+**2. Community Architecture** (`aidlc-docs/graph/community-architecture.png`):
+
+- Only Module and Community nodes
+- BELONGS_TO edges connecting modules to communities
+- Communities drawn larger with distinct color
+- Shows module grouping at a glance
+
+**3. Impact Analysis View** (`aidlc-docs/graph/impact-analysis.png`):
+
+- Only File nodes and IMPORTS edges
+- Hub nodes (high in-degree) highlighted with larger size and red border
+- Edge arrows show import direction
+- Useful for identifying critical dependencies
+
+Script pattern:
+
+```python
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import networkx as nx
+
+# ... (build graph from extracted data)
+
+# Chart 1: Full dependency graph
+fig, ax = plt.subplots(figsize=(16, 12))
+# Color nodes by type, edges by type
+# Add legend
+plt.savefig('aidlc-docs/graph/dependency-graph.png', dpi=150, bbox_inches='tight')
+plt.close()
+
+# Chart 2: Community architecture
+fig, ax = plt.subplots(figsize=(14, 10))
+# Filter to Module + Community nodes, BELONGS_TO edges
+plt.savefig('aidlc-docs/graph/community-architecture.png', dpi=150, bbox_inches='tight')
+plt.close()
+
+# Chart 3: Impact analysis
+fig, ax = plt.subplots(figsize=(14, 10))
+# Filter to File nodes, IMPORTS edges, highlight hubs
+plt.savefig('aidlc-docs/graph/impact-analysis.png', dpi=150, bbox_inches='tight')
+plt.close()
+```
+
+### 14.4 Report Exported Files
+
+After generation, list the exported files:
+
+```markdown
+## PNG Export Complete
+
+| File | Description | Size |
+|------|-------------|------|
+| `aidlc-docs/graph/dependency-graph.png` | Full dependency graph with all node/edge types | [size] |
+| `aidlc-docs/graph/community-architecture.png` | Module-to-community relationships | [size] |
+| `aidlc-docs/graph/impact-analysis.png` | File-level imports with hub highlighting | [size] |
+```
+
+Offer to display the PNG files via the Read tool for immediate review.
+
+### 14.5 Cleanup
+
+Remove the temporary Python script after successful generation:
+
+```bash
+rm -f /tmp/aidlc-graph-export.py
+```
+
+---
 
 ## Content Validation Rules
 - Validate Mermaid diagram syntax before writing

@@ -49,7 +49,7 @@
 - :material-magnify-scan: **Brownfield Support** -- Deep reverse engineering for existing codebases with 8 analysis artifacts.
 - :material-source-pull: **PR Review** -- Standalone utility for analyzing PR diffs across 6 categories (correctness, security, performance, consistency, testing, documentation).
 - :material-pipe: **CI Setup** -- Standalone utility to generate CI/CD pipelines, PR review workflows, and issue/PR templates with automatic tech stack detection.
-- :material-graph-outline: **Dependency Graph** -- Optional graph-based code dependency analysis with multi-backend support (File/Neo4j/Neptune), impact analysis, Mermaid visualization, 9-point deployment verification, and change-aware test prioritization. E2E verified with Neo4j backend.
+- :material-graph-outline: **Dependency Graph** -- Optional graph-based code dependency analysis with multi-backend support (File/Neo4j/Neptune), impact analysis, Mermaid visualization, PNG export, 9-point deployment verification, and change-aware test prioritization. E2E verified with Neo4j and Neptune backends.
 - :material-text-search: **GraphRAG** -- Optional summary-based semantic code retrieval. Claude generates module summaries and community structure stored as graph properties -- no external embedding models required. Search by purpose, find related modules, understand code semantics.
 
 ---

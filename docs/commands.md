@@ -48,7 +48,7 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 |:--------|:------------|
 | `/aidlc-review-pr` | Analyze PR diffs for code quality, security, performance, and consistency |
 | `/aidlc-ci-setup` | Generate CI/CD pipelines, PR review workflows, and issue/PR templates |
-| `/aidlc-graph` | Build, update, visualize, search, verify, or tear down code dependency graphs (File/Neo4j/Neptune) with optional GraphRAG |
+| `/aidlc-graph` | Build, update, visualize, export (PNG), search, verify, or tear down code dependency graphs (File/Neo4j/Neptune) with optional GraphRAG |
 
 ---
 
@@ -85,7 +85,7 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
 | `aidlc-for-claude:aidlc-pr-reviewer` | PR diff analysis for code quality, security, performance, and consistency |
 | `aidlc-for-claude:aidlc-ci-setup-engineer` | CI/CD pipeline, PR review workflow, and issue/PR template generation |
-| `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph with multi-backend support (File/Neo4j/Neptune), 9-point verification, impact analysis, Mermaid visualization, and GraphRAG summary-based retrieval |
+| `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph with multi-backend support (File/Neo4j/Neptune), 9-point verification, impact analysis, Mermaid visualization, PNG export, and GraphRAG summary-based retrieval |
 
 ### :material-speedometer: Haiku Agents (Fast Detection)
 

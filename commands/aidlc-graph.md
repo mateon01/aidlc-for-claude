@@ -12,7 +12,7 @@ This command delegates to the graph analyzer agent for on-demand graph operation
 
 ```
 Task(subagent_type="aidlc-for-claude:aidlc-graph-analyzer", model="sonnet",
-     prompt="Run graph analysis in standalone mode. Ask the user which operation they want: build, update, visualize, impact analysis, or search. Then execute the selected operation on the current workspace.")
+     prompt="Run graph analysis in standalone mode. Ask the user which operation they want: build, update, visualize, export, impact analysis, search, verify, or teardown. Then execute the selected operation on the current workspace.")
 ```
 
 ## Modes
@@ -20,5 +20,8 @@ Task(subagent_type="aidlc-for-claude:aidlc-graph-analyzer", model="sonnet",
 - **Build graph** — Full static analysis of codebase to construct dependency graph
 - **Update graph** — Incrementally update existing graph with recent changes
 - **Visualize** — Generate Mermaid diagram from existing graph
+- **Export as PNG** — Export dependency graph as PNG images (requires Python matplotlib + networkx)
 - **Impact analysis** — Show affected modules based on recent file changes
 - **Search (GraphRAG)** — Find modules by semantic query using summaries and graph context (requires graphRAGEnabled)
+- **Verify** — Run deployment verification on graph DB
+- **Teardown** — Stop graph DB container or clean up resources

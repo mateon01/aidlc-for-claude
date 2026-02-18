@@ -302,7 +302,7 @@ These commands can be run independently of the three-phase workflow:
 
 - `/aidlc-review-pr` — PR code review (code quality, security, performance analysis)
 - `/aidlc-ci-setup` — Generate CI/CD pipelines, PR review workflows, and issue/PR templates
-- `/aidlc-graph` — Dependency graph analysis and visualization
+- `/aidlc-graph` — Dependency graph analysis, visualization, and PNG export
 
 ## Agent Delegation Pattern
 
@@ -411,6 +411,9 @@ aidlc-docs/
   graph/
     dependency-graph.json            # Code dependency graph (when graphEnabled)
     dependency-graph.md              # Mermaid visualization (when graphEnabled)
+    dependency-graph.png             # Full graph PNG export (export mode)
+    community-architecture.png       # Community view PNG (export mode)
+    impact-analysis.png              # Impact view PNG (export mode)
     graph-summary.md                 # Graph statistics summary (all backends)
     verification-report.md           # DB verification report (neo4j/neptune)
     infra/                           # IaC files for Neptune provisioning (neptune only)
