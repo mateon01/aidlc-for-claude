@@ -84,6 +84,27 @@ Generate `.env.example` at the **workspace root** (application code, not aidlc-d
   - Clear marking of SECRET (credentials, API keys) vs CONFIG (ports, URLs)
 - Add header comment: "Copy this file to .env and fill in your values"
 
+**Graph-Enabled Project Additions (CONDITIONAL):**
+
+If `graphEnabled: true` in aidlc-state.md, add graph infrastructure env vars to `.env.example`:
+
+```env
+# === Graph Database Configuration ===
+# GRAPH_BACKEND=file|neo4j|neptune
+
+# Neo4j (when graphBackend: neo4j)
+# NEO4J_URI=bolt://localhost:7687
+# NEO4J_USER=neo4j
+# NEO4J_PASSWORD=your-password-here
+
+# Neptune (when graphBackend: neptune)
+# NEPTUNE_ENDPOINT=your-cluster.region.neptune.amazonaws.com
+# NEPTUNE_REGION=us-east-1
+# NEPTUNE_BASTION_ID=i-xxxxxxxxxxxx
+```
+
+Only include the section matching the configured `graphBackend`. Comment out by default since graph config is infrastructure-level.
+
 ### Step 2.5: Generate CI/CD Pipeline
 Ask the user which CI platform they use via AskUserQuestion:
 - GitHub Actions (Recommended)

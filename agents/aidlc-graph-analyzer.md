@@ -561,6 +561,37 @@ aws ssm get-command-invocation \
 
 Note: SSM Run Command adds ~5s round-trip latency per query but works reliably when SSM sessions (WebSocket) are blocked by network configuration.
 
+**SSM Agent Not Coming Online — Security Group Fix:**
+
+If `aws ssm describe-instance-information` returns `PingStatus: None` for the bastion, the most common cause is a missing self-referencing security group ingress rule. When the bastion EC2 and SSM VPC Endpoints share the same security group, the SG must allow inbound traffic from itself on port 443:
+
+```bash
+# Add self-referencing ingress rule for SSM VPC Endpoint communication
+aws ec2 authorize-security-group-ingress \
+  --group-id $BASTION_SG_ID \
+  --protocol tcp --port 443 \
+  --source-group $BASTION_SG_ID
+
+# Reboot instance to force SSM agent re-registration
+aws ec2 reboot-instances --instance-ids $BASTION_ID
+# Wait ~30s for SSM agent to come back online
+```
+
+CloudFormation templates should include this ingress rule in the bastion/VPC-endpoint SecurityGroup:
+
+```yaml
+BastionSecurityGroup:
+  Type: AWS::EC2::SecurityGroup
+  Properties:
+    GroupDescription: Bastion and VPC Endpoints
+    VpcId: !Ref VPC
+    SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        SourceSecurityGroupId: !Ref BastionSecurityGroup  # self-referencing for SSM
+```
+
 Create schema (openCypher):
 
 ```
@@ -672,24 +703,54 @@ Run verification checks based on backend type. This step executes automatically 
 
 ### 8.3 Data Integrity
 
-After build or update, verify:
+After build or update, verify. All queries below are compatible with both Neo4j and Neptune openCypher:
 
 ```cypher
-// Node count matches expected
-MATCH (m:Module) RETURN count(m) AS nodeCount;
+// 1. Node counts by label
+MATCH (n) RETURN labels(n) AS label, count(n) AS cnt ORDER BY cnt DESC;
 
-// Edge count matches expected
-MATCH ()-[r:IMPORTS]->() RETURN count(r) AS edgeCount;
+// 2. Edge counts by type
+MATCH ()-[r]->() RETURN type(r) AS rel, count(r) AS cnt ORDER BY cnt DESC;
 
-// No orphan edges (edges pointing to non-existent nodes)
-MATCH (a)-[:IMPORTS]->(b) WHERE b IS NULL RETURN count(*) AS orphans;
+// 3. Orphan files — files not belonging to any module
+//    Expected orphans: entry point files (index.ts, main.ts, app.ts, server.ts)
+//    Unexpected orphans: files that should belong to a module but don't
+MATCH (f:File) WHERE NOT (f)<-[:CONTAINS]-(:Module)
+RETURN f.id AS orphan,
+  CASE WHEN f.id STARTS WITH 'file-index'
+    OR f.id STARTS WITH 'file-main'
+    OR f.id STARTS WITH 'file-app'
+    OR f.id STARTS WITH 'file-server'
+  THEN 'expected' ELSE 'unexpected' END AS category;
 
-// No duplicate edges
+// 4. Broken IMPORTS — edges pointing to non-File nodes
+MATCH (f1:File)-[:IMPORTS]->(f2) WHERE NOT f2:File RETURN f1.id AS source;
+
+// 5. Duplicate edges
 MATCH (a)-[r:IMPORTS]->(b)
-WITH a, b, collect(r) AS rels
-WHERE size(rels) > 1
-RETURN a.path, b.path, size(rels) AS dupes;
+WITH a, b, count(r) AS cnt
+WHERE cnt > 1
+RETURN a.id, b.id, cnt AS dupes;
+
+// 6. Circular module dependencies
+MATCH (a:Module)-[:DEPENDS_ON]->(b:Module)-[:DEPENDS_ON]->(a) RETURN a.id, b.id;
+
+// 7. Circular file imports
+MATCH (a:File)-[:IMPORTS]->(b:File)-[:IMPORTS]->(a) RETURN a.id, b.id;
+
+// 8. Modules without community (when GraphRAG enabled)
+MATCH (m:Module) WHERE NOT (m)-[:BELONGS_TO]->(:Community) RETURN m.id AS orphan;
+
+// 9. Community moduleCount accuracy (when GraphRAG enabled)
+MATCH (c:Community)
+WITH c, c.moduleCount AS declared
+OPTIONAL MATCH (m:Module)-[:BELONGS_TO]->(c)
+WITH c, declared, count(m) AS actual
+WHERE declared <> actual
+RETURN c.id, declared, actual;
 ```
+
+**Note on `collect()` and `size()`:** Neptune openCypher supports `count(r)` in aggregation but `collect(r)` on relationships may behave differently. Use `count(r)` with `GROUP BY` (implicit via `WITH`) instead of `collect(r) + size()` for duplicate detection.
 
 **Node ID Convention Validation:**
 
@@ -721,15 +782,32 @@ RETURN n.id AS violatingId, labels(n) AS labels
 **File backend**: Iterate JSON node keys and check prefixes programmatically.
 
 !!! note "Neptune openCypher Limitations"
-    Neptune's openCypher implementation does not support `=~` regex matching (`UnsupportedOperationException: RegexMatch is not supported`). Always use `STARTS WITH`, `ENDS WITH`, or `CONTAINS` for string pattern matching on Neptune. For complex pattern matching, retrieve results and filter client-side.
+    Neptune's openCypher implementation has several differences from Neo4j:
+
+    - **No `=~` regex** — use `STARTS WITH`, `ENDS WITH`, or `CONTAINS` instead
+    - **No `EXISTS { MATCH ... }`** subquery — rewrite as `OPTIONAL MATCH` + `WHERE x IS NULL`
+    - **No `PROFILE`** keyword — measure wall-clock time externally
+    - **No `CALL db.index.fulltext.queryNodes()`** — use `CONTAINS` for text search
+    - **`collect()` on relationships** may behave differently — use `count()` for aggregation
+    - For complex pattern matching, retrieve results and filter client-side
 
 ### 8.4 Performance Baseline
 
-Run a benchmark query and verify latency:
+Run a benchmark query and verify latency.
+
+**Neo4j** (supports PROFILE for query plan analysis):
 
 ```cypher
-// Traversal benchmark — should complete under configured threshold
 PROFILE MATCH (m:Module)<-[:IMPORTS*1..3]-(dep)
+WHERE m.path = $sampleNode
+RETURN count(dep)
+```
+
+**Neptune** (no PROFILE — measure wall-clock time):
+
+```cypher
+// Neptune does not support PROFILE keyword. Measure round-trip time externally.
+MATCH (m:Module)<-[:IMPORTS*1..3]-(dep)
 WHERE m.path = $sampleNode
 RETURN count(dep)
 ```
@@ -751,7 +829,7 @@ Generate `aidlc-docs/graph/verification-report.md`:
 - **Timestamp**: [ISO 8601]
 - **Connection**: [PASS/FAIL] — [details]
 - **Schema**: [PASS/FAIL] — [constraints found]
-- **Data Integrity**: [PASS/FAIL] — [node count, edge count, orphans, dupes]
+- **Data Integrity**: [PASS/FAIL] — [node count, edge count, orphan files (N expected, M unexpected), dupes]
 - **Performance**: [PASS/FAIL] — [query latency vs threshold]
 - **Overall**: [ALL PASSED / X FAILURES]
 ```

@@ -192,6 +192,9 @@ All graph node IDs follow a strict normalization convention for consistency acro
 !!! tip "Neptune Connectivity — SSM Run Command Fallback"
     If SSM port forwarding sessions fail with WebSocket timeout errors (`context deadline exceeded`), use SSM Run Command as an alternative to execute Neptune queries through the bastion host. This approach URL-encodes the Cypher query, sends it via `aws ssm send-command` to the bastion, where curl forwards it to Neptune's openCypher endpoint, then retrieves the result via `aws ssm get-command-invocation`. SSM Run Command adds ~5s round-trip latency per query but works reliably when SSM sessions are blocked by network configuration. See the graph-analyzer agent Step 7.3 for detailed commands.
 
+!!! warning "Neptune SSM — Security Group Ingress Requirement"
+    When the bastion EC2 and SSM VPC Endpoints share the same security group, the SG must include a **self-referencing ingress rule on port 443**. Without this, the bastion cannot communicate with SSM VPC Endpoints and the SSM agent will show `PingStatus: None` indefinitely. CloudFormation templates should include `SourceSecurityGroupId: !Ref BastionSecurityGroup` in the SecurityGroupIngress for port 443. If SSM agent is stuck, add the rule manually via `aws ec2 authorize-security-group-ingress` and reboot the instance.
+
 ---
 
 ## Stage Execution Matrix
