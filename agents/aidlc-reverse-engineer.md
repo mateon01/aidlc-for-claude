@@ -154,7 +154,11 @@ If `graphRAGEnabled: true` in aidlc-state.md:
 1. After graph construction completes, the graph-analyzer automatically generates module summaries (Step 10) and runs community detection (Step 11)
 2. Pass `graphRAGEnabled: true` in the delegation context so the graph-analyzer knows to run PART F
    - Ensure all node IDs follow the Node ID Convention defined in the graph-analyzer spec (lowercase, hyphen-separated, type-prefixed)
-3. Include GraphRAG stats in the RE report:
+3. Pass `graphConstructionMethod` in the delegation context:
+   - If `cgig` or `hybrid`: instruct graph-analyzer to execute Step 4.6 (CGIG-enriched class-level properties)
+   - If `lightweight`: instruct graph-analyzer to execute Step 4.7 (import-only graph, skip detailed analysis)
+   - If `static` (default): standard analysis via Steps 4.1-4.5
+4. Include GraphRAG stats in the RE report:
 
 ```markdown
 ## GraphRAG Summary

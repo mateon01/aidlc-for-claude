@@ -208,6 +208,49 @@ When graph impact analysis is enabled, verify the following end-to-end:
 - [ ] Execution report includes graph-based prioritization details
 - [ ] Untested dependencies (no matching test file) are flagged in the report
 
+## Step 10.7: CGIG Compilation Repair Loop (CONDITIONAL)
+
+**Gate:** Only execute when `cgigEnabled: true` in aidlc-state.md AND the build step (Step 10) resulted in compilation failures.
+
+**Skip if:** Build succeeded at Step 10, OR `cgigEnabled` is false/not set.
+
+When compilation fails and CGIG is enabled, run a repair loop:
+
+**Loop (up to `cgigMaxRounds`, default 3):**
+
+1. **Parse**: Extract compilation errors from Step 10 build output
+2. **Delegate**: Call graph-analyzer in `repair` mode:
+   ```
+   Task(subagent_type="aidlc-for-claude:aidlc-graph-analyzer", model="sonnet",
+        prompt="Run in repair mode. Parse these compilation errors and query the dependency graph for repair context. Errors: [paste error log]. Return CGIG repair context with confidence scores.")
+   ```
+3. **Filter**: Discard suggestions below `cgigConfidenceThreshold` (default 0.6)
+4. **Fix**: Delegate to code-generator for targeted fixes:
+   ```
+   Task(subagent_type="aidlc-for-claude:aidlc-code-generator", model="sonnet",
+        prompt="Apply CGIG repair fixes. Use the following graph-augmented repair context to fix compilation errors. repairContext: [paste repair context]. Only modify files referenced in the repair context.")
+   ```
+5. **Recompile**: Re-run the build command from Step 10
+6. **Check**: If compilation succeeds → break loop, proceed to Step 11
+7. **Continue**: If compilation still fails → next round with updated error list
+
+**On loop exhaustion (all rounds used, still failing):**
+- Log CGIG repair attempt details in execution report
+- Continue to Step 11 (tests may still pass partially)
+- Include CGIG statistics in the execution report
+
+**Execution report addition:**
+```markdown
+## CGIG Compilation Repair
+- Rounds executed: [N] of [max]
+- Initial errors: [count]
+- Final errors: [count] (reduced by [percentage]%)
+- Graph matches: [count] ([high/medium/low confidence breakdown])
+- Outcome: SUCCESS (all errors resolved) | PARTIAL (some errors remain) | EXHAUSTED (max rounds reached)
+```
+
+**Non-blocking:** CGIG repair failure does NOT halt the workflow. If the graph-analyzer delegation fails (timeout, crash, DB connectivity), log the error and skip to Step 11.
+
 ## Step 11: Execute Tests
 Run the test command via Bash with coverage flags where possible:
 - Node.js: `npm test -- --coverage` (if Jest) or `npx vitest --coverage` (if Vitest)

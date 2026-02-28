@@ -61,12 +61,17 @@ If `graphEnabled: true` in aidlc-state.md, include these in the deployment check
    - [ ] For Neptune: Cluster endpoint is accessible, IAM auth configured
    - [ ] Graph data is current (last updated timestamp matches latest code generation)
    - [ ] For Neptune: Document cleanup procedure (VPC Endpoints, GuardDuty SGs)
+   - [ ] If CGIG enabled: Compile toolchain available in CI/CD environment
+   - [ ] If CGIG enabled: Graph DB supports class-level property queries
+   - [ ] If CGIG enabled: CGIG configuration documented (maxRounds, confidenceThreshold)
 
 2. **Developer README — Graph Section:**
    - Graph backend configuration and connection details
    - How to run `/aidlc-graph` for manual graph operations
    - Impact analysis usage: `/aidlc-graph impact`
    - If GraphRAG enabled: semantic search usage: `/aidlc-graph search`
+   - If CGIG enabled: compilation repair usage: Build & Test CGIG loop behavior
+   - If CGIG enabled: configuration tuning guide (cgigMaxRounds, cgigConfidenceThreshold)
    - Teardown instructions per backend
 
 ### Step 2.3: Generate Environment Configuration Template
@@ -101,6 +106,10 @@ If `graphEnabled: true` in aidlc-state.md, add graph infrastructure env vars to 
 # NEPTUNE_ENDPOINT=your-cluster.region.neptune.amazonaws.com
 # NEPTUNE_REGION=us-east-1
 # NEPTUNE_BASTION_ID=i-xxxxxxxxxxxx
+
+# CGIG Configuration (when cgigEnabled: true)
+# CGIG_MAX_ROUNDS=3
+# CGIG_CONFIDENCE_THRESHOLD=0.6
 ```
 
 Only include the section matching the configured `graphBackend`. Comment out by default since graph config is infrastructure-level.

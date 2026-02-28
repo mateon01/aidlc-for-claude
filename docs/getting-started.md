@@ -165,7 +165,7 @@ Build and visualize code dependency graphs for any project:
 /aidlc-graph
 ```
 
-The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers eight modes:
+The agent detects your project's language (TypeScript/JavaScript, Python, or general) and offers nine modes:
 
 - **Build graph** -- Full static analysis to construct dependency graph from scratch
 - **Update graph** -- Incrementally update existing graph with recent changes
@@ -173,6 +173,7 @@ The agent detects your project's language (TypeScript/JavaScript, Python, or gen
 - **Export as PNG** -- Export dependency graph as PNG images (requires Python matplotlib + networkx)
 - **Impact analysis** -- Show which modules are affected by recent file changes
 - **Search (GraphRAG)** -- Find modules by semantic query using summaries and graph context (requires graphRAGEnabled)
+- **Repair (CGIG)** -- Compilation-Guided Iterative Graph-retrieval for automated error resolution (requires cgigEnabled)
 - **Verify** -- Test connectivity and data integrity of graph DB
 - **Teardown** -- Stop graph DB container or clean up cloud resources
 
@@ -187,11 +188,26 @@ Three backends are supported:
 
     - **Reverse Engineering** builds the initial graph from existing code (brownfield projects)
     - **Code Generation** updates the graph incrementally per unit with post-update integrity verification (node count, circular dependency check, cross-unit edge resolution)
-    - **Build & Test** uses impact analysis for prioritized test execution -- direct changes first (P1), 1-hop dependents second (P2), then the full suite (P3)
+    - **Build & Test** uses impact analysis for prioritized test execution -- direct changes first (P1), 1-hop dependents second (P2), then the full suite (P3), and CGIG runs compilation repair loop when cgigEnabled
 
     The orchestrator manages graph DB lifecycle: initialization before the first graph operation, health checks between stages, serialized updates during parallel execution, and a teardown offer at workflow completion. All graph operations are non-blocking -- failures log warnings and continue the workflow. You can retry any graph operation later with `/aidlc-graph`.
 
     **GraphRAG (optional):** When `graphRAGEnabled: true` is selected during Workflow Planning, module summaries (purpose, keywords, architectural layer) and community structure are generated alongside the dependency graph. This enables semantic code search via `/aidlc-graph search` -- finding modules by what they do, not just their file path. No external embedding models or vector databases required.
+
+    **CGIG (optional):** When you select a CGIG or Hybrid graph construction method during Workflow Planning, the dependency graph is enriched with class-level properties (constructors, methods, fields, type hierarchy). If compilation fails during Build & Test, a repair loop queries the graph for fix suggestions:
+
+    1. Compilation errors are parsed and classified into 10 categories (cannot_find_symbol, incompatible_types, missing_method, etc.)
+    2. Per-category graph queries find relevant modules, methods, and type relationships
+    3. Each suggestion gets a confidence score (0.2--0.9)
+    4. High-confidence fixes are applied automatically; low-confidence ones are skipped
+    5. The process repeats until compilation succeeds or max rounds are exhausted
+
+    Four graph construction methods are available:
+
+    - **Static** (default) -- Standard dependency graph with exports, imports, LOC
+    - **CGIG** -- Enriched with constructors, methods, fields, type hierarchy
+    - **Lightweight** -- Import-only graph, fastest for large codebases
+    - **Hybrid** -- Static base, CGIG enrichment added on-demand when errors occur
 
 !!! note "Graph Storage"
     File-based graphs are stored in `aidlc-docs/graph/dependency-graph.json`. Neo4j and Neptune backends store data in the graph database with a local summary at `aidlc-docs/graph/graph-summary.md`. Mermaid visualizations are generated at `aidlc-docs/graph/dependency-graph.md`. PNG exports (three views: full graph, community architecture, impact analysis) are saved to `aidlc-docs/graph/`. Neptune IaC files go to `aidlc-docs/graph/infra/`.

@@ -153,6 +153,73 @@ Ask via AskUserQuestion:
 If "Yes", record `graphRAGEnabled: true` in graph configuration.
 If "No", record `graphRAGEnabled: false`.
 
+### Tier 2.25: Graph Construction Method (only if graphEnabled: true)
+
+Ask via AskUserQuestion:
+
+```
+"Which graph construction method should be used?"
+
+- Static analysis (Recommended)
+  "Full AST-based dependency graph with exports, imports, and LOC — default and most complete"
+
+- CGIG (Compilation-Guided)
+  "Class-level enriched graph with constructors, methods, fields, and type hierarchy — optimized for compilation error repair"
+
+- Lightweight
+  "Import-only graph with minimal overhead — fastest construction, suitable for large codebases"
+
+- Hybrid
+  "Static base graph with CGIG reactive expansion on compilation failures — balanced approach"
+```
+
+Record the selection:
+```markdown
+- graphConstructionMethod: static | cgig | lightweight | hybrid
+```
+
+**If CGIG or Hybrid is selected**, ask follow-up questions via AskUserQuestion:
+
+**Q1 — Max repair rounds:**
+```
+"Maximum CGIG repair rounds per compilation failure?"
+
+- 3 rounds (Recommended)
+  "Up to 3 compile→parse→query→fix cycles before giving up"
+
+- 5 rounds
+  "More attempts for complex codebases with deep dependency chains"
+
+- 1 round
+  "Single attempt — fastest, suitable for well-structured code"
+```
+
+**Q2 — Confidence threshold:**
+```
+"Minimum confidence score for CGIG repair suggestions?"
+
+- 0.6 (Recommended)
+  "Accept repair suggestions with 60%+ confidence — balanced precision/recall"
+
+- 0.4
+  "Accept lower-confidence suggestions — more aggressive repairs"
+
+- 0.8
+  "Only accept high-confidence suggestions — conservative, fewer false fixes"
+```
+
+Record CGIG configuration:
+```markdown
+- cgigEnabled: true
+- cgigMaxRounds: 3 | 5 | 1
+- cgigConfidenceThreshold: 0.6 | 0.4 | 0.8
+```
+
+**If Static or Lightweight is selected**, record:
+```markdown
+- cgigEnabled: false
+```
+
 ### Tier 3a: Neo4j Local Configuration (only if graphBackend: neo4j)
 
 Ask via AskUserQuestion (multi-select NOT needed, ask sequentially):
@@ -347,6 +414,9 @@ When graphEnabled is true, annotate the execution plan:
 - Reverse Engineering: "includes dependency graph construction"
 - Code Generation: "includes real-time graph updates"
 - Build & Test: "includes graph-based impact analysis"
+
+When cgigEnabled is true, additionally annotate:
+- Build & Test: "includes CGIG compilation repair loop"
 
 When graphRAGEnabled is true, additionally annotate:
 - Reverse Engineering: "includes GraphRAG summary generation and community detection"

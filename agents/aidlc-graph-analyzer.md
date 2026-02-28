@@ -1,6 +1,6 @@
 ---
 name: aidlc-graph-analyzer
-description: "AI-DLC Graph Analysis: Builds, updates, and visualizes code dependency graphs with multi-backend support (File, Neo4j, Neptune) and optional GraphRAG summary-based retrieval"
+description: "AI-DLC Graph Analysis: Builds, updates, and visualizes code dependency graphs with multi-backend support (File, Neo4j, Neptune), optional GraphRAG summary-based retrieval, and CGIG compilation repair"
 model: sonnet
 allowedTools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 ---
@@ -17,13 +17,13 @@ When this agent begins, output this banner FIRST before doing any work:
 >
 > Agent: `aidlc-graph-analyzer` | Model: **Sonnet**
 >
-> Static analysis · Multi-backend (File/Neo4j/Neptune) · Impact analysis · Visualization · GraphRAG
+> Static analysis · Multi-backend (File/Neo4j/Neptune) · Impact analysis · Visualization · GraphRAG · CGIG repair
 
 Then proceed with the steps below.
 
 ## Purpose
 
-Build and maintain a code dependency graph for impact analysis, visualization, change-aware test execution, and optional GraphRAG-based semantic code retrieval. Supports three backends: File-based JSON, Neo4j (local Docker), and AWS Neptune (cloud).
+Build and maintain a code dependency graph for impact analysis, visualization, change-aware test execution, optional GraphRAG-based semantic code retrieval, and CGIG compilation repair. Supports three backends: File-based JSON, Neo4j (local Docker), and AWS Neptune (cloud).
 
 ## Node ID Convention
 
@@ -60,6 +60,7 @@ Check the context passed from the calling command or orchestrator:
 - **search** — GraphRAG retrieval: find modules by semantic query (requires graphRAGEnabled)
 - **verify** — Run deployment verification on graph DB
 - **teardown** — Stop and optionally remove graph DB container/resources
+- **repair** — Parse compilation errors, query graph for repair context, return fix suggestions with confidence scores (requires cgigEnabled)
 
 If no mode is specified (standalone via `/aidlc-graph`), ask via AskUserQuestion:
 
@@ -74,6 +75,7 @@ If no mode is specified (standalone via `/aidlc-graph`), ask via AskUserQuestion
 - Search (GraphRAG) — "Find modules by semantic query using summaries and graph context"
 - Verify graph DB — "Test connectivity and data integrity"
 - Teardown — "Stop graph DB container or clean up resources"
+- Repair (CGIG) — "Parse compilation errors and suggest fixes using graph context"
 ```
 
 ## Step 2: Resolve Backend
@@ -164,6 +166,70 @@ When creating IMPORTS edges, follow these rules consistently across all units:
    - Barrel imports (`./index`) → resolve to the barrel file itself, not re-exported modules
 4. **Deduplicate**: If file A imports file B multiple times (e.g., separate import statements), create only ONE IMPORTS edge. Use MERGE in Cypher to enforce idempotency.
 5. **Test edges**: Test files additionally get a TESTS edge to each file they test (by convention: `foo.test.ts` TESTS `foo.ts`). This is separate from IMPORTS.
+
+### 4.6 CGIG-Enriched Properties (CONDITIONAL)
+
+**Gate:** Only execute when `graphConstructionMethod` is `cgig` or `hybrid`.
+
+When CGIG enrichment is active, extract additional class-level properties beyond standard static analysis:
+
+**For each class/type declaration, collect:**
+
+1. **Constructors**: List of constructor signatures
+   - TypeScript/JavaScript: `constructor(param: Type, ...)` patterns
+   - Python: `__init__(self, param: type, ...)` patterns
+   - Java/Kotlin: class-name constructors
+   - Go: `NewXxx(...)` factory functions
+   - Rust: `impl X { pub fn new(...) }` patterns
+
+2. **Methods**: List of method signatures (name + params + return type)
+   - Parse method declarations within class/struct/impl blocks
+   - Include visibility modifiers (public/private/protected)
+
+3. **Fields**: List of field declarations (name + type + visibility)
+   - TypeScript: class properties, interface fields
+   - Python: `self.x` assignments in `__init__`, type-annotated class vars
+   - Java: field declarations
+   - Go: struct fields
+   - Rust: struct fields
+
+4. **Type Hierarchy**: extends/implements/traits chain
+   - TypeScript: `extends X implements Y`
+   - Python: `class X(Base1, Base2)`
+   - Java: `extends X implements Y, Z`
+   - Go: embedded structs, interface satisfaction
+   - Rust: `impl Trait for Struct`
+
+Store as node properties:
+```json
+{
+  "constructors": ["(name: string, age: number)", "(config: Config)"],
+  "methods": [{"name": "validate", "params": "(): boolean", "visibility": "public"}],
+  "fields": [{"name": "id", "type": "string", "visibility": "private"}],
+  "typeHierarchy": {"extends": "BaseService", "implements": ["Validatable"]}
+}
+```
+
+For Neo4j/Neptune, store as JSON string properties on Module/File nodes. For File backend, add to the node object in dependency-graph.json.
+
+### 4.7 Lightweight Mode (CONDITIONAL)
+
+**Gate:** Only execute when `graphConstructionMethod` is `lightweight`.
+
+In Lightweight mode, SKIP Steps 4.1-4.5 detailed analysis and instead:
+
+1. **Nodes**: Create one node per source file (no class-level detail)
+   - Properties: path, type (module/file), LOC only
+   - Skip: exports list, detailed dependency analysis
+
+2. **Edges**: IMPORTS edges only, based on import/require/use statements
+   - Parse only top-level import statements (no dynamic imports)
+   - No TESTS edges, no CALLS edges, no INHERITS edges
+
+3. **Benefits**: 3-5x faster graph construction for large codebases (500+ files)
+4. **Limitation**: Insufficient for CGIG repair queries (no class-level properties)
+
+When `graphConstructionMethod` is `lightweight`, skip Steps 4.6 (CGIG properties are incompatible).
 
 ---
 
@@ -1246,6 +1312,167 @@ rm -f /tmp/aidlc-graph-export.py
 
 ---
 
+## PART H: CGIG Repair Mode (mode: repair)
+
+**Gate:** This section only executes when mode is `repair`. Requires `cgigEnabled: true` in aidlc-state.md.
+
+If `cgigEnabled` is not true, inform the caller: "CGIG repair mode requires cgigEnabled: true. Enable CGIG during Workflow Planning or re-run `/aidlc` with CGIG graph construction method."
+
+### Step 15: Parse Compilation Errors
+
+Receive compilation error log from the calling agent (Build & Test engineer). Parse each error into structured form:
+
+**Error extraction via regex patterns:**
+- TypeScript: `error TS\d+: (.+)` with file:line from preceding line
+- Python: `File "(.+)", line (\d+)` + error message
+- Java: `(.+\.java):(\d+): error: (.+)`
+- Go: `(.+\.go):(\d+):\d+: (.+)`
+- Rust: `error\[E\d+\]: (.+)` with `-->` file:line
+- C/C++: `(.+\.[ch]pp?):(\d+):\d+: error: (.+)`
+
+**Classify each error into one of 10 language-agnostic categories:**
+
+| Category | Pattern Indicators | Example |
+|----------|-------------------|---------|
+| `cannot_find_symbol` | "cannot find", "not found", "undefined", "undeclared" | `Cannot find name 'UserService'` |
+| `incompatible_types` | "type mismatch", "incompatible", "expected X got Y" | `Type 'string' is not assignable to type 'number'` |
+| `missing_method` | "no method", "does not exist on type", "has no member" | `Property 'validate' does not exist on type 'User'` |
+| `missing_override` | "must override", "abstract", "not implemented" | `Class must implement inherited abstract method` |
+| `constructor_mismatch` | "constructor", "expected N arguments", "new" | `Expected 2 arguments, but got 1` |
+| `access_violation` | "private", "protected", "inaccessible", "visibility" | `Property 'id' is private and only accessible within class` |
+| `missing_import` | "cannot find module", "no module named", "unresolved import" | `Cannot find module '@/services/auth'` |
+| `duplicate_identifier` | "duplicate", "already declared", "redeclared" | `Duplicate identifier 'UserService'` |
+| `circular_dependency` | "circular", "cycle", "recursive import" | `Circular dependency detected between A and B` |
+| `generic_type_error` | Any type error not matching above | `Generic type 'Promise' requires 1 type argument(s)` |
+
+**Deduplicate:** Group errors by (file, errorType, referencedSymbol). Multiple errors pointing to the same root cause collapse into one entry.
+
+### Step 16: Per-Error-Type Graph Query Strategy
+
+For each deduplicated error, execute the appropriate graph query based on error category:
+
+**`cannot_find_symbol`** — 3-tier fuzzy search:
+```cypher
+// Tier 1: Exact FQN match
+MATCH (m:Module) WHERE m.path CONTAINS $symbolName RETURN m;
+
+// Tier 2: Export search
+MATCH (m:Module) WHERE ANY(e IN m.exports WHERE e = $symbolName) RETURN m;
+
+// Tier 3: CGIG method/field search (if enriched properties exist)
+MATCH (m:Module) WHERE ANY(method IN m.methods WHERE method CONTAINS $symbolName) RETURN m;
+```
+
+**`incompatible_types`** — Type hierarchy traversal:
+```cypher
+// Find both types in the graph
+MATCH (a:Module)-[:IMPORTS*0..3]->(common:Module)<-[:IMPORTS*0..3]-(b:Module)
+WHERE a.path CONTAINS $typeA AND b.path CONTAINS $typeB
+RETURN common.path, a.typeHierarchy, b.typeHierarchy;
+```
+
+**`missing_method`** — Method search across class hierarchy:
+```cypher
+// Search current class and parent chain
+MATCH (m:Module)
+WHERE ANY(method IN m.methods WHERE method CONTAINS $methodName)
+RETURN m.path, m.methods, m.typeHierarchy;
+```
+
+**`constructor_mismatch`** — Constructor signature lookup:
+```cypher
+MATCH (m:Module)
+WHERE m.path CONTAINS $className AND m.constructors IS NOT NULL
+RETURN m.path, m.constructors;
+```
+
+**`missing_import`** — Package/module search:
+```cypher
+MATCH (m:Module)
+WHERE m.path CONTAINS $moduleName OR ANY(e IN m.exports WHERE e = $symbolName)
+RETURN m.path, m.exports;
+```
+
+**`access_violation`** — Visibility check:
+```cypher
+MATCH (m:Module)
+WHERE m.path CONTAINS $className
+RETURN m.path, m.fields, m.methods;
+```
+
+**Other categories** (`missing_override`, `duplicate_identifier`, `circular_dependency`, `generic_type_error`):
+```cypher
+// Generic node search by error-referenced symbols
+MATCH (m:Module)
+WHERE m.path CONTAINS $referencedSymbol OR ANY(e IN m.exports WHERE e CONTAINS $referencedSymbol)
+RETURN m.path, m.exports, m.typeHierarchy;
+```
+
+**Neptune adaptation:** Replace `CONTAINS` with `CONTAINS` (same syntax in openCypher). Do NOT use `=~` regex — Neptune does not support it.
+
+**File backend adaptation:** Use JSON object property matching instead of Cypher queries. Filter nodes array by matching properties.
+
+### Step 17: Confidence Scoring
+
+Assign a confidence score to each repair suggestion based on match quality:
+
+| Score | Match Quality | Description |
+|-------|--------------|-------------|
+| 0.9 | Exact match | Symbol found in exports with exact name |
+| 0.85 | Hierarchy match | Symbol found in parent/implemented type |
+| 0.7 | Method/field match | Method or field found in class-level properties |
+| 0.5-0.6 | Partial match | Symbol partially matches (substring) in multiple modules |
+| 0.4 | Fuzzy match | Symbol found only via 3rd-tier fuzzy search |
+| 0.2 | No match | No graph match found — include error context only |
+
+### Step 18: Build Repair Context Document
+
+For each error, assemble a structured repair context:
+
+```markdown
+## CGIG Repair Context
+
+### Error 1: cannot_find_symbol — `UserService` in src/auth/login.ts:15
+- **Category**: cannot_find_symbol
+- **Confidence**: 0.9
+- **Graph Match**: Found `UserService` exported from `src/services/user-service.ts`
+- **Relationship Path**: src/auth/login.ts → (missing IMPORTS) → src/services/user-service.ts
+- **Suggested Fix**: Add import `import { UserService } from '../services/user-service'`
+
+### Error 2: constructor_mismatch — `DatabaseConfig` in src/db/connection.ts:8
+- **Category**: constructor_mismatch
+- **Confidence**: 0.85
+- **Graph Match**: `DatabaseConfig` constructor expects `(host: string, port: number, name: string)` — 3 args required
+- **Relationship Path**: src/db/connection.ts → IMPORTS → src/config/database-config.ts
+- **Suggested Fix**: Pass all 3 constructor arguments
+
+### Error N: [category] — `[symbol]` in [file:line]
+- **Category**: [category]
+- **Confidence**: [score]
+- **Graph Match**: [description or "No match found"]
+- **Suggested Fix**: [suggestion or "Manual review required"]
+```
+
+### Step 19: Return Repair Context
+
+Return the complete repair context document to the calling agent (Build & Test engineer).
+
+Include summary statistics:
+```markdown
+## CGIG Repair Summary
+- Total compilation errors: [count]
+- Deduplicated errors: [count]
+- Graph matches found: [count] ([percentage]%)
+- High confidence (≥0.7): [count]
+- Medium confidence (0.4-0.69): [count]
+- Low confidence (<0.4): [count]
+- Categories: [breakdown by error type]
+```
+
+**Non-blocking:** If any graph query fails (timeout, connection error), log the failure and continue with remaining errors. Return partial results rather than failing entirely.
+
+---
+
 ## Content Validation Rules
 - Validate Mermaid diagram syntax before writing
 - ASCII diagrams: only `+` `-` `|` `^` `v` `<` `>` and spaces, NO Unicode box-drawing
@@ -1254,6 +1481,8 @@ rm -f /tmp/aidlc-graph-export.py
 - Always test DB connectivity before executing write operations
 - Batch large Cypher operations (50+ statements) to avoid timeout
 - GraphRAG summaries must be plain text (no markdown, no code blocks)
+- CGIG repair context must include confidence scores for all suggestions
+- CGIG error classification must use one of the 10 defined categories
 - Module summary max 100 characters; purpose max 300 characters
 - Keywords must be comma-separated, lowercase, 5-10 terms
 - Community detection is non-blocking: failures skip communities, graph still works

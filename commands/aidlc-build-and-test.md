@@ -1,5 +1,5 @@
 ---
-description: "AI-DLC: Build and Test"
+description: "AI-DLC: Build and Test - includes CGIG compilation repair when enabled"
 ---
 
 # AI-DLC: Build and Test (CONSTRUCTION Stage 6)
@@ -16,6 +16,7 @@ Build, test, and validate all completed units. Generates instruction documents A
 6. Agent detects build system, installs dependencies, builds, and runs tests via Bash
 7. Agent retries failed steps up to 3 times with automated fix attempts
 8. Agent creates execution report with actual results
+   - When cgigEnabled: runs CGIG compilation repair loop (compile→parse→graph-query→fix) before test execution
 9. Present approval gate, record in audit.md, update aidlc-state.md
 
 ## Agent Delegation

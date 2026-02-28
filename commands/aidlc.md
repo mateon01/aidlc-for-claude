@@ -332,6 +332,10 @@ When `graphEnabled: true` is set in the execution plan (from Workflow Planning S
 - graphPath: aidlc-docs/graph/dependency-graph.json
 - graphInitialized: true/false
 - graphVerification: standard | full | skip
+- graphConstructionMethod: static | cgig | lightweight | hybrid
+- cgigEnabled: true/false
+- cgigMaxRounds: 3
+- cgigConfidenceThreshold: 0.6
 - lastGraphUpdate: <ISO 8601 timestamp>
 # Neo4j-specific (when graphBackend: neo4j)
 - neo4jEndpoint: bolt://localhost:7687
@@ -349,15 +353,16 @@ When `graphEnabled: true` is set in the execution plan (from Workflow Planning S
 ```
 
 2. Pass graph configuration context to downstream agents:
-   - **Reverse Engineer** (INCEPTION Stage 2) — triggers Step 9.5 graph construction (pass backend type + connection details)
-   - **Code Generator** (CONSTRUCTION Stage 5) — triggers Step 14.7 graph update (pass backend type + connection details)
-   - **Build & Test** (CONSTRUCTION Stage 6) — triggers Step 10.5 impact analysis (pass backend type + connection details)
+   - **Reverse Engineer** (INCEPTION Stage 2) — triggers Step 9.5 graph construction (pass backend type + connection details + graphConstructionMethod)
+   - **Code Generator** (CONSTRUCTION Stage 5) — triggers Step 14.7 graph update (pass backend type + connection details + graphConstructionMethod)
+   - **Build & Test** (CONSTRUCTION Stage 6) — triggers Step 10.5 impact analysis + CGIG repair loop when cgigEnabled (pass backend type + connection details + CGIG config)
    - **Orchestrator itself** — manages DB lifecycle: initialization before first graph op, health checks between stages, parallel coordination, teardown offer at completion
 
 3. When graphEnabled is true, stage banners should indicate graph status:
 ```
 > Graph: **Enabled** ([backend]) — dependency tracking active
 > GraphRAG: **Enabled** / **Disabled** — summary-based code retrieval
+> CGIG: **Enabled** / **Disabled** — compilation-guided repair loop
 ```
 
 4. After workflow completion, include graph statistics in the final summary when graph was enabled:

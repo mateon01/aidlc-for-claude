@@ -54,6 +54,41 @@ For Neo4j and Neptune backends, additional configuration questions cover ports, 
 
 The recommendation is context-aware: enabled by default for complex brownfield changes and multi-unit greenfield projects, disabled for simple changes.
 
+During Workflow Planning, you also select a **graph construction method** (Tier 2.25):
+
+- **Static** (default) -- Full AST-based graph with exports, imports, and LOC
+- **CGIG** -- Class-level enriched with constructors, methods, fields, and type hierarchy -- optimized for compilation error repair
+- **Lightweight** -- Import-only graph with minimal overhead -- fastest for large codebases
+- **Hybrid** -- Static base with CGIG reactive expansion on compilation failures
+
+When CGIG or Hybrid is selected, additional configuration covers max repair rounds (default 3) and confidence threshold (default 0.6).
+
+#### Graph Construction Methods in Detail
+
+The graph construction method determines what information is extracted from source code and stored as graph node properties. This directly affects which repair strategies are available during Build & Test.
+
+| Method | Nodes | Edges | Class-Level Properties | Best For |
+|:-------|:------|:------|:----------------------|:---------|
+| **Static** | Files + Modules | IMPORTS + TESTS | Exports, LOC | General dependency analysis, impact assessment |
+| **CGIG** | Files + Modules | IMPORTS + TESTS | Exports, LOC, constructors, methods, fields, type hierarchy | Compilation error repair, type-aware analysis |
+| **Lightweight** | Files only | IMPORTS only | LOC only | Large codebases (500+ files), fast setup |
+| **Hybrid** | Static base | Static base | Static base + CGIG on failure | Balanced: fast start, enriched when needed |
+
+**Static** is the default and recommended for most projects. It extracts file-level dependencies (imports, exports) and creates a standard dependency graph sufficient for impact analysis and visualization.
+
+**CGIG** enriches each module node with class-level properties:
+
+- **Constructors**: Signatures of all constructors/`__init__`/factory functions
+- **Methods**: Method name, parameters, return type, and visibility
+- **Fields**: Field name, type, and visibility (public/private/protected)
+- **Type hierarchy**: Extends/implements/traits chain
+
+These properties enable the CGIG repair mode to perform targeted graph queries per error type. For example, a `constructor_mismatch` error triggers a constructor signature lookup in the graph, while a `missing_method` error searches the method list across the class hierarchy.
+
+**Lightweight** creates a minimal graph for large codebases where full static analysis would be too slow. It parses only top-level import statements and creates one node per file with no class-level detail. This is 3-5x faster than Static but insufficient for CGIG repair queries.
+
+**Hybrid** starts with a Static graph and reactively enriches specific modules with CGIG properties only when compilation errors occur. This avoids the upfront cost of full CGIG extraction while still enabling repair capabilities on demand.
+
 ### Stage 6: Application Design (Conditional)
 
 Designs component architecture, service layers, and inter-service dependencies across 10 mandatory categories (Component Identification, Methods, Service Layer, Dependencies, Design Patterns, Scalability, Data Architecture, Security Architecture, Error Handling Strategy, API Design). Minimum 10 questions. Critical architectural choices (monolith vs microservices, DB type, communication pattern) use interactive Q&A. Produces design documents with ASCII diagrams.
@@ -134,6 +169,35 @@ When dependency graph analysis is enabled (`graphEnabled: true`), an **impact an
 
 Test execution follows priority order. If P1 fails, P2 and P3 still run for completeness. If P1+P2 pass but P3 fails, the report highlights the unexpected transitive effect.
 
+When CGIG is enabled (`cgigEnabled: true`) and compilation fails, a **CGIG repair loop** runs before test execution. The loop (up to `cgigMaxRounds`):
+
+1. Parses compilation errors into 10 language-agnostic categories (cannot_find_symbol, incompatible_types, missing_method, etc.)
+2. Queries the dependency graph for repair context using per-error-type strategies
+3. Scores each suggestion by confidence (0.2-0.9)
+4. Filters by `cgigConfidenceThreshold` and delegates targeted fixes to the code generator
+5. Recompiles and checks -- repeats until success or rounds exhausted
+
+CGIG is non-blocking: failures log warnings and continue to test execution.
+
+#### CGIG Error Categories and Graph Query Strategies
+
+The CGIG repair mode classifies compilation errors into 10 language-agnostic categories, each with a specialized graph query strategy:
+
+| Category | Graph Query Strategy | Confidence Range |
+|:---------|:--------------------|:-----------------|
+| `cannot_find_symbol` | 3-tier fuzzy search: exact FQN, then exports, then method/field names | 0.4 -- 0.9 |
+| `incompatible_types` | Type hierarchy traversal to find common ancestors and valid cast paths | 0.5 -- 0.85 |
+| `missing_method` | Method search across class hierarchy (current class, superclasses, interfaces) | 0.5 -- 0.85 |
+| `constructor_mismatch` | Constructor signature lookup in target class node properties | 0.7 -- 0.9 |
+| `missing_import` | Package/module search by symbol name across all module exports | 0.7 -- 0.9 |
+| `access_violation` | Visibility check on matched fields/methods | 0.5 -- 0.7 |
+| `missing_override` | Abstract method search in parent types | 0.5 -- 0.85 |
+| `duplicate_identifier` | Namespace collision detection across modules | 0.4 -- 0.7 |
+| `circular_dependency` | Cycle detection in import graph | 0.7 -- 0.9 |
+| `generic_type_error` | Generic symbol search by referenced names | 0.2 -- 0.6 |
+
+The confidence threshold (default 0.6) filters suggestions before passing them to the code generator. Higher thresholds (0.8) produce fewer but more reliable fixes; lower thresholds (0.4) attempt more aggressive repairs.
+
 After all units are complete, generates build instructions and test plans, then **executes actual builds and tests**. The agent detects the project's build system (npm, pip, cargo, etc.), installs dependencies, runs a **dependency security scan**, runs the build, executes tests **with coverage tracking**, and generates **integration tests** for multi-unit projects. Failed builds are retried up to 3 times with automated fix attempts. For web applications, an optional **E2E test scaffold** (Playwright/Cypress) can be generated.
 
 ### Operations
@@ -173,13 +237,13 @@ These commands can be run independently of the three-phase workflow at any time:
 |:--------|:------------|
 | `/aidlc-review-pr` | Analyze PR diffs or local changes for code quality, security, performance, and consistency |
 | `/aidlc-ci-setup` | Generate CI/CD pipelines, PR review workflows, and issue/PR templates for any project |
-| `/aidlc-graph` | Build, update, visualize, or analyze code dependency graphs |
+| `/aidlc-graph` | Build, update, visualize, repair, or analyze code dependency graphs |
 
 The **PR review** utility performs a 6-category analysis (correctness, security, performance, consistency, testing, documentation) and presents a structured report with per-file findings and a verdict.
 
 The **CI setup** utility detects your project's tech stack automatically and generates selected infrastructure files (CI/CD pipeline, PR review workflow, issue templates, PR template). It also provides branch protection recommendations.
 
-The **graph analysis** utility supports eight modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), export (PNG images via Python networkx+matplotlib), impact analysis (affected module detection with test prioritization), search (GraphRAG semantic code retrieval), verify (9-point DB health check), and teardown (stop/remove graph DB). It supports three backends: File-based JSON, Neo4j (local Docker with Cypher), and AWS Neptune (managed graph DB with IaC provisioning). When GraphRAG is enabled (`graphRAGEnabled: true`), module summaries (purpose, keywords, architectural layer) and community structure are generated alongside the dependency graph -- no external embedding models required. Neo4j uses full-text indexes for search; File backend uses keyword matching. E2E verified with Neo4j backend on a 15-module TypeScript project -- 15 nodes, 41 edges loaded, all 9 verification checks passed, hub analysis identified critical modules, and impact analysis correctly traced direct and transitive dependencies.
+The **graph analysis** utility supports nine modes: build (full static analysis), update (incremental), visualize (Mermaid diagram), export (PNG images via Python networkx+matplotlib), impact analysis (affected module detection with test prioritization), search (GraphRAG semantic code retrieval), repair (CGIG compilation error resolution), verify (9-point DB health check), and teardown (stop/remove graph DB). It supports three backends: File-based JSON, Neo4j (local Docker with Cypher), and AWS Neptune (managed graph DB with IaC provisioning). When GraphRAG is enabled (`graphRAGEnabled: true`), module summaries (purpose, keywords, architectural layer) and community structure are generated alongside the dependency graph -- no external embedding models required. Neo4j uses full-text indexes for search; File backend uses keyword matching. E2E verified with Neo4j backend on a 15-module TypeScript project -- 15 nodes, 41 edges loaded, all 9 verification checks passed, hub analysis identified critical modules, and impact analysis correctly traced direct and transitive dependencies.
 
 All graph node IDs follow a strict normalization convention for consistency across units and queries: `u-{NN}` for units (lowercase, zero-padded), `mod-{kebab-name}` for modules, `file-{kebab-name}` for files, `comm-{kebab-name}` for communities, and `summary-{parent-id}` for summaries. IDs are always lowercase, hyphen-separated, and type-prefixed.
 

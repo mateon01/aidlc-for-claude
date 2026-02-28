@@ -95,6 +95,7 @@ When graphEnabled is true:
    - Pass: changed file list, unit name
    - The analyzer re-parses only changed files and updates the graph incrementally
    - Ensure all node IDs follow the convention: `u-{NN}` for units (lowercase, zero-padded), `mod-{name}` for modules, `file-{name}` for files — see graph-analyzer Node ID Convention
+   - Pass graphConstructionMethod so the graph-analyzer applies the correct property extraction level during update.
 3. Log the graph update summary:
 
 ```markdown
@@ -144,6 +145,31 @@ After graph-analyzer returns from update mode:
    - If graph-analyzer fails: log warning, continue code generation
    - Graph update is informational, NOT a blocking gate
    - User can manually update later with `/aidlc-graph update`
+
+## Step 14.8: CGIG-Augmented Regeneration (CONDITIONAL)
+
+**Gate:** Only execute when this code generation was triggered by the CGIG repair loop (Build & Test Step 10.7).
+
+When the code-generator is called with a `repairContext` parameter (from CGIG repair loop):
+
+1. Read the repair context document containing:
+   - Error locations (file:line)
+   - Error categories (10 types)
+   - Graph-matched suggestions with confidence scores
+   - Relationship paths from the dependency graph
+
+2. For each error with confidence >= threshold:
+   - Apply the suggested fix to the referenced file
+   - If the fix involves adding an import: verify the target module exists in the workspace
+   - If the fix involves changing a type: verify type compatibility via the repair context's type hierarchy data
+
+3. For errors with confidence < threshold:
+   - Skip automated fix
+   - Add a `// CGIG: manual review needed — [error description]` comment at the error location
+
+4. After applying fixes, re-run the quality gate (Step 13) on modified files only
+
+**Non-blocking:** If repair context is empty or all suggestions are below threshold, return without changes.
 
 ## Step 15: Code Quality Check
 Before presenting results to the user, run a quick quality check via Bash:
