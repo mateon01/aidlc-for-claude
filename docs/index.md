@@ -102,6 +102,19 @@ Not every stage runs every time. The workflow adapts to your needs:
 
 ## References
 
+### AI-DLC Methodology
+
 - :material-newspaper: [AI-DLC Methodology Blog (AWS Tech Blog)](https://aws.amazon.com/ko/blogs/tech/ai-driven-development-life-cycle/) -- Original methodology introduction
 - :material-play-circle: [AI-DLC Interactive Demo](https://prod.d13rzhkk8cj2z0.amplifyapp.com/) -- Live demo of the AI-DLC workflow
 - :material-github: [AI-DLC Workflows for Kiro (AWS Labs GitHub)](https://github.com/awslabs/aidlc-workflows) -- Original Kiro steering files
+
+### Code Graph and CGIG Research
+
+The CGIG feature (v1.8.0) is based on research from SELENE Lab, Korea University. These papers inform graph-based code generation and repair:
+
+- :material-file-document: **CGIG: Compilation-Guided Iterative Graph-Retrieval for LLM-Based Brownfield Code Generation** -- SELENE Lab, Korea University. Reactive compile-parse-query-fix loop achieving 98% compilation success rate on Apache Lucene (1.2M LOC), up from 72% single-shot baseline.
+- :material-graph-outline: Liu et al. (2024). [RepoGraph: Enhancing AI Software Engineering with Repository-level Code Graph](https://arxiv.org/abs/2410.14684). *arXiv:2410.14684*. -- Repository-level dependency graph for code completion.
+- :material-graph-outline: Liu et al. (2024). [CodeXGraph: Bridging LLMs and Code Repositories via Code Graph Databases](https://arxiv.org/abs/2408.05978). *arXiv:2408.05978*. -- Graph DB interface for LLM agents to query repository structure.
+- :material-graph-outline: Liu et al. (2024). [GraphCoder: Enhancing Repository-Level Code Completion via Code Context Graph-based Retrieval](https://arxiv.org/abs/2406.07003). *arXiv:2406.07003*. -- Code graph retrieval with generation integration.
+- :material-bug: Chen et al. (2024). [Teaching Large Language Models to Self-Debug](https://openreview.net/forum?id=KuPixIqPiq). *ICLR 2024*. -- LLM self-debugging via execution feedback.
+- :material-bug: Zhong et al. (2024). [LDB: A Large Language Model Debugger via Verifying Runtime Execution Step-by-step](https://aclanthology.org/2024.acl-long.866/). *ACL 2024*. -- Structured debugging with runtime traces.

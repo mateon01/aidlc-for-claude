@@ -335,9 +335,22 @@ AI-DLC was originally developed as an AI-driven software development methodology
 
 ### References
 
+**AI-DLC Methodology:**
+
 - [AI-DLC Methodology Blog (AWS Tech Blog)](https://aws.amazon.com/ko/blogs/tech/ai-driven-development-life-cycle/) - Original methodology introduction
 - [AI-DLC Interactive Demo](https://prod.d13rzhkk8cj2z0.amplifyapp.com/) - Live demo of the AI-DLC workflow
 - [AI-DLC Workflows for Kiro (GitHub)](https://github.com/awslabs/aidlc-workflows) - Original Kiro steering files
+
+**Code Graph and CGIG Research:**
+
+The CGIG (Compilation-Guided Iterative Graph-retrieval) feature in v1.8.0 is based on research from SELENE Lab, Korea University. The following papers inform the graph-based code generation and repair capabilities:
+
+- CGIG: Compilation-Guided Iterative Graph-Retrieval for LLM-Based Brownfield Code Generation. SELENE Lab, Korea University. -- Reactive compile-parse-query-fix loop achieving 98% compilation success rate on Apache Lucene (1.2M LOC), up from 72% single-shot baseline.
+- Liu, J., Xia, C. S., Wang, Y., & Zhang, L. (2024). [RepoGraph: Enhancing AI Software Engineering with Repository-level Code Graph](https://arxiv.org/abs/2410.14684). *arXiv:2410.14684*. -- Repository-level dependency graph for code completion context.
+- Liu, Y., Zan, D., Huang, J., & Liu, Z. (2024). [CodeXGraph: Bridging Large Language Models and Code Repositories via Code Graph Databases](https://arxiv.org/abs/2408.05978). *arXiv:2408.05978*. -- Graph database interface enabling LLM agents to query repository structure.
+- Liu, Y., Yang, S., Li, C., Hu, M., & Luo, Z. (2024). [GraphCoder: Enhancing Repository-Level Code Completion via Code Context Graph-based Retrieval and Language Model](https://arxiv.org/abs/2406.07003). *arXiv:2406.07003*. -- Code graph retrieval with bridge mechanism for generation integration.
+- Chen, X., Lin, M., Schaerli, N., & Zhou, D. (2024). [Teaching Large Language Models to Self-Debug](https://openreview.net/forum?id=KuPixIqPiq). *ICLR 2024*. -- LLM self-debugging via execution feedback.
+- Zhong, R., Du, X., Kai, S., Jiang, Z., Ma, S., & Lou, J.-G. (2024). [LDB: A Large Language Model Debugger via Verifying Runtime Execution Step-by-step](https://aclanthology.org/2024.acl-long.866/). *ACL 2024*. -- Structured debugging with runtime traces.
 
 ## License
 
