@@ -351,6 +351,7 @@ The CGIG (Compilation-Guided Iterative Graph-retrieval) feature in v1.8.0 is bas
 - Liu, Y., Yang, S., Li, C., Hu, M., & Luo, Z. (2024). [GraphCoder: Enhancing Repository-Level Code Completion via Code Context Graph-based Retrieval and Language Model](https://arxiv.org/abs/2406.07003). *arXiv:2406.07003*. -- Code graph retrieval with bridge mechanism for generation integration.
 - Li, J., Shi, X., Zhang, K., Li, G., et al. (2025). [GraphCodeAgent: Dual Graph-Guided LLM Agent for Retrieval-Augmented Repo-Level Code Generation](https://arxiv.org/abs/2504.10046). *arXiv:2504.10046*. -- Dual graph (Requirement Graph + Structural-Semantic Code Graph) for repo-level code generation.
 - Ren, S., Sun, J., Qi, Y., & Wang, Y. (2026). RPG-Encoder: Learning Repository Structure for Code Completion via Graph Encoding. *ICSE 2026*. -- Incremental graph-based representations of repository evolution for code completion.
+- Ke, Y., Dong, J., Luo, Z., & Zhao, Y. (2025). CGM: Compilation-Guided Code Generation with LLMs. *ISSTA 2025*. -- Compilation diagnostics to guide iterative code generation improvements.
 - Chen, X., Lin, M., Schaerli, N., & Zhou, D. (2024). [Teaching Large Language Models to Self-Debug](https://openreview.net/forum?id=KuPixIqPiq). *ICLR 2024*. -- LLM self-debugging via execution feedback.
 - Zhong, R., Du, X., Kai, S., Jiang, Z., Ma, S., & Lou, J.-G. (2024). [LDB: A Large Language Model Debugger via Verifying Runtime Execution Step-by-step](https://aclanthology.org/2024.acl-long.866/). *ACL 2024*. -- Structured debugging with runtime traces.
 
