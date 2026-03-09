@@ -179,6 +179,8 @@ When CGIG is enabled (`cgigEnabled: true`) and compilation fails, a **CGIG repai
 
 CGIG is non-blocking: failures log warnings and continue to test execution.
 
+When database migration files are detected (Alembic, Prisma, Flyway, ActiveRecord), a **migration verification** step runs using an ephemeral database container. It applies migrations (upgrade), tests reversibility (downgrade), and checks for multi-unit conflicts (duplicate tables, conflicting columns). Migration verification is non-blocking and requires Docker.
+
 #### CGIG Error Categories and Graph Query Strategies
 
 The CGIG repair mode classifies compilation errors into 10 language-agnostic categories, each with a specialized graph query strategy:
@@ -226,6 +228,29 @@ The Operations phase can optionally generate an AI-powered PR review workflow (`
 ### Issue and PR Templates
 
 The Operations phase also generates GitHub issue templates (`.github/ISSUE_TEMPLATE/`) and a PR template (`.github/PULL_REQUEST_TEMPLATE.md`) customized to the project's components and conventions. These standardize how contributors report bugs, request features, and describe pull requests.
+
+### Execution Verification
+
+After generating artifacts, the Operations phase verifies they actually work:
+
+- **.env completeness** -- cross-references `.env.example` against code references, reports missing or unused variables
+- **CI pipeline lint** -- validates GitHub Actions YAML with `actionlint` (if available)
+- **IaC validation** -- runs `terraform validate`, `cdk synth`, or CloudFormation validation; checks for cross-unit resource conflicts
+- **Dockerfile build** -- builds the Docker image to verify no syntax or dependency errors; reports image size
+- **Docker Compose config** -- validates service definitions and variable references without starting containers
+
+All verification steps are non-blocking -- failures are reported but do not stop the workflow.
+
+### Post-Deployment Verification
+
+The Operations phase generates a `scripts/verify-deployment.sh` script that performs automated post-deployment checks:
+
+- Health endpoint verification
+- API smoke tests on critical endpoints
+- Response time measurement
+- PASS/FAIL summary with exit code
+
+The deployment checklist also includes rollback triggers (health failures, error rate spikes, latency degradation) with specific thresholds and time windows.
 
 ---
 

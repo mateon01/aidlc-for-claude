@@ -78,9 +78,9 @@ Per-Unit Loop (sequential or parallel):
 Build and Test (after all units)
 ```
 
-### :material-server:{ .lg } OPERATIONS -- Future
+### :material-server:{ .lg } OPERATIONS -- Ship
 
-Deployment, monitoring, and operational concerns. Coming in a future release.
+Deployment checklist, CI/CD pipeline, Dockerfile, environment templates, developer README, and post-deployment verification scripts. Ensures the generated project is immediately deployable and developer-ready.
 
 ---
 

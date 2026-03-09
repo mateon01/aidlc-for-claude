@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI-DLC for Claude Code is a plugin implementing the AI-Driven Development Life Cycle methodology. It provides 19 slash commands and 19 specialized agents that guide structured three-phase software development (INCEPTION, CONSTRUCTION, OPERATIONS).
 
-**Version**: 1.8.0 | **License**: Apache-2.0
+**Version**: 1.9.0 | **License**: Apache-2.0
 
 ## Build & Development
 
@@ -67,7 +67,8 @@ CONSTRUCTION (8 stages): System NFR → per-unit [sequential or parallel]
   (Functional Design → NFR Requirements → NFR Design → Infrastructure Design
   → Code Generation) → Build & Test
 
-OPERATIONS (1 stage): Deployment Checklist + Developer README
+OPERATIONS (1 stage): Deployment Checklist + CI/CD + Dockerfile + Verification
+  (IaC Validation → Docker Build Verify → Post-deployment Script)
 ```
 
 ### Key Patterns

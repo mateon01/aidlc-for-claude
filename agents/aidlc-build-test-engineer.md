@@ -251,6 +251,63 @@ When compilation fails and CGIG is enabled, run a repair loop:
 
 **Non-blocking:** CGIG repair failure does NOT halt the workflow. If the graph-analyzer delegation fails (timeout, crash, DB connectivity), log the error and skip to Step 11.
 
+## Step 10.8: Database Migration Verification (CONDITIONAL)
+
+**Gate:** Skip this step if no migration files are detected in the workspace OR Docker is not available (`docker info` fails).
+
+When migration files exist and Docker is available:
+
+1. **Detect migration framework** via Glob:
+   - `alembic.ini` + `migrations/` → Alembic (Python)
+   - `prisma/schema.prisma` → Prisma (Node.js)
+   - `db/migrate/` → ActiveRecord (Ruby)
+   - `flyway.conf` or `src/main/resources/db/migration/` → Flyway (Java)
+   - If none detected: skip with "no migration framework found"
+
+2. **Start ephemeral database** via Bash:
+   ```bash
+   docker run -d --name aidlc-migration-test \
+     -e POSTGRES_DB=test -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test \
+     -p 15432:5432 postgres:16-alpine
+
+   # Wait for ready
+   until docker exec aidlc-migration-test pg_isready; do sleep 1; done
+   ```
+
+3. **Apply migrations (upgrade)** via Bash:
+   - Alembic: `DATABASE_URL=postgresql://test:test@localhost:15432/test alembic upgrade head`
+   - Prisma: `DATABASE_URL=postgresql://test:test@localhost:15432/test npx prisma migrate deploy`
+   - ActiveRecord: `DATABASE_URL=postgres://test:test@localhost:15432/test rails db:migrate`
+   - Flyway: `flyway -url=jdbc:postgresql://localhost:15432/test -user=test -password=test migrate`
+
+4. **Verify reversibility (downgrade)** via Bash:
+   - Alembic: `alembic downgrade base && alembic upgrade head` (confirms full round-trip)
+   - Prisma: skip (Prisma does not support downgrade — record "NOT SUPPORTED")
+   - ActiveRecord: `rails db:rollback STEP=999 && rails db:migrate`
+   - Flyway: skip (community edition does not support undo — record "NOT SUPPORTED")
+
+5. **Multi-unit conflict check**:
+   - Parse all migration files for table/column definitions via Grep
+   - Detect: duplicate table names across units, conflicting column types for the same column, missing foreign key targets
+   - Record all conflicts found
+
+6. **Cleanup** (always runs, even on failure):
+   ```bash
+   docker rm -f aidlc-migration-test
+   ```
+
+**Execution report addition:**
+```markdown
+## Database Migration Verification
+- Framework: Alembic / Prisma / ActiveRecord / Flyway / None
+- Migration files: [count]
+- Upgrade: SUCCESS / FAILED (error: ...)
+- Downgrade: SUCCESS / FAILED / NOT SUPPORTED
+- Conflict check: CLEAN / [list of conflicts]
+```
+
+**Non-blocking:** Docker not available → skip with "migration verification skipped (Docker not available)". Migration failure → report in execution report, do NOT block Build & Test. Cleanup always runs regardless of outcome.
+
 ## Step 11: Execute Tests
 Run the test command via Bash with coverage flags where possible:
 - Node.js: `npm test -- --coverage` (if Jest) or `npx vitest --coverage` (if Vitest)
@@ -316,6 +373,7 @@ Create `aidlc-docs/construction/build-and-test/execution-report.md` containing:
 - Install result: success/failure + output summary
 - **Security scan result**: vulnerabilities found (high/critical) or "clean" or "skipped (tool not available)"
 - Build result: success/failure + output summary
+- **Migration verification result** (if Step 10.8 ran): framework detected, migration file count, upgrade/downgrade outcome, conflict check result — or "skipped (no migrations)" / "skipped (Docker not available)"
 - Test result: passed count, failed count, skipped count + output summary
 - **Test coverage**: coverage percentage if available, or "not measured"
 - Retry attempts (if any): what was fixed and the outcome

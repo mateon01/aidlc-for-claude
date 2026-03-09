@@ -50,6 +50,42 @@ Write `aidlc-docs/operations/deployment-checklist.md` with:
 - **Deployment Steps**: Ordered list of deployment actions
 - **Rollback Plan**: How to revert if deployment fails
 - **Monitoring Setup**: What to monitor post-deployment
+- **Post-Deployment Verification**: Automated verification after deployment
+- **Rollback Triggers**: Conditions that should trigger an immediate rollback
+
+**Post-Deployment Verification section** — include in deployment-checklist.md:
+
+```markdown
+## Post-Deployment Verification
+- [ ] Run `./scripts/verify-deployment.sh https://your-domain.com`
+- [ ] Verify all health checks pass
+- [ ] Verify API smoke tests pass
+- [ ] Check response latency is within budget
+- [ ] Monitor error rates for 15 minutes after deployment
+```
+
+**Rollback Triggers section** — include in deployment-checklist.md:
+
+```markdown
+## Rollback Triggers
+Initiate rollback if ANY of the following occurs within 15 minutes:
+- Health endpoint returns non-200 for > 30 seconds
+- Error rate exceeds 5% (compared to pre-deployment baseline)
+- P95 latency exceeds 2x pre-deployment baseline
+- Any critical API endpoint returns 5xx
+```
+
+**IaC Deployment Section (CONDITIONAL):**
+
+If IaC files were detected in Step 2.7, add an "Infrastructure Deployment Order" section to the checklist:
+
+```markdown
+## Infrastructure Deployment Order
+- [ ] Apply shared infrastructure first (VPC, networking, IAM)
+- [ ] Apply database infrastructure (RDS, Neptune, ElastiCache)
+- [ ] Apply application infrastructure (ECS/EKS, ALB, API Gateway)
+- [ ] Verify all resources are healthy before deploying application code
+```
 
 **Graph-Enabled Project Additions (CONDITIONAL):**
 
@@ -114,6 +150,24 @@ If `graphEnabled: true` in aidlc-state.md, add graph infrastructure env vars to 
 
 Only include the section matching the configured `graphBackend`. Comment out by default since graph config is infrastructure-level.
 
+### Step 2.3.1: Validate .env Completeness (CONDITIONAL — non-blocking)
+**Skip this step if**: Step 2.3 was skipped OR no `.env.example` was generated.
+
+Cross-reference `.env.example` variables against actual code references:
+1. Extract all variable names from the generated `.env.example` (ignore comments and blank lines)
+2. Scan application source code via Grep for env var usage patterns:
+   - Node.js/TypeScript: `process.env.VAR_NAME`
+   - Python: `os.environ["VAR_NAME"]`, `os.environ.get("VAR_NAME")`, `os.getenv("VAR_NAME")`
+   - Go: `os.Getenv("VAR_NAME")`
+   - Rust: `std::env::var("VAR_NAME")`
+   - Generic: `.env` file loaders, config parsers
+3. Compare the two sets and report:
+   - **Missing from .env.example**: env vars referenced in code but not listed in `.env.example` — add them
+   - **Unused in code**: env vars listed in `.env.example` but not referenced in code — flag for review (may be infrastructure-only vars like `PORT` used by Docker, which is acceptable)
+4. Log results: `✓ .env completeness: X/Y matched` or `⚠ .env completeness: X missing, Y unused`
+
+**Non-blocking**: Completeness gaps are logged but do NOT stop the workflow.
+
 ### Step 2.5: Generate CI/CD Pipeline
 Ask the user which CI platform they use via AskUserQuestion:
 - GitHub Actions (Recommended)
@@ -132,6 +186,21 @@ Pipeline should include:
 - **Test**: exact test command from execution-report.md (with coverage if available)
 - **Security audit**: dependency audit command if available
 - Use the same language/runtime version detected in the project
+
+### Step 2.5.1: Validate CI Pipeline (CONDITIONAL — non-blocking)
+**Skip this step if**: Step 2.5 was skipped OR no CI pipeline file was generated.
+
+Validate the generated CI pipeline configuration:
+1. **GitHub Actions** (`.github/workflows/ci.yml`):
+   - Check if `actionlint` is available via Bash: `actionlint --version`
+   - If available: run `actionlint .github/workflows/ci.yml` via Bash
+     - If valid: log `✓ GitHub Actions workflow lint passed`
+     - If invalid: log the errors, attempt to fix, re-lint once
+   - If not available: skip silently (no warning needed)
+   - If PR review workflow was also generated, validate it too: `actionlint .github/workflows/pr-review.yml`
+2. **GitLab CI** (`.gitlab-ci.yml`): skip validation (no common local linting tool available)
+
+**Non-blocking**: Lint failure is logged but does NOT stop the workflow.
 
 ### Step 2.6: Generate PR Review Workflow (CONDITIONAL)
 
@@ -176,6 +245,33 @@ Generate GitHub issue and PR templates customized to the project:
   - Requiring status checks (CI pipeline, AI review if configured)
   - Protecting the main branch from force pushes
 
+### Step 2.7: Consolidate and Validate IaC (CONDITIONAL)
+**Skip this step if**: No IaC files detected in workspace (no `*.tf`, no `cdk.json`, no `template.yaml`/`template.json`).
+
+When IaC files exist:
+
+**a. Scan** workspace for IaC files via Glob:
+- Terraform: `**/*.tf` files
+- CDK: `cdk.json` + `lib/*.ts` or `lib/*.py`
+- CloudFormation: `template.yaml` / `template.json` / `*-stack.yaml`
+
+**b. Consolidation check** via Read + analysis:
+- Verify shared resources (VPC, subnets, security groups) are defined once, not duplicated per unit
+- Check for port conflicts across services
+- Verify all cross-unit resource references (ARNs, names) are valid
+
+**c. Validate** via Bash (if tools available):
+- Terraform: `terraform init -backend=false && terraform validate`
+- CDK: `npx cdk synth --quiet`
+- CloudFormation: `aws cloudformation validate-template --template-body file://template.yaml`
+- If validation tool not available: skip silently
+
+**d. Generate consolidated deployment order**:
+- Based on unit dependency graph from `aidlc-docs/inception/plans/unit-of-work-dependency.md`
+- Add ordered IaC apply sequence to `deployment-checklist.md`
+
+**Non-blocking**: All validation steps are informational. Failures are reported, not gating.
+
 ### Step 2.8: Generate Dockerfile (CONDITIONAL)
 **Skip this step if**:
 - Infrastructure design specifies "serverless" or "bare metal" deployment
@@ -191,6 +287,20 @@ If applicable, generate `Dockerfile` at the **workspace root**:
 - Expose correct ports from infrastructure-design
 - For multi-unit microservice projects: generate one Dockerfile per independently deployable unit at `{unit-name}/Dockerfile`
 
+### Step 2.8.1: Verify Dockerfile Build (CONDITIONAL — non-blocking)
+**Skip this step if**: Step 2.8 was skipped OR no Dockerfile was generated.
+
+Verify the generated Dockerfile builds successfully:
+1. Check if Docker is available via Bash: `docker --version`
+   - If not available: log `⚠ Docker not found — skipping Dockerfile build verification` and SKIP
+2. Run via Bash: `docker build -t aidlc-verify:latest --target production .`
+   - For multi-unit projects with per-unit Dockerfiles, verify each: `docker build -t aidlc-verify-{unit-name}:latest --target production -f {unit-name}/Dockerfile .`
+   - If build succeeds: report image size via `docker images aidlc-verify:latest --format "{{.Size}}"` and log `✓ Dockerfile build succeeded (image: <size>)`
+   - If build fails: log the error, attempt to fix the Dockerfile, retry (max 2 attempts total)
+3. Cleanup: remove verification images via Bash: `docker rmi aidlc-verify:latest` (and per-unit images if applicable)
+
+**Non-blocking**: Build failure is logged but does NOT stop the workflow.
+
 ### Step 2.9: Generate Docker Compose (CONDITIONAL — multi-unit only)
 **Skip this step if**: single-unit project OR Dockerfile was skipped.
 
@@ -201,6 +311,19 @@ Generate `docker-compose.yml` at the **workspace root**:
 - Map ports, volumes, and networks
 - Reference `.env` file for configuration
 - Add comments explaining each service
+
+### Step 2.9.1: Verify Docker Compose (CONDITIONAL — non-blocking)
+**Skip this step if**: Step 2.9 was skipped OR no `docker-compose.yml` was generated.
+
+Validate the generated Docker Compose file:
+1. Check if Docker Compose is available via Bash: `docker compose version`
+   - If not available: log `⚠ docker compose not found — skipping compose validation` and SKIP
+2. Run `docker compose config -q` via Bash to validate YAML syntax and variable references
+   - If valid: log `✓ docker-compose.yml syntax valid`
+   - If invalid: log the error output, attempt to fix the generated file, re-validate once
+3. Do NOT run `docker compose up` — it requires external services that may not be available locally
+
+**Non-blocking**: Validation failure is logged but does NOT stop the workflow.
 
 ### Step 2.10: Generate Monitoring Configuration (CONDITIONAL)
 **Skip this step if**: no system-nfr-decisions.md exists OR observability was not addressed in NFR artifacts.
@@ -216,6 +339,32 @@ If observability decisions exist in `aidlc-docs/construction/system-nfr-decision
    - Health check URL and expected response
    - Key metrics to monitor
    - Alerting recommendations
+
+### Step 2.11: Generate Post-Deployment Verification Script (CONDITIONAL)
+**Skip this step if**: no health endpoint is detected in `aidlc-docs/operations/deployment-checklist.md` or in generated application code.
+
+If at least one health endpoint exists:
+
+1. **Extract endpoints**:
+   - Use Grep to find health/readiness/liveness URLs from `aidlc-docs/operations/deployment-checklist.md`
+   - Use Grep to find health router definitions in generated application code (e.g., `/health`, `/ready`, `/livez`)
+   - Read `aidlc-docs/inception/application-design/` artifacts to extract top-level API endpoints for smoke testing
+
+2. **Generate `scripts/verify-deployment.sh`** at the **workspace root**:
+   - Takes a base URL as required argument: `./scripts/verify-deployment.sh https://your-domain.com`
+   - Defines a reusable `check` function that curls each endpoint, compares HTTP status to expected, and tallies PASS/FAIL
+   - **Health Checks section**: one `check` call per discovered health/readiness/liveness endpoint (expected 200)
+   - **API Smoke Tests section**: one `check` call per top-level API endpoint (GET-only, expected 200 or 404 for authenticated routes)
+   - **Performance section**: measures response time (ms) for the primary health endpoint using curl timing
+   - Reports a summary line: `Results: N passed, M failed`
+   - Exits with code 1 if any check failed, 0 if all passed
+   - Uses `set -euo pipefail`, `curl --max-time 10`, portable bash constructs
+   - Make the file executable via Bash (`chmod +x scripts/verify-deployment.sh`)
+
+3. **For Python projects (CONDITIONAL)**: if the detected stack is Python, also generate `scripts/verify_deployment.py`:
+   - Uses `httpx` for HTTP requests (with `sys.exit(1)` on failure)
+   - Same endpoint checks and PASS/FAIL reporting as the bash script
+   - Make the file executable via Bash (`chmod +x scripts/verify_deployment.py`)
 
 ### Step 3: Generate Developer README
 Write `aidlc-docs/operations/developer-readme.md` with:
@@ -241,7 +390,7 @@ Root README should include:
 - Link to detailed developer docs in aidlc-docs/operations/
 
 ### Step 4: Present for Review
-Present all generated artifacts:
+Present all generated artifacts and verification results:
 
 ```markdown
 # Operations Artifacts Generated
@@ -259,9 +408,23 @@ Present all generated artifacts:
 - `Dockerfile` (if applicable)
 - `docker-compose.yml` (if applicable, multi-unit only)
 - `README.md` (generated or updated)
+- `scripts/verify-deployment.sh` — post-deployment verification script (if health endpoint detected)
+
+## Verification Results
+- Dockerfile build: SUCCESS (image: <size>) / FAILED (<reason>) / SKIPPED
+- docker-compose config: VALID / INVALID (<reason>) / SKIPPED
+- CI pipeline lint: VALID / SKIPPED
+- .env completeness: <matched>/<total> matched / <N> missing, <N> unused
+
+## IaC Validation
+- IaC type: Terraform / CDK / CloudFormation / None
+- Files found: [count]
+- Validation: PASSED / FAILED / SKIPPED (tool not available)
+- Resource conflicts: [none / list]
+- Deployment order: [ordered list]
 
 > **REVIEW REQUIRED:**
-> Examine all generated files above.
+> Examine all generated files and verification results above.
 
 > **WHAT'S NEXT?**
 > 1. **Request Changes** — modify the operations artifacts

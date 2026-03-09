@@ -24,3 +24,56 @@ npm-debug.log*
 
 # MkDocs
 site/
+
+# Test Workflows
+paper/
+
+# ---- Application (Python / Docker) ----
+
+# Secrets -- never commit
+.env
+*.pem
+*.key
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# uv cache (lock file IS committed intentionally)
+.uv/
+
+# Type checking caches
+.mypy_cache/
+.ruff_cache/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# Docker named volumes (data dirs if mapped locally)
+postgres_data/
+redis_data/
+neo4j_data/
+
+# Distribution archives
+*.tar.gz
+*.whl
+
+# AWS credentials
+.aws/credentials

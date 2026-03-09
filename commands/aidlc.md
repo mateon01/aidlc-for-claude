@@ -28,7 +28,9 @@ CONSTRUCTION PHASE (HOW)
   → Infrastructure Design → Code Generation
   Build and Test (after all units)
 
-OPERATIONS PHASE (future placeholder)
+OPERATIONS PHASE (SHIP)
+  Deployment Checklist → CI/CD Pipeline → Dockerfile
+  → Developer README → Post-deployment Verification
 ```
 
 **Key Principles:**

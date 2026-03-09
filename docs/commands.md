@@ -34,13 +34,13 @@ All commands are prefixed with `/aidlc-for-claude:` when used in Claude Code.
 | `/aidlc-nfr-design` | 3 | NFR pattern design (per-unit) |
 | `/aidlc-infrastructure-design` | 4 | Infrastructure mapping (per-unit) |
 | `/aidlc-code-generation` | 5 | Code + test generation with multi-layer quality gate (per-unit, two-part) |
-| `/aidlc-build-and-test` | 6 | Build, test (with coverage), security scan, CGIG repair (when enabled), integration tests, and validate |
+| `/aidlc-build-and-test` | 6 | Build, test (with coverage), security scan, DB migration verification, CGIG repair (when enabled), integration tests, and validate |
 
 ### OPERATIONS Phase
 
 | Command | Description |
 |:--------|:------------|
-| `/aidlc-operations` | CI/CD pipeline, Dockerfile, .env.example, README, deployment checklist generation |
+| `/aidlc-operations` | CI/CD pipeline, Dockerfile, .env.example, README, deployment checklist, IaC validation, execution verification, post-deployment script |
 
 ### Standalone Utilities
 
@@ -81,8 +81,8 @@ Each command delegates to a specialized agent. Agents are tiered by model for co
 | `aidlc-for-claude:aidlc-nfr-designer` | NFR pattern and component design |
 | `aidlc-for-claude:aidlc-infra-designer` | Infrastructure service mapping |
 | `aidlc-for-claude:aidlc-code-generator` | Code + test generation with lint, type check, and design conformance |
-| `aidlc-for-claude:aidlc-build-test-engineer` | Build, test (coverage), security scan, CGIG compilation repair, integration/E2E test scaffolding |
-| `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist |
+| `aidlc-for-claude:aidlc-build-test-engineer` | Build, test (coverage), security scan, DB migration verification, CGIG compilation repair, integration/E2E test scaffolding |
+| `aidlc-for-claude:aidlc-ops-generator` | CI/CD, Dockerfile, Docker Compose, .env.example, README, deployment checklist, IaC validation, execution verification, post-deployment script |
 | `aidlc-for-claude:aidlc-pr-reviewer` | PR diff analysis for code quality, security, performance, and consistency |
 | `aidlc-for-claude:aidlc-ci-setup-engineer` | CI/CD pipeline, PR review workflow, and issue/PR template generation |
 | `aidlc-for-claude:aidlc-graph-analyzer` | Code dependency graph with multi-backend support (File/Neo4j/Neptune), 9-point verification, impact analysis, Mermaid visualization, PNG export, GraphRAG summary-based retrieval, and CGIG compilation repair |
